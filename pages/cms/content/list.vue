@@ -25,17 +25,23 @@
       </view>
       <view class="content-main">
         <template v-if="vk.pubfn.isNotNull(currentModel)">
-          <!-- 公共头部 -->
-          <view class="content-main-header">
-            <span class="content-main-title">{{ currentModel.type === 'collection' ? currentModel.name + '列表' : currentModel.name }}</span>
-            <el-button v-if="currentModel.type === 'collection'" type="primary" size="small" icon="el-icon-plus" @click="onAdd">添加{{ currentModel.name }}</el-button>
-          </view>
-          <!-- 集合类：内容表格组件 -->
-          <cms-content-table v-if="currentModel.type === 'collection'" ref="contentTable" :model="currentModel" @update="onUpdate"></cms-content-table>
-          <!-- 单页类：直接显示表单 -->
-          <view v-else-if="currentModel.type === 'single'" class="vk-page-card" style="margin-top: 10px">
-            <cms-content-form ref="singlePageForm" v-model="singlePageData" :model="currentModel" :form-type="singlePageFormType" @success="onSinglePageSuccess"></cms-content-form>
-          </view>
+          <!-- 集合类：内容表格组件（组件内含公共头部与添加按钮） -->
+          <cms-content-table v-if="currentModel.type === 'collection'" ref="contentTable" :model="currentModel" @add="onAdd" @update="onUpdate"></cms-content-table>
+          <!-- 单页类：公共头部 + 直接显示表单 -->
+          <template v-else-if="currentModel.type === 'single'">
+            <view class="content-main-header">
+              <span class="content-main-title">{{ currentModel.name }}</span>
+            </view>
+            <view class="vk-page-card" style="margin-top: 10px">
+              <cms-content-form
+                ref="singlePageForm"
+                v-model="singlePageData"
+                :model="currentModel"
+                :form-type="singlePageFormType"
+                @success="onSinglePageSuccess"
+              ></cms-content-form>
+            </view>
+          </template>
         </template>
         <view v-else class="content-empty">
           <i class="el-icon-document-copy" style="font-size: 48px; display: block; margin-bottom: 16px; color: #c0c4cc"></i>
@@ -47,7 +53,13 @@
     <!-- destroy-on-close 必须为 true：弹窗关闭时销毁内容，否则 tinymce 等第三方编辑器实例不会重新初始化，导致再次打开时无法显示内容/无法输入 -->
     <template v-if="vk.pubfn.isNotNull(currentModel)">
       <vk-data-dialog v-model="formDatas.contentForm.show" :title="formDatas.contentForm.title" width="1000px" mode="form" :close-on-click-modal="false" :destroy-on-close="true">
-        <cms-content-form v-model="formDatas.contentForm.data" :model="currentModel" :form-type="formDatas.contentForm.formType" @success="onFormSuccess"></cms-content-form>
+        <cms-content-form
+          v-model="formDatas.contentForm.data"
+          :model="currentModel"
+          :form-type="formDatas.contentForm.formType"
+          :extra-data="formDatas.contentForm.extraData"
+          @success="onFormSuccess"
+        ></cms-content-form>
       </vk-data-dialog>
     </template>
   </view>
@@ -63,7 +75,7 @@
         currentModel: {},
         searchKeyword: '',
         formDatas: {
-          contentForm: { show: false, title: '', formType: 'add', data: {} },
+          contentForm: { show: false, title: '', formType: 'add', data: {}, extraData: {} },
         },
         singlePageData: {},
         singlePageFormType: 'add',
@@ -148,11 +160,14 @@
         this.$message.success('保存成功');
         this.loadSinglePageData();
       },
-      onAdd() {
-        vk.pubfn.openForm('contentForm', { show: true, title: '添加' + this.currentModel.name, formType: 'add', data: {} }, this);
+      onAdd({ locale } = {}) {
+        // 多语言模型下新增的内容属于当前选中的语言，通过 extraData 注入表单默认数据（不能直接塞进 data，否则丢失 model_id/status 默认值）
+        let extraData = vk.pubfn.isNotNull(locale) ? { locale } : {};
+        vk.pubfn.openForm('contentForm', { show: true, title: '添加' + this.currentModel.name, formType: 'add', data: {}, extraData }, this);
       },
       onUpdate({ item }) {
-        vk.pubfn.openForm('contentForm', { show: true, title: '编辑' + this.currentModel.name, formType: 'update', data: item }, this);
+        // 编辑不改变内容自身已有的语言，故不传 extraData
+        vk.pubfn.openForm('contentForm', { show: true, title: '编辑' + this.currentModel.name, formType: 'update', data: item, extraData: {} }, this);
       },
       onFormSuccess() {
         vk.pubfn.closeForm('contentForm', this);

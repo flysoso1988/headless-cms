@@ -58,3 +58,17 @@ npm test            # 仅存桩，无实际测试
 ## 强制规则
 - 所有回复、文档、思考过程必须使用**简体中文**
 - 所有弹窗打开必须使用 `vk.pubfn.openForm` 方法，不得直接操作 `show` 属性
+
+## Agent skills
+
+### Issue tracker
+
+Issue 和 spec 追踪在本仓库的 GitHub Issues（`flysoso1988/headless-cms`），使用 `gh` CLI 操作。见 `docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+使用五个默认标签名，与角色名一致：`needs-triage` / `needs-info` / `ready-for-agent` / `ready-for-human` / `wontfix`。见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+单上下文布局：`CONTEXT.md` + `docs/adr/` 位于仓库根目录。见 `docs/agents/domain.md`。

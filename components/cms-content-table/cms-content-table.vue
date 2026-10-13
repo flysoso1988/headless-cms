@@ -1,9 +1,17 @@
 <template>
   <view class="cms-content-table">
+    <view class="content-main-header">
+      <span class="content-main-title">{{ model.name }}列表</span>
+      <el-button type="primary" size="small" icon="el-icon-plus" @click="addBtn">添加{{ model.name }}</el-button>
+    </view>
     <view class="vk-page-card" style="margin-top: 10px">
       <view class="vk-page-card-toolbar">
         <view class="toolbar-placeholder"></view>
         <view class="vk-page-card-actions">
+          <!-- 多语言模型才显示语言下拉，切换后按 locale 精确筛选并回到第一页（el-select 默认不可清空，故语言始终有值） -->
+          <el-select v-if="model.internationalization" v-model="queryForm1.formData.locale" size="small" class="locale-select" @change="onLocaleChange">
+            <el-option v-for="opt in localeOptions" :key="opt.value" :label="opt.label" :value="opt.value"></el-option>
+          </el-select>
           <el-popover placement="bottom-end" width="240" trigger="click" :visible.sync="columnPopoverVisible" popper-class="column-setting-popover" @show="onColumnPopoverShow">
             <view slot="reference" class="action-icon-btn">
               <vk-data-icon name="el-icon-setting"></vk-data-icon>
@@ -42,6 +50,12 @@
 <script>
   import cmsContentField from '@/common/function/cmsContentField.js';
   let vk = uni.vk;
+  // 内容语言候选清单（临时写死）与默认语言，是内容自身的属性，与后台界面语言无关，勿改为取 vk.pubfn.getLocale()
+  const LOCALE_OPTIONS = [
+    { value: 'zh-Hans', label: '简体中文' },
+    { value: 'en', label: '英文' },
+  ];
+  const DEFAULT_LOCALE = 'zh-Hans';
   export default {
     name: 'cms-content-table',
     props: {
@@ -57,6 +71,10 @@
     data() {
       return {
         columnPopoverVisible: false,
+        // 内容语言候选清单，供工具栏的语言下拉渲染
+        localeOptions: LOCALE_OPTIONS,
+        // 上一次生成配置时所属的模型，用于区分“切模型”与“同模型内重新生成”
+        lastConfigModelId: '',
         columnOptions: [],
         checkedCols: [],
         allColumns: [],
@@ -125,12 +143,30 @@
         this.table1.columns = allCols.filter((c) => this.checkedCols.includes(c.key));
         this.table1.action = this.contentAction + '/getList';
         if (searchCols.length === 0) searchCols.push({ key: 'title', title: '标题', type: 'text', width: 160, mode: '%%' });
+        // 多语言模型：语言下拉渲染在工具栏 setting 图标左侧，此处仅挂一条不渲染的 locale 规则列，
+        // 让 queryForm1.formData.locale 以完全匹配参与云端 where 条件（云函数无需为此改动）
+        let formData = { model_id: model._id };
+        if (model.internationalization) {
+          searchCols.push({ key: 'locale', title: '语言', mode: '=', hidden: true });
+          // 同一模型内重新生成配置（如调整显示字段）时保留当前语言，切换模型则重置为默认语言
+          let prevLocale = this.queryForm1.formData.locale;
+          formData.locale = this.lastConfigModelId === model._id && LOCALE_OPTIONS.some((o) => o.value === prevLocale) ? prevLocale : DEFAULT_LOCALE;
+        }
+        this.lastConfigModelId = model._id;
         searchCols.push({ key: 'model_id', title: '所属模型', hidden: true });
         this.queryForm1.columns = searchCols;
-        this.queryForm1.formData = Object.assign({ model_id: model._id }, this.extraData);
+        this.queryForm1.formData = Object.assign(formData, this.extraData);
         this.$nextTick(() => {
           if (this.$refs.table1) this.$refs.table1.refresh();
         });
+      },
+      addBtn() {
+        // 新增的内容归属于当前选中的语言（非多语言模型时无 locale）
+        this.$emit('add', { locale: this.queryForm1.formData.locale });
+      },
+      onLocaleChange() {
+        // 切换语言视为变更筛选条件，回到第一页重新查询
+        this.search();
       },
       updateBtn({ item }) {
         this.$emit('update', { item });
@@ -169,8 +205,26 @@
 </script>
 
 <style lang="scss" scoped>
+  .content-main-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 10px;
+  }
+
+  .content-main-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+  }
+
   .toolbar-placeholder {
     flex: 1;
+  }
+
+  .locale-select {
+    width: 110px;
+    margin-right: 10px;
   }
 
   .action-icon-btn {
