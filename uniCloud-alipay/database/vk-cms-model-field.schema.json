@@ -1,0 +1,148 @@
+{
+  "bsonType": "object",
+  "required": ["model_id", "key", "title", "type"],
+  "permission": {
+    "read": true,
+    "create": "'admin' in auth.role || 'UPDATE_CMS_MODEL' in auth.permission",
+    "update": "'admin' in auth.role || 'UPDATE_CMS_MODEL' in auth.permission",
+    "delete": "'admin' in auth.role || 'UPDATE_CMS_MODEL' in auth.permission"
+  },
+  "properties": {
+    "_id": {
+      "description": "存储文档 ID，系统自动生成"
+    },
+    "model_id": {
+      "bsonType": "string",
+      "title": "所属模型ID",
+      "foreignKey": "vk-cms-model._id"
+    },
+    "key": {
+      "bsonType": "string",
+      "title": "字段标识",
+      "trim": "both",
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "title": {
+      "bsonType": "string",
+      "title": "字段名称",
+      "trim": "both",
+      "maxLength": 50
+    },
+    "type": {
+      "bsonType": "string",
+      "title": "字段类型",
+      "defaultValue": "text",
+      "enum": [
+        { "value": "text", "text": "单行文本" },
+        { "value": "textarea", "text": "多行文本" },
+        { "value": "number", "text": "数字" },
+        { "value": "switch", "text": "开关" },
+        { "value": "radio", "text": "单选" },
+        { "value": "checkbox", "text": "多选" },
+        { "value": "select", "text": "下拉选择" },
+        { "value": "file-select", "text": "文件选择" },
+        { "value": "date", "text": "日期" },
+        { "value": "datetime", "text": "日期时间" },
+        { "value": "color", "text": "颜色" },
+        { "value": "editor", "text": "富文本" },
+        { "value": "relation", "text": "关联模型" },
+        { "value": "remote-select", "text": "远程选择" },
+        { "value": "json", "text": "JSON" },
+        { "value": "component", "text": "组件" }
+      ]
+    },
+    "data": {
+      "bsonType": "array",
+      "title": "选项数据",
+      "description": "单选/多选/下拉选择类型的选项列表",
+      "items": {
+        "bsonType": "object",
+        "properties": {
+          "label": {
+            "bsonType": "string",
+            "title": "选项名"
+          },
+          "value": {
+            "bsonType": "string",
+            "title": "选项值"
+          }
+        }
+      }
+    },
+    "fileType": {
+      "bsonType": "string",
+      "title": "文件类型",
+      "enum": [
+        { "value": "image", "text": "图片" },
+        { "value": "video", "text": "视频" },
+        { "value": "other", "text": "其他文件" }
+      ]
+    },
+    "relation": {
+      "bsonType": "string",
+      "title": "关联模型",
+      "description": "关联模型时选择的模型_id"
+    },
+    "multiple": {
+      "bsonType": "bool",
+      "title": "是否多选",
+      "defaultValue": false
+    },
+    "multipleLimit": {
+      "bsonType": "int",
+      "title": "可选数量"
+    },
+    "default_value": {
+      "bsonType": "string",
+      "title": "默认值",
+      "description": "该字段的默认值"
+    },
+    "condition": {
+      "bsonType": "array",
+      "title": "显示条件",
+      "description": "字段显示条件，用于控制字段在表单中的显示/隐藏",
+      "items": {
+        "bsonType": "object",
+        "required": ["field", "operator", "value"],
+        "properties": {
+          "field": {
+            "bsonType": "string",
+            "title": "字段标识",
+            "description": "要判断的字段标识"
+          },
+          "operator": {
+            "bsonType": "string",
+            "title": "条件运算符",
+            "enum": ["=", "==", ">", ">=", "<", "<=", "!=", "{in}", "{nin}", "&&", "||"]
+          },
+          "value": {
+            "bsonType": "string",
+            "title": "比较值",
+            "description": "要比较的值"
+          }
+        }
+      }
+    },
+    "required": {
+      "bsonType": "bool",
+      "title": "是否必填",
+      "defaultValue": false
+    },
+    "sort": {
+      "bsonType": "int",
+      "title": "排序",
+      "defaultValue": 100
+    },
+    "_add_time": {
+      "bsonType": "timestamp",
+      "title": "创建时间",
+      "defaultValue": { "$env": "now" }
+    },
+    "_add_time_str": {
+      "bsonType": "string",
+      "title": "创建时间字符串"
+    }
+  },
+  "version": "0.0.1"
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "model_article",
+    "name": "文章",
+    "key": "article",
+    "type": "collection",
+    "status": true,
+    "draft": false,
+    "internationalization": false,
+    "display_fields": [],
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  }
+]

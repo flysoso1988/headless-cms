@@ -1,0 +1,72 @@
+{
+  "bsonType": "object",
+  "required": ["name", "key"],
+  "permission": {
+    "read": true,
+    "create": "'admin' in auth.role || 'CREATE_CMS_MODEL' in auth.permission",
+    "update": "'admin' in auth.role || 'UPDATE_CMS_MODEL' in auth.permission",
+    "delete": "'admin' in auth.role || 'DELETE_CMS_MODEL' in auth.permission"
+  },
+  "properties": {
+    "_id": {
+      "description": "存储文档 ID，系统自动生成"
+    },
+    "name": {
+      "bsonType": "string",
+      "title": "模型名称",
+      "trim": "both",
+      "maxLength": 50
+    },
+    "key": {
+      "bsonType": "string",
+      "title": "模型标识",
+      "trim": "both",
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "type": {
+      "bsonType": "string",
+      "title": "模型类型",
+      "defaultValue": "collection",
+      "enum": [
+        { "value": "collection", "text": "集合类型" },
+        { "value": "single", "text": "单页类型" },
+        { "value": "component", "text": "组件类型" }
+      ]
+    },
+    "status": {
+      "bsonType": "bool",
+      "title": "状态",
+      "defaultValue": true
+    },
+    "draft": {
+      "bsonType": "bool",
+      "title": "草稿箱",
+      "defaultValue": false
+    },
+    "internationalization": {
+      "bsonType": "bool",
+      "title": "多语言",
+      "defaultValue": false
+    },
+    "display_fields": {
+      "bsonType": "array",
+      "title": "内容列表显示字段",
+      "description": "内容列表勾选显示的字段标识，为空表示全部显示",
+      "items": {
+        "bsonType": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
+    "_add_time": {
+      "bsonType": "timestamp",
+      "title": "创建时间",
+      "defaultValue": { "$env": "now" }
+    },
+    "_add_time_str": {
+      "bsonType": "string",
+      "title": "创建时间字符串"
+    }
+  },
+  "version": "0.0.1"
+}

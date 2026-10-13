@@ -1,0 +1,92 @@
+[
+  {
+    "_id": "field_article_title",
+    "model_id": "model_article",
+    "key": "title",
+    "title": "标题",
+    "type": "text",
+    "required": true,
+    "sort": 10,
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  },
+  {
+    "_id": "field_article_content",
+    "model_id": "model_article",
+    "key": "content",
+    "title": "内容",
+    "type": "editor",
+    "required": true,
+    "sort": 20,
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  },
+  {
+    "_id": "field_article_cover",
+    "model_id": "model_article",
+    "key": "cover",
+    "title": "封面图",
+    "type": "file-select",
+    "fileType": "image",
+    "multiple": false,
+    "required": false,
+    "sort": 30,
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  },
+  {
+    "_id": "field_article_summary",
+    "model_id": "model_article",
+    "key": "summary",
+    "title": "摘要",
+    "type": "textarea",
+    "required": false,
+    "sort": 40,
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  },
+  {
+    "_id": "field_article_author",
+    "model_id": "model_article",
+    "key": "author",
+    "title": "作者",
+    "type": "text",
+    "required": false,
+    "sort": 50,
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  },
+  {
+    "_id": "field_article_publish_date",
+    "model_id": "model_article",
+    "key": "publish_date",
+    "title": "发布日期",
+    "type": "date",
+    "required": false,
+    "sort": 60,
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  },
+  {
+    "_id": "field_article_is_top",
+    "model_id": "model_article",
+    "key": "is_top",
+    "title": "是否置顶",
+    "type": "switch",
+    "required": false,
+    "sort": 70,
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  },
+  {
+    "_id": "field_article_sort",
+    "model_id": "model_article",
+    "key": "sort",
+    "title": "排序",
+    "type": "number",
+    "required": false,
+    "sort": 80,
+    "_add_time": 1700000000000,
+    "_add_time_str": "2023-11-15 00:00:00"
+  }
+]

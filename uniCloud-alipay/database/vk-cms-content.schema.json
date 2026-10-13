@@ -1,0 +1,44 @@
+{
+  "bsonType": "object",
+  "required": ["model_id"],
+  "permission": {
+    "read": true,
+    "create": "'admin' in auth.role || 'CREATE_CMS_ENTRY' in auth.permission",
+    "update": "'admin' in auth.role || 'UPDATE_CMS_ENTRY' in auth.permission",
+    "delete": "'admin' in auth.role || 'DELETE_CMS_ENTRY' in auth.permission"
+  },
+  "properties": {
+    "_id": {
+      "description": "存储文档 ID，系统自动生成"
+    },
+    "model_id": {
+      "bsonType": "string",
+      "title": "所属模型ID",
+      "foreignKey": "vk-cms-model._id"
+    },
+    "document_id": {
+      "bsonType": "string",
+      "title": "文档ID"
+    },
+    "locale": {
+      "bsonType": "string",
+      "title": "语言"
+    },
+    "status": {
+      "bsonType": "bool",
+      "title": "状态",
+      "defaultValue": true
+    },
+    "user_id": {
+      "bsonType": "string",
+      "title": "创建用户ID",
+      "foreignKey": "uni-id-users._id"
+    },
+    "_add_time": {
+      "bsonType": "timestamp",
+      "title": "创建时间",
+      "defaultValue": { "$env": "now" }
+    }
+  },
+  "version": "0.0.1"
+}
