@@ -8,7 +8,6 @@
       <view class="vk-page-card-toolbar">
         <view class="toolbar-placeholder"></view>
         <view class="vk-page-card-actions">
-          <!-- 多语言模型才显示语言下拉，切换后按 locale 精确筛选并回到第一页（el-select 默认不可清空，故语言始终有值） -->
           <el-select v-if="model.internationalization" v-model="queryForm1.formData.locale" size="small" class="locale-select" @change="onLocaleChange">
             <el-option v-for="opt in localeOptions" :key="opt.value" :label="opt.label" :value="opt.value"></el-option>
           </el-select>
