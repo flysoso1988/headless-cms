@@ -45,6 +45,20 @@
     ]
   },
   {
+    "menu_id": "setting",
+    "name": "设置",
+    "icon": "el-icon-s-tools",
+    "url": "",
+    "children": [
+      {
+        "menu_id": "setting-i18n",
+        "name": "国际化",
+        "icon": "",
+        "url": "/pages/setting/i18n/list"
+      }
+    ]
+  },
+  {
     "menu_id": "components-admin",
     "name": "VK框架 组件演示",
     "comment": "以下菜单在正式环境不会出现!",

@@ -1,0 +1,39 @@
+{
+  "bsonType": "object",
+  "required": ["name", "locale"],
+  "permission": {
+    "read": true,
+    "create": "'admin' in auth.role || 'CREATE_CMS_I18N' in auth.permission",
+    "update": "'admin' in auth.role || 'UPDATE_CMS_I18N' in auth.permission",
+    "delete": "'admin' in auth.role || 'DELETE_CMS_I18N' in auth.permission"
+  },
+  "properties": {
+    "_id": {
+      "description": "存储文档 ID，系统自动生成"
+    },
+    "name": {
+      "bsonType": "string",
+      "title": "显示名称",
+      "trim": "both",
+      "maxLength": 50
+    },
+    "locale": {
+      "bsonType": "string",
+      "title": "语言",
+      "trim": "both",
+      "maxLength": 50,
+      "pattern": "^[a-zA-Z][a-zA-Z0-9-]*$"
+    },
+    "is_default": {
+      "bsonType": "bool",
+      "title": "是否默认",
+      "defaultValue": false
+    },
+    "_add_time": {
+      "bsonType": "timestamp",
+      "title": "创建时间",
+      "defaultValue": { "$env": "now" }
+    }
+  },
+  "version": "0.0.1"
+}

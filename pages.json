@@ -1,6 +1,8 @@
 {
   "pages": [
-    { "path": "pages/index/index" },
+    {
+      "path": "pages/index/index"
+    },
     {
       "path": "pages/login/index",
       "style": {
@@ -12,49 +14,156 @@
   ],
   "subPackages": [
     {
+      "root": "pages/cms",
+      "pages": [
+        {
+          "path": "model/list",
+          "style": {
+            "navigationBarTitleText": "模型管理"
+          }
+        },
+        {
+          "path": "content/list",
+          "style": {
+            "navigationBarTitleText": "内容管理"
+          }
+        },
+        {
+          "path": "content/edit",
+          "style": {
+            "navigationBarTitleText": "内容编辑"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages/setting",
+      "pages": [
+        {
+          "path": "i18n/list"
+        }
+      ]
+    },
+    {
       "root": "pages/design",
       "pages": [
-        { "path": "list", "style": { "navigationBarTitleText": "设计列表" } },
-        { "path": "edit", "style": { "navigationBarTitleText": "设计编辑", "topWindow": false, "leftWindow": false } }
+        {
+          "path": "list",
+          "style": {
+            "navigationBarTitleText": "设计列表"
+          }
+        },
+        {
+          "path": "edit",
+          "style": {
+            "navigationBarTitleText": "设计编辑",
+            "topWindow": false,
+            "leftWindow": false
+          }
+        }
       ]
     },
     {
       "root": "pages/vk-stats",
       "pages": [
-        { "path": "user/overview", "style": { "navigationBarTitleText": "用户统计" } },
-        { "path": "user/log", "style": { "navigationBarTitleText": "用户登录日志" } },
-        { "path": "pay/overview", "style": { "navigationBarTitleText": "支付统计" } },
-        { "path": "pay/ranking", "style": { "navigationBarTitleText": "用户价值排行" } },
-        { "path": "pay/list", "style": { "navigationBarTitleText": "支付订单明细" } },
-        { "path": "error/list", "style": { "navigationBarTitleText": "云端错误统计" } }
-      ]
-    },
-    {
-      "root": "pages/cms",
-      "pages": [
-        { "path": "model/list", "style": { "navigationBarTitleText": "模型管理" } },
-        { "path": "content/list", "style": { "navigationBarTitleText": "内容管理" } },
-        { "path": "content/edit", "style": { "navigationBarTitleText": "内容编辑" } }
+        {
+          "path": "user/overview",
+          "style": {
+            "navigationBarTitleText": "用户统计"
+          }
+        },
+        {
+          "path": "user/log",
+          "style": {
+            "navigationBarTitleText": "用户登录日志"
+          }
+        },
+        {
+          "path": "pay/overview",
+          "style": {
+            "navigationBarTitleText": "支付统计"
+          }
+        },
+        {
+          "path": "pay/ranking",
+          "style": {
+            "navigationBarTitleText": "用户价值排行"
+          }
+        },
+        {
+          "path": "pay/list",
+          "style": {
+            "navigationBarTitleText": "支付订单明细"
+          }
+        },
+        {
+          "path": "error/list",
+          "style": {
+            "navigationBarTitleText": "云端错误统计"
+          }
+        }
       ]
     },
     {
       "root": "pages_plugs",
       "pages": [
-        { "path": "error/404", "style": { "navigationBarTitleText": "页面不存在" } },
-        { "path": "error/403", "style": { "navigationBarTitleText": "无权访问" } },
-        { "path": "error/500", "style": { "navigationBarTitleText": "服务器出错了" } },
-        { "path": "system/user/list" },
-        { "path": "system/role/list" },
-        { "path": "system/permission/list" },
-        { "path": "system/menu/list" },
-        { "path": "system/app/list" },
-        { "path": "system/app-upgrade-center/list" },
-        { "path": "system_uni/vk-global-data" },
-        { "path": "system_uni/opendb-admin-log" },
-        { "path": "system_uni/vk-components-dynamic" },
-        { "path": "system_uni/uni-id-files/list" },
-        { "path": "system_uni/vk-ws-connection" },
-        { "path": "system_uni/lucky-draw/list", "style": { "navigationBarTitleText": "抽奖活动" } }
+        {
+          "path": "error/404",
+          "style": {
+            "navigationBarTitleText": "页面不存在"
+          }
+        },
+        {
+          "path": "error/403",
+          "style": {
+            "navigationBarTitleText": "无权访问"
+          }
+        },
+        {
+          "path": "error/500",
+          "style": {
+            "navigationBarTitleText": "服务器出错了"
+          }
+        },
+        {
+          "path": "system/user/list"
+        },
+        {
+          "path": "system/role/list"
+        },
+        {
+          "path": "system/permission/list"
+        },
+        {
+          "path": "system/menu/list"
+        },
+        {
+          "path": "system/app/list"
+        },
+        {
+          "path": "system/app-upgrade-center/list"
+        },
+        {
+          "path": "system_uni/vk-global-data"
+        },
+        {
+          "path": "system_uni/opendb-admin-log"
+        },
+        {
+          "path": "system_uni/vk-components-dynamic"
+        },
+        {
+          "path": "system_uni/uni-id-files/list"
+        },
+        {
+          "path": "system_uni/vk-ws-connection"
+        },
+        {
+          "path": "system_uni/lucky-draw/list",
+          "style": {
+            "navigationBarTitleText": "抽奖活动"
+          }
+        }
       ]
     }
   ],
