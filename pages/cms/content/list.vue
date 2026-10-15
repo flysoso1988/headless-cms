@@ -49,19 +49,6 @@
         </view>
       </view>
     </view>
-    <!-- 内容表单弹窗（表单组件仅封装 vk-data-form，弹窗由页面承载） -->
-    <!-- destroy-on-close 必须为 true：弹窗关闭时销毁内容，否则 tinymce 等第三方编辑器实例不会重新初始化，导致再次打开时无法显示内容/无法输入 -->
-    <template v-if="vk.pubfn.isNotNull(currentModel)">
-      <vk-data-dialog v-model="formDatas.contentForm.show" :title="formDatas.contentForm.title" width="1000px" mode="form" :close-on-click-modal="false" :destroy-on-close="true">
-        <cms-content-form
-          v-model="formDatas.contentForm.data"
-          :model="currentModel"
-          :form-type="formDatas.contentForm.formType"
-          :extra-data="formDatas.contentForm.extraData"
-          @success="onFormSuccess"
-        ></cms-content-form>
-      </vk-data-dialog>
-    </template>
   </view>
 </template>
 
@@ -74,9 +61,8 @@
         filteredModels: [],
         currentModel: {},
         searchKeyword: '',
-        formDatas: {
-          contentForm: { show: false, title: '', formType: 'add', data: {}, extraData: {} },
-        },
+        // 从内容编辑页返回后才需要刷新表格，避免页面首次显示时重复请求
+        needRefreshTable: false,
         singlePageData: {},
         singlePageFormType: 'add',
         singlePageSaving: false,
@@ -100,6 +86,12 @@
       vk = this.vk;
       this.options = options;
       this.init();
+    },
+    // 从内容编辑页返回时刷新表格，展示编辑后的最新数据
+    onShow() {
+      if (!this.needRefreshTable) return;
+      this.needRefreshTable = false;
+      if (this.$refs.contentTable) this.$refs.contentTable.refresh();
     },
     methods: {
       init() {
@@ -161,17 +153,17 @@
         this.loadSinglePageData();
       },
       onAdd({ locale } = {}) {
-        // 多语言模型下新增的内容属于当前选中的语言，通过 extraData 注入表单默认数据（不能直接塞进 data，否则丢失 model_id/status 默认值）
-        let extraData = vk.pubfn.isNotNull(locale) ? { locale } : {};
-        vk.pubfn.openForm('contentForm', { show: true, title: '添加' + this.currentModel.name, formType: 'add', data: {}, extraData }, this);
+        // 多语言模型下新增的内容属于当前选中的语言，通过参数传给编辑页注入表单默认数据
+        let url = '/pages/cms/content/edit?type=add&model_id=' + this.currentModel._id;
+        if (vk.pubfn.isNotNull(locale)) url += '&locale=' + locale;
+        this.toContentEditPage(url);
       },
       onUpdate({ item }) {
-        // 编辑不改变内容自身已有的语言，故不传 extraData
-        vk.pubfn.openForm('contentForm', { show: true, title: '编辑' + this.currentModel.name, formType: 'update', data: item, extraData: {} }, this);
+        this.toContentEditPage('/pages/cms/content/edit?type=update&model_id=' + this.currentModel._id + '&id=' + item._id);
       },
-      onFormSuccess() {
-        vk.pubfn.closeForm('contentForm', this);
-        this.$refs.contentTable.refresh();
+      toContentEditPage(url) {
+        this.needRefreshTable = true;
+        vk.navigateTo(url);
       },
     },
   };

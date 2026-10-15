@@ -55,7 +55,7 @@
               </view>
             </view>
           </draggable>
-          <view v-if="!currentModel.fields || currentModel.fields.length === 0" class="empty-fields">暂无字段，点击"添加字段"添加</view>
+          <view v-if="!currentModel.fields || currentModel.fields.length === 0" class="empty-fields">暂无字段，点击"添加字段"添加 </view>
         </view>
       </view>
       <view v-else class="empty-content">
@@ -92,24 +92,72 @@
   import draggable from 'vuedraggable';
 
   const fieldTypeData = [
-    { value: 'text', label: '单行文本' },
-    { value: 'textarea', label: '多行文本' },
-    { value: 'number', label: '数字' },
-    { value: 'switch', label: '开关' },
-    { value: 'radio', label: '单选' },
-    { value: 'checkbox', label: '多选' },
-    { value: 'select', label: '下拉选择' },
-    { value: 'file-select', label: '文件选择' },
-    { value: 'date', label: '日期' },
-    { value: 'datetime', label: '日期时间' },
-    { value: 'color', label: '颜色' },
-    { value: 'editor', label: '富文本' },
-    { value: 'remote-select', label: '远程选择' },
-    { value: 'json', label: 'JSON' },
-    { value: 'component', label: '组件' },
+    {
+      value: 'text',
+      label: '单行文本',
+    },
+    {
+      value: 'textarea',
+      label: '多行文本',
+    },
+    {
+      value: 'number',
+      label: '数字',
+    },
+    {
+      value: 'switch',
+      label: '开关',
+    },
+    {
+      value: 'radio',
+      label: '单选',
+    },
+    {
+      value: 'checkbox',
+      label: '多选',
+    },
+    {
+      value: 'select',
+      label: '下拉选择',
+    },
+    {
+      value: 'file-select',
+      label: '文件选择',
+    },
+    {
+      value: 'date',
+      label: '日期',
+    },
+    {
+      value: 'datetime',
+      label: '日期时间',
+    },
+    {
+      value: 'color',
+      label: '颜色',
+    },
+    {
+      value: 'editor',
+      label: '富文本',
+    },
+    {
+      value: 'remote-select',
+      label: '远程选择',
+    },
+    {
+      value: 'json',
+      label: 'JSON',
+    },
+    {
+      value: 'component',
+      label: '组件',
+    },
   ];
   export default {
-    components: { fieldUpdate, draggable },
+    components: {
+      fieldUpdate,
+      draggable,
+    },
     data() {
       return {
         loading: false,
@@ -118,7 +166,12 @@
         currentModel: null,
         searchKeyword: '',
         formDatas: {
-          fieldUpdate: { show: false, mode: 'add', item: {}, modelId: '' },
+          fieldUpdate: {
+            show: false,
+            mode: 'add',
+            item: {},
+            modelId: '',
+          },
         },
         modelForm: {
           data: {
@@ -127,10 +180,30 @@
           props: {
             action: '',
             columns: [
-              { key: 'name', title: '模型名称', type: 'text', placeholder: '请输入模型名称' },
-              { key: 'key', title: '模型标识', type: 'text', placeholder: '英文小写，如 product' },
-              { key: 'draft', title: '草稿箱', type: 'switch', defaultValue: true },
-              { key: 'internationalization', title: '多语言', type: 'switch', defaultValue: false },
+              {
+                key: 'name',
+                title: '模型名称',
+                type: 'text',
+                placeholder: '请输入模型名称',
+              },
+              {
+                key: 'key',
+                title: '模型标识',
+                type: 'text',
+                placeholder: '英文小写，如 product',
+              },
+              {
+                key: 'draft',
+                title: '草稿箱',
+                type: 'switch',
+                defaultValue: true,
+              },
+              {
+                key: 'internationalization',
+                title: '多语言',
+                type: 'switch',
+                defaultValue: false,
+              },
             ],
             rules: {},
             formType: '',
@@ -143,9 +216,18 @@
       groupedModels() {
         const groups = [];
         const typeConfig = [
-          { type: 'collection', label: '集合' },
-          { type: 'single', label: '单页' },
-          { type: 'component', label: '组件' },
+          {
+            type: 'collection',
+            label: '集合',
+          },
+          {
+            type: 'single',
+            label: '单页',
+          },
+          {
+            type: 'component',
+            label: '组件',
+          },
         ];
         for (const config of typeConfig) {
           const items = this.filteredModels.filter((m) => m.type === config.type);
@@ -169,16 +251,18 @@
         this.loadModels();
       },
       resetModelForm() {
-        vk.pubfn.resetForm({ modelForm: originalModelForm }, this);
+        vk.pubfn.resetForm(
+          {
+            modelForm: originalModelForm,
+          },
+          this
+        );
       },
       loadModels() {
         const that = this;
         vk.callFunction({
-          url: 'admin/cms/model/sys/getList',
+          url: 'admin/cms/sys.model.getList',
           title: '请求中...',
-          data: {
-            pageSize: 200,
-          },
           success: (res) => {
             this.models = res.rows || [];
             this.filterModels();
@@ -208,66 +292,88 @@
       },
       addBtn(type) {
         this.resetModelForm();
-        this.modelForm.props.action = 'admin/cms/model/sys/add';
+        this.modelForm.props.action = 'admin/cms/sys.model.add';
         this.modelForm.props.formType = 'add';
         this.modelForm.props.title = '新建模型';
         this.modelForm.data.type = type;
         this.modelForm.props.show = true;
       },
       updateBtn(item) {
-        this.modelForm.props.action = 'admin/cms/model/sys/update';
+        this.modelForm.props.action = 'admin/cms/sys.model.update';
         this.modelForm.props.formType = 'update';
         this.modelForm.props.title = '编辑模型';
         this.modelForm.props.show = true;
         this.modelForm.data = item;
       },
+      deleteModel(item) {
+        vk.confirm(`确定要删除模型"${item.name}"吗？`, '提示', '确定', '取消', (res) => {
+          if (res.confirm) {
+            vk.callFunction({
+              url: 'admin/cms/sys.model.delete',
+              data: {
+                _id: item._id,
+              },
+              success: (res) => {
+                if (this.currentModel && this.currentModel._id === item._id) {
+                  this.currentModel = null;
+                }
+                this.models = this.models.filter((f) => f._id !== item._id);
+                this.filterModels();
+                vk.toast('删除成功');
+              },
+            });
+          }
+        });
+      },
       addField() {
         if (!this.currentModel) return;
         const { _id, fields = [] } = this.currentModel;
-        vk.pubfn.openForm('fieldUpdate', { mode: 'add', item: { model_id: _id, sort: fields.length } }, this);
+        vk.pubfn.openForm(
+          'fieldUpdate',
+          {
+            mode: 'add',
+            item: {
+              model_id: _id,
+              sort: fields.length,
+            },
+          },
+          this
+        );
       },
       editField(row) {
-        vk.pubfn.openForm('fieldUpdate', { mode: 'update', item: row }, this);
-      },
-      deleteModel(item) {
-        this.$confirm(`确定要删除模型"${item.name}"吗？删除后该模型下的所有字段也将被删除。`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        }).then(() => {
-          vk.callFunction({
-            url: 'admin/cms/model/sys/delete',
-            data: { _id: item._id },
-            success: (res) => {
-              if (this.currentModel && this.currentModel._id === item._id) {
-                this.currentModel = null;
-              }
-              vk.toast('删除成功');
-              this.loadModels();
-            },
-          });
-        });
+        vk.pubfn.openForm(
+          'fieldUpdate',
+          {
+            mode: 'update',
+            item: row,
+          },
+          this
+        );
       },
       deleteField(row) {
-        this.$confirm(`确定要删除字段"${row.title}"吗？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        }).then(async () => {
-          await vk.callFunction({
-            url: 'admin/cms/fields/sys/delete',
-            data: { _id: row._id },
-          });
-          vk.toast('删除成功');
-          this.loadModels();
+        vk.confirm(`确定要删除字段"${row.title}"吗？`, '提示', '确定', '取消', (res) => {
+          if (res.confirm) {
+            vk.callFunction({
+              url: 'admin/cms/sys.field.delete',
+              data: {
+                _id: row._id,
+              },
+              success: (res) => {
+                this.currentModel.fields = this.currentModel.fields.filter(f=>f._id!==row._id)
+                vk.toast('删除成功');
+              },
+            });
+          }
         });
       },
       sortHandle() {
         const ids = vk.pubfn.arrayObjectGetArray(this.currentModel.fields, '_id');
         console.log('ids:', ids);
         vk.callFunction({
-          url: 'admin/cms/fields/sys/sort',
-          data: { ids },
+          url: 'admin/cms/sys.field.sort',
+          data: {
+            ids,
+          },
         });
       },
     },
@@ -457,6 +563,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
     &:hover {
       background-color: #f6f6f9;
     }

@@ -2,11 +2,12 @@
   <vk-data-form
     v-model="formData"
     ref="formRef"
-    :rules="rules"
+    :rules="formConfig.rules"
     :action="finalAction"
     :form-type="formType"
-    :columns="columns"
+    :columns="formConfig.columns"
     :label-width="labelWidth"
+    :footer-show="footerShow"
     @success="onFormSuccess"
   ></vk-data-form>
 </template>
@@ -31,16 +32,21 @@
       // 附加固定数据，会合并进新增表单默认数据（如 { site_id: 'xxx' }）
       extraData: { type: Object, default: () => ({}) },
       labelWidth: { type: String, default: '120px' },
+      // 是否显示组件自带的底部按钮，页面自行渲染保存/返回按钮时传 false
+      footerShow: { type: Boolean, default: true },
     },
     watch: {
       value: {
-        // 新增模式下，外部传入空数据时自动生成默认数据（用于弹窗打开时初始化）
-        handler(val) {
-          if (this.formType === 'add' && (!val || Object.keys(val).length === 0)) {
-            this.$emit('input', this.buildDefaultData());
-          }
+        handler() {
+          this.syncDefaultData();
         },
         immediate: true,
+      },
+      'model._id'() {
+        this.syncDefaultData();
+      },
+      formType() {
+        this.syncDefaultData();
       },
     },
     computed: {
@@ -55,15 +61,7 @@
       finalAction() {
         return this.action || this.contentAction + '/' + this.formType;
       },
-      columns() {
-        return this.buildFormConfig().columns;
-      },
-      rules() {
-        return this.buildFormConfig().rules;
-      },
-    },
-    methods: {
-      buildFormConfig() {
+      formConfig() {
         let model = this.model;
         if (!model || !model._id) return { columns: [], rules: {} };
         let fields = model.fields || [];
@@ -78,17 +76,34 @@
             rules[f.key] = [{ required: true, message: f.title + '不能为空', trigger: ['blur', 'change'] }];
           }
         });
-        formCols.push({ key: 'status', title: '发布', type: 'switch', defaultValue: true });
+        formCols.push({ key: 'status', title: '发布', type: 'switch', defaultValue: !model.draft });
         return { columns: formCols, rules };
       },
+    },
+    methods: {
       buildDefaultData() {
-        let data = { model_id: this.model._id, status: this.model.draft ? false : true };
-        (this.model.fields || []).forEach((f) => {
+        let model = this.model || {};
+        let data = { model_id: model._id, status: !model.draft };
+        (model.fields || []).forEach((f) => {
           if (f.default_value !== undefined && f.default_value !== null && f.default_value !== '') {
             data[f.key] = f.default_value;
           }
         });
         return Object.assign(data, this.extraData);
+      },
+      /**
+       * 新增模式下把模型默认值补齐进表单数据。
+       * model 与 extraData 均由页面异步传入，组件初始化时可能还是空对象，
+       * 因此默认数据需要在依赖就绪后重新同步，而不是只在 created 时构建一次。
+       */
+      syncDefaultData() {
+        if (this.formType !== 'add') return;
+        let model = this.model;
+        if (!model || !model._id) return;
+        let current = this.value || {};
+        let next = Object.assign({}, this.buildDefaultData(), current);
+        let changed = Object.keys(next).length !== Object.keys(current).length || next.model_id !== current.model_id;
+        if (changed) this.$emit('input', next);
       },
       /**
        * 获取完整的表单配置（供弹窗场景 openForm 展开使用）
@@ -100,8 +115,8 @@
         return {
           action: this.contentAction + '/' + (isUpdate ? 'update' : 'add'),
           formType: isUpdate ? 'update' : 'add',
-          columns: this.columns,
-          rules: this.rules,
+          columns: this.formConfig.columns,
+          rules: this.formConfig.rules,
           data: isUpdate ? item || {} : this.buildDefaultData(),
         };
       },
@@ -111,7 +126,7 @@
       },
       /** 提交表单（供自定义提交按钮调用） */
       submit() {
-        if (this.$refs.formRef) this.$refs.formRef.submit();
+        if (this.$refs.formRef) this.$refs.formRef.submitForm();
       },
       onFormSuccess() {
         this.$emit('success');

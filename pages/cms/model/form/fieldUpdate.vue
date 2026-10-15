@@ -28,9 +28,6 @@
       <template v-slot:condition="{ form, keyName }">
         <view style="display: flex; padding-bottom: 22px">
           <div style="flex: 1">
-            <!-- <el-select v-model="form[keyName].label" placeholder="请选择" style="width: 100%">
-              <el-option label="选项" value="1"></el-option>
-            </el-select> -->
             <el-input v-model="form[keyName].label" placeholder="请输入字段标识"></el-input>
           </div>
           <div class="line">-</div>
@@ -78,18 +75,18 @@
           title: '标题',
           submitText: '确定',
           cancelText: '关闭',
-          showCancel: false,
+          showCancel: true,
           top: '1vh',
           width: '1200px',
         },
         form1: {
-          data: {},
+          data: {fileType:'image'},
           props: {
             action: '',
             formType: '',
             columns: [
               { key: 'title', title: '字段名称', type: 'text', placeholder: '请输入字段名称', span: 12 },
-              { key: 'key', title: '字段标识', type: 'text', placeholder: '英文小写，如 title', span: 12 },
+              { key: 'key', title: '字段标识', type: 'text', placeholder: '英文小写，如 title', span: 12, show: ['add'] },
               {
                 key: 'type',
                 title: '字段类型',
@@ -140,6 +137,7 @@
                   { value: 'video', label: '视频' },
                   { value: 'other', label: '其他文件' },
                 ],
+                defaultIndex:0,
                 showRule: 'type==file-select',
               },
               { key: 'multiple', title: '是否多选', type: 'switch', showRule: 'type=file-select' },
@@ -197,15 +195,19 @@
         let { item = {} } = value;
         // 每次打开时，重新设置表单的值 = value.item 的值，item通过 vk.pubfn.openForm('表单名',{ item:{ _id:"1" } }) 传递值
         if (value.mode === 'update') {
-          this.form1.props.action = 'admin/cms/fields/sys/update';
+          this.form1.props.action = 'admin/cms/sys.field.update';
           this.page.title = '修改字段';
           this.page.submitText = '修改';
         } else {
-          this.form1.props.action = 'admin/cms/fields/sys/add';
+          this.form1.props.action = 'admin/cms/sys.field.add';
           this.page.title = '添加字段';
           this.page.submitText = '添加';
         }
-        this.form1.data = vk.pubfn.copyObject(item);
+        console.log('form:',this.form1.data)
+        console.log(item)
+        this.form1.data = vk.pubfn.objectAssign(this.form1.data,item);
+        
+        console.log('form1:',this.form1.data)
       },
       // 监听 - 页面关闭
       onClose() {

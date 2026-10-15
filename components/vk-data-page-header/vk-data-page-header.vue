@@ -8,7 +8,7 @@
         <slot name="sub-title"> {{ subTitle }} </slot>
       </div>
     </div>
-    <div>
+    <div class="header-actions">
       <slot name="right">
         <el-button v-if="showBack" size="mini" type="primary" @click="_backBtn">{{ backText }}</el-button>
       </slot>
@@ -124,6 +124,12 @@
       font-size: 14px;
       color: #999;
     }
+	
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap:5px;
+	}
   }
 
   // 笔记本电脑、小屏幕电脑适配

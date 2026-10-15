@@ -92,27 +92,10 @@ function buildFormColumn(field, formType, options = {}) {
     }
   }
   // 处理显示条件
-  if (field.condition && field.condition.length > 0) {
-    col.showRule = buildShowRule(field.condition);
+  if (vk.pubfn.isNotNull(field.condition)) {
+    col.showRule =  Object.values(field.condition).join(' ')
   }
   return col;
-}
-
-/**
- * 生成表单显示条件规则
- * @param {Array} condition 显示条件配置
- */
-function buildShowRule(condition) {
-  if (!condition || condition.length === 0) return '';
-  let parts = [];
-  for (let i = 0; i < condition.length; i++) {
-    let item = condition[i];
-    if (!item.field || !item.operator) continue;
-    let fieldKey = item.field;
-    let part = fieldKey + item.operator + item.value;
-    parts.push(part);
-  }
-  return parts.join('&&');
 }
 
 /**
@@ -145,6 +128,5 @@ export default {
   fieldTypeMap,
   buildTableColumn,
   buildFormColumn,
-  buildShowRule,
   buildStatusColumn,
 };
