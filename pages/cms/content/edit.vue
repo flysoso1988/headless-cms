@@ -28,7 +28,6 @@
 </template>
 
 <script>
-  import cmsContentField from '@/common/function/cmsContentField.js';
   let vk = uni.vk;
   export default {
     data() {
@@ -59,29 +58,10 @@
         return 'admin/cms/sys.content.' + (this.mode === 'update' ? 'update' : 'add');
       },
       formColumns() {
-        let model = this.model;
-        if (!model || !model._id) return [];
-        let fields = model.fields || [];
-        let cols = [];
-        let sortedFields = [...fields].sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        sortedFields.forEach((f) => {
-          if (f.type === 'component') return;
-          let formType = cmsContentField.fieldTypeMap[f.type] || 'text';
-          cols.push(cmsContentField.buildFormColumn(f, formType));
-        });
-
-        return cols;
+        return vk.myfn.buildFormConfig({ model: this.model }).columns;
       },
       formRules() {
-        let model = this.model;
-        if (!model || !model._id) return {};
-        let rules = {};
-        (model.fields || []).forEach((f) => {
-          if (f.required) {
-            rules[f.key] = [{ required: true, message: f.title + '不能为空', trigger: ['blur', 'change'] }];
-          }
-        });
-        return rules;
+        return vk.myfn.buildFormConfig({ model: this.model }).rules;
       },
     },
     onLoad(options = {}) {

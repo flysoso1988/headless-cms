@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import cmsContentField from '@/common/function/cmsContentField.js';
+  let vk = uni.vk;
   export default {
     name: 'cms-content-form',
     props: {
@@ -62,34 +62,14 @@
         return this.action || this.contentAction + '.' + this.formType;
       },
       formConfig() {
-        let model = this.model;
-        if (!model || !model._id) return { columns: [], rules: {} };
-        let fields = model.fields || [];
-        let formCols = [];
-        let rules = {};
-        let sortedFields = [...fields].sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        sortedFields.forEach((f) => {
-          if (f.type === 'component') return;
-          let formType = cmsContentField.fieldTypeMap[f.type] || 'text';
-          formCols.push(cmsContentField.buildFormColumn(f, formType, { contentPubAction: this.contentPubAction }));
-          if (f.required) {
-            rules[f.key] = [{ required: true, message: f.title + '不能为空', trigger: ['blur', 'change'] }];
-          }
-        });
-        formCols.push({ key: 'status', title: '发布', type: 'switch', defaultValue: !model.draft });
-        return { columns: formCols, rules };
+        let config = vk.myfn.buildFormConfig({ model: this.model, contentPubAction: this.contentPubAction });
+        config.columns.push({ key: 'status', title: '发布', type: 'switch', defaultValue: !(this.model && this.model.draft) });
+        return config;
       },
     },
     methods: {
       buildDefaultData() {
-        let model = this.model || {};
-        let data = { model_id: model._id, status: !model.draft };
-        (model.fields || []).forEach((f) => {
-          if (f.default_value !== undefined && f.default_value !== null && f.default_value !== '') {
-            data[f.key] = f.default_value;
-          }
-        });
-        return Object.assign(data, this.extraData);
+        return vk.myfn.buildFormDefaultData({ model: this.model, extraData: this.extraData });
       },
       /**
        * 新增模式下把模型默认值补齐进表单数据。

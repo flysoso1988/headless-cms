@@ -48,7 +48,6 @@
 </template>
 
 <script>
-  import cmsContentField from '@/common/function/cmsContentField.js';
   let vk = uni.vk;
   export default {
     name: 'cms-content-table',
@@ -160,48 +159,19 @@
       generateConfig() {
         let model = this.model;
         if (!model || !model._id) return;
-        let fields = model.fields || [];
-        let cols = [];
-        let searchCols = [];
-        let searchFields = (model.list_config && model.list_config.search_fields) || [];
-        let sortedFields = [...fields].sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        let titleField = sortedFields.find((f) => f.type === 'text');
-        let hasTitleField = false;
-        sortedFields.forEach((f) => {
-          if (f.type === 'component') return;
-          let formType = cmsContentField.fieldTypeMap[f.type] || 'text';
-          let col = cmsContentField.buildTableColumn(f, formType);
-          cols.push(col);
-          if (formType === 'text' || formType === 'textarea' || formType === 'number') {
-            if (!titleField || f.key === titleField.key) hasTitleField = true;
-            let searchCol = { key: f.key, title: f.title, type: formType === 'number' ? 'number' : 'text', width: 160, mode: '%%' };
-            if (searchFields.length === 0 || searchFields.includes(f.key)) searchCols.push(searchCol);
-          }
-        });
-        if (!hasTitleField && titleField) {
-          cols.unshift({ key: titleField.key, title: titleField.title, type: 'text', width: 200 });
-        }
-        let allCols = [...cols];
-        allCols.push(cmsContentField.buildStatusColumn(this.contentAction));
-        allCols.push({ key: '_add_time', title: '创建时间', type: 'time', width: 160, sortable: 'custom' });
-        this.allColumns = allCols;
-        this.columnOptions = allCols.map((c) => ({ key: c.key, title: c.title }));
-        // 读取模型持久化的显示字段配置（过滤掉已不存在的字段）
-        let saveFields = model.display_fields || [];
-        let validFields = allCols.filter((c) => saveFields.includes(c.key)).map((c) => c.key);
-        this.checkedCols = validFields.length > 0 ? validFields : allCols.map((c) => c.key);
-        this.table1.columns = allCols.filter((c) => this.checkedCols.includes(c.key));
-        this.table1.action = this.contentAction + '.getList';
-        if (searchCols.length === 0) searchCols.push({ key: 'title', title: '标题', type: 'text', width: 160, mode: '%%' });
-        searchCols.push({ key: 'model_id', title: '所属模型', hidden: true });
-        // query 会整体透传到云端 getList（data.query）：locale 过滤语言，draft 过滤草稿
-        let query = { draft: model.draft };
-        if (model.internationalization) {
-          query.locale = this.locale;
-        }
-        this.queryForm1.columns = searchCols;
-        this.queryForm1.formData = Object.assign({ model_id: model._id }, this.extraData);
-        this.queryForm1.query = query;
+        let config = vk.myfn.buildTableConfig({ model, contentAction: this.contentAction, locale: this.locale, extraData: this.extraData });
+        if (!config) return;
+        // 状态开关列插入到创建时间列之前
+        let timeIndex = config.allColumns.findIndex((c) => c.key === '_add_time');
+        config.allColumns.splice(timeIndex, 0, vk.myfn.buildStatusColumn({ contentAction: this.contentAction }));
+        this.allColumns = config.allColumns;
+        this.columnOptions = config.columnOptions;
+        this.checkedCols = config.checkedCols;
+        this.table1.columns = config.columns;
+        this.table1.action = config.action;
+        this.queryForm1.columns = config.searchColumns;
+        this.queryForm1.formData = config.formData;
+        this.queryForm1.query = config.query;
         this.scheduleRefresh();
       },
       addBtn() {
