@@ -131,12 +131,12 @@ const cloudObject = {
     // 业务逻辑开始-----------------------------------------------------------
     let { _id } = data;
 
-    if (vk.pubfn.isNullOne(_id)) {
+    if (vk.pubfn.isNull(_id)) {
       return { code: -1, msg: '_id不能为空' };
     }
 
     await vk.baseDao.deleteById({
-      dbName,
+      dbName:dbName.modelField,
       id: _id,
     });
 

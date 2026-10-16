@@ -80,7 +80,7 @@
           width: '1200px',
         },
         form1: {
-          data: {fileType:'image'},
+          data: { fileType: 'image' },
           props: {
             action: '',
             formType: '',
@@ -137,7 +137,7 @@
                   { value: 'video', label: '视频' },
                   { value: 'other', label: '其他文件' },
                 ],
-                defaultIndex:0,
+                defaultIndex: 0,
                 showRule: 'type==file-select',
               },
               { key: 'multiple', title: '是否多选', type: 'switch', showRule: 'type=file-select' },
@@ -171,7 +171,10 @@
             ],
             rules: {
               title: [{ required: true, message: '字段名称不能为空' }],
-              key: [{ required: true, message: '字段标识不能为空' }],
+              key: [
+                { required: true, message: '字段标识不能为空' },
+                { pattern: /^[a-z_]+$/, message: '字段标识只能输入小写英文字母和下划线' },
+              ],
               type: [{ required: true, message: '字段类型不能为空' }],
             },
             labelWidth: '140px',
@@ -203,11 +206,11 @@
           this.page.title = '添加字段';
           this.page.submitText = '添加';
         }
-        console.log('form:',this.form1.data)
-        console.log(item)
-        this.form1.data = vk.pubfn.objectAssign(this.form1.data,item);
-        
-        console.log('form1:',this.form1.data)
+        console.log('form:', this.form1.data);
+        console.log(item);
+        this.form1.data = vk.pubfn.objectAssign(this.form1.data, item);
+
+        console.log('form1:', this.form1.data);
       },
       // 监听 - 页面关闭
       onClose() {
