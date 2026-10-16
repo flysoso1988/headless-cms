@@ -6,9 +6,9 @@
     </view>
     <view class="vk-page-card" style="margin-top: 10px">
       <view class="vk-page-card-toolbar">
-        <view class="toolbar-placeholder"></view>
+        <view class="toolbar-placeholder"> aaa </view>
         <view class="vk-page-card-actions">
-          <el-select v-if="model.internationalization" v-model="queryForm1.formData.locale" size="small" class="locale-select" @change="onLocaleChange">
+          <el-select v-if="model.internationalization" v-model="locale" size="small" class="locale-select" @change="onLocaleChange">
             <el-option v-for="opt in localeOptions" :key="opt.value" :label="opt.label" :value="opt.value"></el-option>
           </el-select>
           <el-popover placement="bottom-end" width="240" trigger="click" :visible.sync="columnPopoverVisible" popper-class="column-setting-popover" @show="onColumnPopoverShow">
@@ -32,6 +32,7 @@
         <vk-data-table
           ref="table1"
           :action="table1.action"
+          :auto-action="false"
           :columns="table1.columns"
           :query-form-param="queryForm1"
           :right-btns="['update', 'delete']"
@@ -49,31 +50,25 @@
 <script>
   import cmsContentField from '@/common/function/cmsContentField.js';
   let vk = uni.vk;
-  // 内容语言候选清单（临时写死）与默认语言，是内容自身的属性，与后台界面语言无关，勿改为取 vk.pubfn.getLocale()
-  const LOCALE_OPTIONS = [
-    { value: 'zh-Hans', label: '简体中文' },
-    { value: 'en', label: '英文' },
-  ];
-  const DEFAULT_LOCALE = 'zh-Hans';
   export default {
     name: 'cms-content-table',
     props: {
       // 内容模型（含 fields 字段配置）
       model: { type: Object, required: true },
-      // 内容 CRUD 云函数 action 前缀
-      contentAction: { type: String, default: 'admin/cms/content/sys' },
-      // 模型云函数 action 前缀（用于持久化显示字段配置）
-      modelAction: { type: String, default: 'admin/cms/model/sys' },
+      // 内容 CRUD 云对象 action 前缀，如 'admin/cms/sys.content'
+      contentAction: { type: String, default: 'admin/cms/sys.content' },
       // 附加固定查询条件，会合并进列表查询（如 { site_id: 'xxx' }）
       extraData: { type: Object, default: () => ({}) },
     },
     data() {
       return {
         columnPopoverVisible: false,
-        // 内容语言候选清单，供工具栏的语言下拉渲染
-        localeOptions: LOCALE_OPTIONS,
-        // 上一次生成配置时所属的模型，用于区分“切模型”与“同模型内重新生成”
-        lastConfigModelId: '',
+        // 内容语言候选清单，从 i18n 接口动态获取
+        localeOptions: [],
+        // 语言列表是否已加载完成，未完成前多语言模型不发列表请求
+        localeOptionsLoaded: false,
+        // 同一轮内的重复刷新合并标记
+        refreshScheduled: false,
         columnOptions: [],
         checkedCols: [],
         allColumns: [],
@@ -84,8 +79,21 @@
         queryForm1: {
           formData: {},
           columns: [],
+          query: {},
         },
       };
+    },
+    computed: {
+      // 当前内容语言：Vuex 持久化，跨模型、跨页面（编辑页）共享
+      // 需要 setter，否则 v-model 写不回 Vuex，下拉框显示的仍是旧语言
+      locale: {
+        get() {
+          return vk.getVuex('$app.locale');
+        },
+        set(val) {
+          vk.setVuex('$app.locale', val);
+        },
+      },
     },
     watch: {
       model: {
@@ -101,11 +109,54 @@
         },
         deep: true,
       },
+      localeOptions() {
+        if (this.localeOptions.length > 0) {
+          this.generateConfig();
+        }
+      },
+      locale(val) {
+        // 其他页面（如内容编辑页）修改了语言时，同步列表查询条件
+        if (this.queryForm1.query) this.queryForm1.query.locale = val;
+      },
     },
     mounted() {
       vk = this.vk;
+      this.loadLocaleOptions();
     },
     methods: {
+      loadLocaleOptions() {
+        vk.callFunction({
+          url: 'admin/setting/sys.i18n.select',
+          success: (res) => {
+            let list = res.list || [];
+            // 尚未选择语言时，默认选中设置中的默认语言（无默认则取第一项）
+            if (vk.pubfn.isNull(this.locale) && list.length > 0) {
+              let defaultOpt = list.find((opt) => opt.is_default) || list[0];
+              vk.setVuex('$app.locale', defaultOpt.value);
+            }
+            this.localeOptionsLoaded = true;
+            this.localeOptions = list;
+          },
+          complete: () => {
+            // 请求失败或返回空列表时 watch 不会触发，这里兜底放行一次列表请求
+            if (!this.localeOptionsLoaded) {
+              this.localeOptionsLoaded = true;
+              this.scheduleRefresh();
+            }
+          },
+        });
+      },
+      // 合并同一轮内多次 generateConfig 产生的刷新，只向云端发一次列表请求
+      scheduleRefresh() {
+        // 多语言模型的查询条件依赖 locale，语言列表未就绪前不发请求，加载完成后会再触发一次
+        if (this.model && this.model.internationalization && !this.localeOptionsLoaded) return;
+        if (this.refreshScheduled) return;
+        this.refreshScheduled = true;
+        this.$nextTick(() => {
+          this.refreshScheduled = false;
+          if (this.$refs.table1) this.$refs.table1.refresh();
+        });
+      },
       generateConfig() {
         let model = this.model;
         if (!model || !model._id) return;
@@ -140,38 +191,33 @@
         let validFields = allCols.filter((c) => saveFields.includes(c.key)).map((c) => c.key);
         this.checkedCols = validFields.length > 0 ? validFields : allCols.map((c) => c.key);
         this.table1.columns = allCols.filter((c) => this.checkedCols.includes(c.key));
-        this.table1.action = this.contentAction + '/getList';
+        this.table1.action = this.contentAction + '.getList';
         if (searchCols.length === 0) searchCols.push({ key: 'title', title: '标题', type: 'text', width: 160, mode: '%%' });
-        // 多语言模型：语言下拉渲染在工具栏 setting 图标左侧，此处仅挂一条不渲染的 locale 规则列，
-        // 让 queryForm1.formData.locale 以完全匹配参与云端 where 条件（云函数无需为此改动）
-        let formData = { model_id: model._id };
-        if (model.internationalization) {
-          searchCols.push({ key: 'locale', title: '语言', mode: '=', hidden: true });
-          // 同一模型内重新生成配置（如调整显示字段）时保留当前语言，切换模型则重置为默认语言
-          let prevLocale = this.queryForm1.formData.locale;
-          formData.locale = this.lastConfigModelId === model._id && LOCALE_OPTIONS.some((o) => o.value === prevLocale) ? prevLocale : DEFAULT_LOCALE;
-        }
-        this.lastConfigModelId = model._id;
         searchCols.push({ key: 'model_id', title: '所属模型', hidden: true });
+        // query 会整体透传到云端 getList（data.query）：locale 过滤语言，draft 过滤草稿
+        let query = { draft: model.draft };
+        if (model.internationalization) {
+          query.locale = this.locale;
+        }
         this.queryForm1.columns = searchCols;
-        this.queryForm1.formData = Object.assign(formData, this.extraData);
-        this.$nextTick(() => {
-          if (this.$refs.table1) this.$refs.table1.refresh();
-        });
+        this.queryForm1.formData = Object.assign({ model_id: model._id }, this.extraData);
+        this.queryForm1.query = query;
+        this.scheduleRefresh();
       },
       addBtn() {
-        // 新增的内容归属于当前选中的语言（非多语言模型时无 locale）
-        this.$emit('add', { locale: this.queryForm1.formData.locale });
+        // 新增的内容归属于当前选中的语言（非多语言模型时不传 locale）
+        this.$emit('add', { locale: this.model.internationalization ? this.locale : '' });
       },
-      onLocaleChange() {
-        // 切换语言视为变更筛选条件，回到第一页重新查询
+      onLocaleChange(val) {
+        // v-model 已通过 computed 写入 Vuex，这里同步查询条件后重新搜索
+        if (this.queryForm1.query) this.queryForm1.query.locale = val;
         this.search();
       },
       updateBtn({ item }) {
         this.$emit('update', { item });
       },
       deleteBtn({ item, deleteFn }) {
-        deleteFn({ action: this.contentAction + '/delete', data: { _id: item._id } });
+        deleteFn({ action: this.contentAction + '.delete', data: { _id: item._id } });
       },
       onColumnPopoverShow() {
         if (!this.allColumns || this.allColumns.length === 0) {
@@ -185,13 +231,11 @@
         if (this.model && this.model._id) {
           this.model.display_fields = this.checkedCols;
           vk.callFunction({
-            url: this.modelAction + '/update',
+            url: 'admin/cms/sys.model.update',
             data: { _id: this.model._id, display_fields: this.checkedCols },
           });
         }
-        this.$nextTick(() => {
-          if (this.$refs.table1) this.$refs.table1.refresh();
-        });
+        this.scheduleRefresh();
       },
       refresh() {
         this.$refs.table1.refresh();

@@ -42,10 +42,13 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
+    const { type } = data;
     res = await vk.baseDao.selects({
       dbName: dbName.model,
       pageSize: -1,
-      whereJson: {},
+      whereJson: {
+        type,
+      },
       sortArr: [{ name: 'key', type: 'asc' }],
       foreignDB: [
         {

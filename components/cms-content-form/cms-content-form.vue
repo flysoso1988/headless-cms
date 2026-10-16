@@ -25,8 +25,8 @@
       value: { type: Object, default: () => ({}) },
       // 自定义云函数 action，不传则根据 formType 自动生成
       action: { type: String, default: '' },
-      // 内容 CRUD 云函数 action 前缀
-      contentAction: { type: String, default: 'admin/cms/content/sys' },
+      // 内容 CRUD 云对象 action 前缀，如 'admin/cms/sys.content'
+      contentAction: { type: String, default: 'admin/cms/sys.content' },
       // 远程下拉（关联内容）数据源 action
       contentPubAction: { type: String, default: 'admin/cms/content/pub/getContent' },
       // 附加固定数据，会合并进新增表单默认数据（如 { site_id: 'xxx' }）
@@ -59,7 +59,7 @@
         },
       },
       finalAction() {
-        return this.action || this.contentAction + '/' + this.formType;
+        return this.action || this.contentAction + '.' + this.formType;
       },
       formConfig() {
         let model = this.model;
@@ -113,7 +113,7 @@
       getFormConfig(mode, item) {
         let isUpdate = mode === 'update';
         return {
-          action: this.contentAction + '/' + (isUpdate ? 'update' : 'add'),
+          action: this.contentAction + '.' + (isUpdate ? 'update' : 'add'),
           formType: isUpdate ? 'update' : 'add',
           columns: this.formConfig.columns,
           rules: this.formConfig.rules,

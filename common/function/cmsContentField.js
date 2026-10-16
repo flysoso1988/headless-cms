@@ -93,14 +93,14 @@ function buildFormColumn(field, formType, options = {}) {
   }
   // 处理显示条件
   if (vk.pubfn.isNotNull(field.condition)) {
-    col.showRule =  Object.values(field.condition).join(' ')
+    col.showRule = Object.values(field.condition).join(' ');
   }
   return col;
 }
 
 /**
  * 生成状态开关列（发布/下架）
- * @param {String} contentAction 内容云函数 action 前缀，如 'admin/cms/content/sys'
+ * @param {String} contentAction 内容云对象 action 前缀，如 'admin/cms/sys.content'
  */
 function buildStatusColumn(contentAction) {
   return {
@@ -113,7 +113,7 @@ function buildStatusColumn(contentAction) {
     watch: (res) => {
       let { value, row, change } = res;
       vk.callFunction({
-        url: contentAction + '/update',
+        url: contentAction + '.update',
         title: value ? '发布中...' : '下架中...',
         data: { _id: row._id, model_id: row.model_id, status: value },
         success: () => {

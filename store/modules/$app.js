@@ -52,6 +52,9 @@ export default {
     isPC: $app.isPC || true,
     // PC状态下左侧菜单是否折叠文字（只显示图标，如果不要记忆功能，则去掉$app.leftCollapse ||即可，直接leftCollapse:false）
     leftCollapse: $app.leftCollapse || false,
+    // 内容管理当前选中的语言（跨模型持久化）
+    locale: $app.locale || '',
+    model:$app.model || {},
   },
   /**
    * 从基本数据(state)派生的数据，相当于state的计算属性

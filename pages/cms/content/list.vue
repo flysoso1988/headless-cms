@@ -59,7 +59,6 @@
       return {
         modelList: [],
         filteredModels: [],
-        currentModel: {},
         searchKeyword: '',
         // 从内容编辑页返回后才需要刷新表格，避免页面首次显示时重复请求
         needRefreshTable: false,
@@ -81,6 +80,13 @@
         }
         return groups;
       },
+      currentModel() {
+        return vk.getVuex('$app.model');
+      },
+      // 当前内容语言：与内容编辑页共享
+      locale() {
+        return vk.getVuex('$app.locale');
+      },
     },
     onLoad(options = {}) {
       vk = this.vk;
@@ -96,7 +102,7 @@
     methods: {
       init() {
         vk.callFunction({
-          url: 'admin/cms/model/sys/getList',
+          url: 'admin/cms/sys.model.getList',
           title: '请求中',
           success: (res) => {
             this.modelList = res.rows.filter((m) => m.type !== 'component');
@@ -114,7 +120,8 @@
       },
       onModelClick(item) {
         if (item._id === this.currentModel._id) return;
-        this.currentModel = item;
+        // this.currentModel = item;
+        vk.setVuex('$app.model', item);
         if (item.type === 'single') {
           this.loadSinglePageData();
         }
@@ -128,11 +135,17 @@
             defaultData[f.key] = f.default_value;
           }
         });
+        let formData = { model_id: this.currentModel._id };
+        if (this.currentModel.internationalization) {
+          defaultData.locale = this.locale;
+          formData.locale = this.locale;
+        }
         this.singlePageData = defaultData;
+        let columns = Object.keys(formData).map((key) => ({ key, mode: '=' }));
         vk.callFunction({
-          url: 'admin/cms/content/sys/getList',
+          url: 'admin/cms/sys.content.getList',
           title: '加载中',
-          data: { model_id: this.currentModel._id, page: 1, limit: 1 },
+          data: { pageIndex: 1, pageSize: 1, formData, columns },
           success: (res) => {
             if (res.rows && res.rows.length > 0) {
               this.singlePageData = res.rows[0];
@@ -153,13 +166,15 @@
         this.loadSinglePageData();
       },
       onAdd({ locale } = {}) {
-        // 多语言模型下新增的内容属于当前选中的语言，通过参数传给编辑页注入表单默认数据
-        let url = '/pages/cms/content/edit?type=add&model_id=' + this.currentModel._id;
+        // 新增的内容归属于当前选中的语言，通过参数传给编辑页注入表单默认数据
+        let url = '/pages/cms/content/edit?mode=add&model_id=' + this.currentModel._id;
         if (vk.pubfn.isNotNull(locale)) url += '&locale=' + locale;
         this.toContentEditPage(url);
       },
       onUpdate({ item }) {
-        this.toContentEditPage('/pages/cms/content/edit?type=update&model_id=' + this.currentModel._id + '&id=' + item._id);
+        // 编辑通过 document_id 定位内容，locale 决定打开哪个语言版本
+        let url = '/pages/cms/content/edit?mode=update&model_id=' + this.currentModel._id + '&document_id=' + item.document_id + '&locale=' + this.locale;
+        this.toContentEditPage(url);
       },
       toContentEditPage(url) {
         this.needRefreshTable = true;

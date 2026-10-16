@@ -149,10 +149,10 @@
                 type: 'remote-select',
                 placeholder: '请选择关联模型',
                 showRule: 'type=relation',
-                action: 'admin/cms/model/sys/getList',
+                action: 'admin/cms/sys.model.getList',
                 props: { list: 'rows', value: '_id', label: 'name' },
                 showAll: true,
-                actionData: { pageSize: 500, type: 'collection' },
+                actionData: { type: 'collection' },
               },
               { key: 'default_value', title: '默认值', type: 'text', placeholder: '该字段的默认值，可留空', span: 12 },
               // 显示条件配置
