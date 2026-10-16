@@ -1,7 +1,7 @@
 <template>
   <view>
     <!-- 搜索区域卡片 -->
-    <view class="vk-page-card vk-page-search-card">
+    <!-- <view class="vk-page-card vk-page-search-card">
       <vk-data-table-query
         v-model="queryForm1.formData"
         :columns="queryForm1.columns"
@@ -11,7 +11,7 @@
         @search="search"
         @collapse-change="collapseChange"
       ></vk-data-table-query>
-    </view>
+    </view> -->
     <!-- 表格内容卡片 -->
     <view class="vk-page-card">
       <!-- 操作按钮与表格标题区域 -->
@@ -21,7 +21,7 @@
         <!-- 右侧操作栏 -->
         <view class="vk-page-card-actions">
           <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加</el-button>
-          <el-dropdown v-if="table1.multipleSelection" :split-button="false" trigger="click" @command="batchBtn">
+          <!-- <el-dropdown v-if="table1.multipleSelection" :split-button="false" trigger="click" @command="batchBtn">
             <el-button type="danger" :size="$global.size" style="margin-left: 20rpx" :disabled="table1.multipleSelection.length === 0">
               批量操作<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
@@ -29,7 +29,7 @@
               <el-dropdown-item :command="1">批量操作1</el-dropdown-item>
               <el-dropdown-item :command="2">批量操作2</el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown>
+          </el-dropdown> -->
         </view>
       </view>
 
@@ -41,16 +41,14 @@
           :action="table1.action"
           :columns="table1.columns"
           :query-form-param="queryForm1"
-          :right-btns="['detail_auto', 'update', 'delete']"
+          :custom-right-btns="table1.customRightBtns"
+          right-btns-align="right"
           :selection="true"
           :row-no="true"
           :pagination="true"
-          @update="updateBtn"
-          @delete="deleteBtn"
           @current-change="currentChange"
           @selection-change="selectionChange"
-        >
-        </vk-data-table>
+        ></vk-data-table>
         <!-- 表格组件结束 -->
       </view>
     </view>
@@ -102,6 +100,26 @@
           multipleSelection: [],
           // 当前高亮的记录
           selectItem: '',
+          // 右侧固定按钮
+          customRightBtns: [
+            {
+              title: '编辑',
+              type: 'primary',
+              icon: 'el-icon-edit',
+              onClick: (item) => {
+                this.updateBtn({ item: vk.pubfn.copyObject(item) });
+              },
+            },
+            {
+              title: '删除',
+              type: 'danger',
+              icon: 'el-icon-delete',
+              show: (item) => !item.is_default,
+              onClick: (item) => {
+                this.deleteBtn(item);
+              },
+            },
+          ],
         },
         // 表格相关结束 -----------------------------------------------------------
         // 表单相关开始 -----------------------------------------------------------
@@ -117,7 +135,9 @@
         },
         form1: {
           // 表单请求数据，此处可以设置默认值
-          data: {},
+          data: {
+            sort:1000
+          },
           // 表单属性
           props: {
             // 表单请求地址
@@ -218,11 +238,34 @@
         this.form1.data = item;
       },
       // 删除按钮
-      deleteBtn({ item, deleteFn }) {
-        deleteFn({
-          action: 'admin/setting/sys.i18n.delete',
-          data: {
-            _id: item._id,
+      deleteBtn(item) {
+        this.$confirm(`删除语言【${item.name}】将同时删除该语言下的所有内容，且无法恢复，是否继续？`, '删除确认', {
+          confirmButtonText: '确定删除',
+          cancelButtonText: '取消',
+          type: 'warning',
+        })
+          .then(() => {
+            vk.callFunction({
+              url: 'admin/setting/sys.i18n.delete',
+              data: { _id: item._id },
+              success: () => {
+                vk.toast('删除成功');
+                this.resetCurrentLocale(item.locale);
+                this.refresh();
+              },
+            });
+          })
+          .catch(() => {});
+      },
+      // 被删除的语言若是内容管理当前选中的语言，则切换到默认语言
+      resetCurrentLocale(deletedLocale) {
+        if (vk.pubfn.isNull(deletedLocale) || vk.getVuex('$app.locale') !== deletedLocale) return;
+        vk.callFunction({
+          url: 'admin/setting/sys.i18n.select',
+          success: (res) => {
+            let list = res.list || [];
+            let defaultItem = list.find((item) => item.is_default) || list[0];
+            if (defaultItem) vk.setVuex('$app.locale', defaultItem.value);
           },
         });
       },

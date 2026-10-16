@@ -1,0 +1,10 @@
+[
+  {
+    "_id": "i18n_zh_hans",
+    "name": "简体中文",
+    "locale": "zh-Hans",
+    "is_default": true,
+    "sort": 1,
+    "_add_time": 1700000000000
+  }
+]
