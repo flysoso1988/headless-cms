@@ -29,6 +29,12 @@
       "title": "是否默认",
       "defaultValue": false
     },
+    "sort": {
+      "bsonType": "int",
+      "title": "排序",
+      "defaultValue": 1000,
+      "description": "数值越小越靠前"
+    },
     "_add_time": {
       "bsonType": "timestamp",
       "title": "创建时间",
