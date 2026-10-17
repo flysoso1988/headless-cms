@@ -106,6 +106,7 @@
                   { value: 'editor', label: '富文本' },
                   { value: 'relation', label: '关联模型' },
                   { value: 'json', label: 'JSON' },
+                  { value: 'dynamiczone', label: '动态区块' },
                   // { value: 'component', label: '组件' },
                 ],
               },
@@ -155,6 +156,20 @@
                 actionData: { type: 'collection' },
               },
               { key: 'default_value', title: '默认值', type: 'text', placeholder: '该字段的默认值，可留空', span: 12 },
+              // 动态区块配置：允许的组件集合（来源为组件类型模型）
+              {
+                key: 'components',
+                title: '允许的组件',
+                type: 'remote-select',
+                placeholder: '请选择该字段允许的组件',
+                span: 24,
+                showRule: 'type=dynamiczone',
+                action: 'admin/cms/sys.model.getList',
+                props: { list: 'rows', value: 'key', label: 'name' },
+                multiple: true,
+                showAll: true,
+                actionData: { type: 'component' },
+              },
               // 显示条件配置
               {
                 key: 'condition',
@@ -209,6 +224,9 @@
         console.log('form:', this.form1.data);
         console.log(item);
         this.form1.data = vk.pubfn.objectAssign(this.form1.data, item);
+        // 允许的组件集合存放在字段 settings 通道（settings.components），表单上用扁平 components 编辑
+        let components = item.settings && Array.isArray(item.settings.components) ? item.settings.components : [];
+        this.$set(this.form1.data, 'components', components);
 
         console.log('form1:', this.form1.data);
       },
@@ -227,6 +245,11 @@
           vk.msg.error('字段标识 status 已被系统预留，不能使用');
           return false;
         }
+        // 动态区块的允许组件集合写入字段 settings 通道
+        formData.settings = Object.assign({}, formData.settings, {
+          components: Array.isArray(formData.components) ? formData.components : [],
+        });
+        delete formData.components;
         return formData;
       },
       // 表单重置

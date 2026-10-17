@@ -18,10 +18,14 @@ module.exports = {
       let item = selectRes.rows[i];
       let value = item._id;
       let label = item.title;
-      list.push({
-        value: value,
-        label: label,
-      });
+      // 除远程下拉需要的 value/label 外，原样透出内容文档字段（含动态区块数组），
+      // 消费端据 __component 逐块渲染，后台不做任何加工与清洗
+      list.push(
+        Object.assign({}, item, {
+          value: value,
+          label: label,
+        })
+      );
     }
     res.list = list;
     return res;

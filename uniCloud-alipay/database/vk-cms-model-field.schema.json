@@ -49,6 +49,7 @@
         { "value": "relation", "text": "关联模型" },
         { "value": "remote-select", "text": "远程选择" },
         { "value": "json", "text": "JSON" },
+        { "value": "dynamiczone", "text": "动态区块" },
         { "value": "component", "text": "组件" }
       ]
     },
@@ -128,6 +129,21 @@
       "bsonType": "bool",
       "title": "是否必填",
       "defaultValue": false
+    },
+    "settings": {
+      "bsonType": "object",
+      "title": "字段配置",
+      "description": "按字段类型存放的类型专属配置，如动态区块字段的允许组件集合 settings.components",
+      "properties": {
+        "components": {
+          "bsonType": "array",
+          "title": "允许的组件",
+          "description": "动态区块字段允许的组件模型 key 集合，组件模型 key 创建后不可变",
+          "items": {
+            "bsonType": "string"
+          }
+        }
+      }
     },
     "sort": {
       "bsonType": "int",

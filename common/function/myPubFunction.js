@@ -29,8 +29,21 @@ let cmsFieldTypeMap = {
   'remote-select': 'remote-select',
   relation: 'remote-select',
   json: 'json',
+  dynamiczone: 'dynamiczone',
   component: 'component',
 };
+
+/**
+ * 读取动态区块字段允许的组件集合
+ * 优先 settings.components（字段 schema 的 settings 通道），兼容顶层 components
+ * @param {Object} field 字段定义
+ * @returns {String[]} 组件模型 key 数组
+ */
+function getDynamicZoneComponents(field = {}) {
+  if (field.settings && Array.isArray(field.settings.components)) return field.settings.components;
+  if (Array.isArray(field.components)) return field.components;
+  return [];
+}
 
 /**
  * 生成内容管理的万能表格配置（表格列、查询列、查询参数）
@@ -79,6 +92,11 @@ myfn.buildTableConfig = function (options = {}) {
       col.type = 'time';
       col.valueFormat = 'yyyy-MM-dd hh:mm:ss';
       col.width = 160;
+    } else if (formType === 'dynamiczone') {
+      // 动态区块：表格侧渲染为「N 个区块」摘要列
+      col.type = 'custom';
+      col.component = 'cms-dynamic-zone';
+      col.width = 120;
     }
     cols.push(col);
     // 文本/多行文本/数字类字段可作查询条件
@@ -142,6 +160,17 @@ myfn.buildFormConfig = function (options = {}) {
     if (f.type === 'component') return; // 组件占位字段不渲染
     let formType = cmsFieldTypeMap[f.type] || 'text';
     let col = { key: f.key, title: f.title, type: formType };
+    // 动态区块：表单侧映射为自定义渲染组件（传入允许的组件集合）
+    if (f.type === 'dynamiczone') {
+      col.type = 'custom';
+      col.component = 'cms-dynamic-zone';
+      col.components = getDynamicZoneComponents(f);
+      formCols.push(col);
+      if (f.required) {
+        rules[f.key] = [{ required: true, message: f.title + '不能为空', trigger: ['blur', 'change'] }];
+      }
+      return;
+    }
     // 富文本字段使用自定义编辑器组件
     if (formType === 'editor') {
       col.type = 'custom';
@@ -227,6 +256,8 @@ myfn.buildFormDefaultData = function (options = {}) {
   let { model = {}, extraData = {} } = options;
   let data = { model_id: model._id, status: !model.draft };
   (model.fields || []).forEach((f) => {
+    // 动态区块没有可序列化为文本的默认值，跳过
+    if (f.type === 'dynamiczone') return;
     if (f.default_value !== undefined && f.default_value !== null && f.default_value !== '') {
       data[f.key] = f.default_value;
     }

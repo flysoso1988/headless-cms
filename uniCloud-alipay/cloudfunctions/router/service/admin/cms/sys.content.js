@@ -2,6 +2,8 @@
 let vk = uniCloud.vk; // 全局vk实例
 // 涉及的表名
 const dbName = require('../../../dao/config.js');
+// 内容写入共用逻辑（字段白名单 + 动态区块校验）
+const contentWrite = require('./content/util/contentWrite.js');
 
 const db = uniCloud.database(); // 全局数据库引用
 const _ = db.command; // 数据库操作符
@@ -78,7 +80,7 @@ const cloudObject = {
     res.info = await vk.baseDao.selects({
       dbName: dbName.content,
       getMain: true,
-      getOne:true,
+      getOne: true,
       // 主表where条件
       whereJson,
       foreignDB: [
@@ -139,13 +141,11 @@ const cloudObject = {
       whereJson: { model_id },
     });
 
-    let allowedKeys = vk.pubfn.arrayObjectGetArray(fields, 'key');
-
-    allowedKeys.forEach((key) => {
-      if (data[key] !== undefined) {
-        dataJson[key] = data[key];
-      }
-    });
+    // 按字段定义生成写入白名单，并对动态区块做递归一层校验
+    // getMain 为 true 时 selects 直接返回字段数组
+    let buildRes = await contentWrite.buildContentFieldData({ vk, data, modelFields: fields });
+    if (buildRes.code !== 0) return buildRes;
+    dataJson = Object.assign(dataJson, buildRes.dataJson);
 
     let id = await vk.baseDao.add({
       dbName: dbName.content,
@@ -181,13 +181,11 @@ const cloudObject = {
       whereJson: { model_id },
     });
 
-    let allowedKeys = vk.pubfn.arrayObjectGetArray(fields, 'key');
-
-    allowedKeys.forEach((key) => {
-      if (data[key] !== undefined) {
-        dataJson[key] = data[key];
-      }
-    });
+    // 按字段定义生成写入白名单，并对动态区块做递归一层校验
+    // getMain 为 true 时 selects 直接返回字段数组
+    let buildRes = await contentWrite.buildContentFieldData({ vk, data, modelFields: fields });
+    if (buildRes.code !== 0) return buildRes;
+    dataJson = Object.assign(dataJson, buildRes.dataJson);
 
     let num = await vk.baseDao.update({
       dbName: dbName.content,
@@ -231,8 +229,8 @@ const cloudObject = {
     let num = await vk.baseDao.del({
       dbName: dbName.content,
       whereJson: {
-        _id:_.exists(true)
-      }
+        _id: _.exists(true),
+      },
     });
     // 业务逻辑结束-----------------------------------------------------------
     return res;

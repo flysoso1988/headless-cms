@@ -3,7 +3,7 @@ module.exports = {
     let { data = {}, userInfo, util, filterResponse, originalParam } = event;
     let { customUtil, uniID, config, pubFun, vk, db, _ } = util;
     let res = { code: 0, msg: '' };
-    let { _id, key, type, model_id, data: options, fileType, multiple, multipleLimit, default_value, condition, required, sort, relation } = data;
+    let { _id, key, type, model_id, data: options, fileType, multiple, multipleLimit, default_value, condition, required, sort, relation, settings } = data;
 
     if (vk.pubfn.isNullOne(_id)) {
       return { code: -1, msg: '_id不能为空' };
@@ -25,6 +25,7 @@ module.exports = {
         required,
         sort,
         relation,
+        settings,
       },
     });
 

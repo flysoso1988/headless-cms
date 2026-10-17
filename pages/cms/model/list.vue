@@ -149,6 +149,10 @@
       label: 'JSON',
     },
     {
+      value: 'dynamiczone',
+      label: '动态区块',
+    },
+    {
       value: 'component',
       label: '组件',
     },
@@ -359,7 +363,7 @@
                 _id: row._id,
               },
               success: (res) => {
-                this.currentModel.fields = this.currentModel.fields.filter(f=>f._id!==row._id)
+                this.currentModel.fields = this.currentModel.fields.filter((f) => f._id !== row._id);
                 vk.toast('删除成功');
               },
             });

@@ -54,7 +54,7 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
-    const { title, key, type, model_id, data: options, fileType, multiple, multipleLimit, default_value, condition, required, sort, relation } = data;
+    const { title, key, type, model_id, data: options, fileType, multiple, multipleLimit, default_value, condition, required, sort, relation, settings } = data;
 
     let num = await vk.baseDao.count({
       dbName: dbName.modelField,
@@ -82,6 +82,7 @@ const cloudObject = {
         required,
         sort,
         relation,
+        settings,
       },
     });
     // 业务逻辑结束-----------------------------------------------------------
@@ -94,7 +95,7 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
-    let { _id, title, type, model_id, data: options, fileType, multiple, multipleLimit, default_value, condition, required, sort, relation } = data;
+    let { _id, title, type, model_id, data: options, fileType, multiple, multipleLimit, default_value, condition, required, sort, relation, settings } = data;
 
     if (vk.pubfn.isNullOne(_id)) {
       return { code: -1, msg: '_id不能为空' };
@@ -116,6 +117,7 @@ const cloudObject = {
         required,
         sort,
         relation,
+        settings,
       },
     });
     // 业务逻辑结束-----------------------------------------------------------
@@ -136,7 +138,7 @@ const cloudObject = {
     }
 
     await vk.baseDao.deleteById({
-      dbName:dbName.modelField,
+      dbName: dbName.modelField,
       id: _id,
     });
 

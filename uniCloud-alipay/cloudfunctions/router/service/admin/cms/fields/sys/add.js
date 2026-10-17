@@ -3,7 +3,7 @@ module.exports = {
     let { data = {}, userInfo, util, filterResponse, originalParam } = event;
     let { customUtil, uniID, config, pubFun, vk, db, _ } = util;
     let res = { code: 0, msg: '' };
-    const { title, key, type, model_id, data: options, fileType, multiple, multipleLimit, default_value, condition, required, sort, relation } = data;
+    const { title, key, type, model_id, data: options, fileType, multiple, multipleLimit, default_value, condition, required, sort, relation, settings } = data;
 
     if (key === 'status') {
       return { code: -1, msg: '字段标识 status 已被系统预留，不能使用' };
@@ -25,6 +25,7 @@ module.exports = {
         required,
         sort,
         relation,
+        settings,
       },
     });
 
