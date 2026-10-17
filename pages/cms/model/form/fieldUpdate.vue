@@ -155,7 +155,7 @@
                 showAll: true,
                 actionData: { type: 'collection' },
               },
-              { key: 'default_value', title: '默认值', type: 'text', placeholder: '该字段的默认值，可留空', span: 12 },
+              { key: 'default_value', title: '默认值', type: 'text', placeholder: '该字段的默认值，可留空', span: 12, showRule: (formData) => formData.type !== 'dynamiczone' },
               // 动态区块配置：允许的组件集合（来源为组件类型模型）
               {
                 key: 'components',
@@ -245,10 +245,12 @@
           vk.msg.error('字段标识 status 已被系统预留，不能使用');
           return false;
         }
-        // 动态区块的允许组件集合写入字段 settings 通道
-        formData.settings = Object.assign({}, formData.settings, {
-          components: Array.isArray(formData.components) ? formData.components : [],
-        });
+        // 动态区块的允许组件集合写入字段 settings 通道（其它类型不占用 settings.components）
+        if (formData.type === 'dynamiczone') {
+          formData.settings = Object.assign({}, formData.settings, {
+            components: Array.isArray(formData.components) ? formData.components : [],
+          });
+        }
         delete formData.components;
         return formData;
       },

@@ -195,6 +195,8 @@
                 title: '模型标识',
                 type: 'text',
                 placeholder: '英文小写，如 product',
+                // 模型标识创建后不可变：动态区块的 __component 存的就是模型 key，改名会使存量内容断链
+                show: ['add'],
               },
               {
                 key: 'draft',

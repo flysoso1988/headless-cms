@@ -160,6 +160,8 @@ myfn.buildFormConfig = function (options = {}) {
     if (f.type === 'component') return; // 组件占位字段不渲染
     let formType = cmsFieldTypeMap[f.type] || 'text';
     let col = { key: f.key, title: f.title, type: formType };
+    // 显示条件：condition 对象的值拼接为 showRule 表达式（对所有字段类型生效）
+    if (vk.pubfn.isNotNull(f.condition)) col.showRule = Object.values(f.condition).join(' ');
     // 动态区块：表单侧映射为自定义渲染组件（传入允许的组件集合）
     if (f.type === 'dynamiczone') {
       col.type = 'custom';
@@ -203,8 +205,7 @@ myfn.buildFormConfig = function (options = {}) {
         if (f.settings && f.settings.multiple) col.multiple = true;
       }
     }
-    // 显示条件：condition 对象的值拼接为 showRule 表达式
-    if (vk.pubfn.isNotNull(f.condition)) col.showRule = Object.values(f.condition).join(' ');
+    // 显示条件已在上方统一设置
     formCols.push(col);
     // 必填校验规则
     if (f.required) {

@@ -7,6 +7,7 @@
  *    - 字段值必须是数组
  *    - 每块的 __component 必须在该字段声明的允许组件集合内
  *    - 块内键过滤至该组件模型的字段白名单（不深挖 json 子结构，深度一层）
+ *    - 组件模型已不存在时白名单无从获取，该块原样保留（不静默清空）
  *
  * 违规返回 { code: -1, msg }，错误消息含字段名与块序号。
  */
@@ -78,7 +79,13 @@ function normalizeDynamicZone({ field = {}, value, componentFieldMap = {} }) {
     if (!componentKey || allowedComponents.indexOf(componentKey) === -1) {
       return { code: -1, msg: `字段「${fieldName}」第 ${i + 1} 个区块使用了未允许的组件「${componentKey || '空'}」` };
     }
-    let allowedKeys = componentFieldMap[componentKey] || [];
+    let allowedKeys = componentFieldMap[componentKey];
+    if (!allowedKeys) {
+      // 组件模型已删除（字段声明的允许组件里残留了已不存在模型的 key）：白名单无从获取，
+      // 此时原样保留整块，而不是把块内字段静默清空（与 spec「后台不做未知组件数据的自动清洗」一致）
+      blocks.push(Object.assign({}, block));
+      continue;
+    }
     let newBlock = { __component: componentKey };
     allowedKeys.forEach((key) => {
       if (block[key] !== undefined) {
@@ -128,8 +135,5 @@ async function buildContentFieldData({ vk, data = {}, modelFields = [] }) {
 }
 
 module.exports = {
-  getAllowedComponents,
-  loadComponentFieldMap,
-  normalizeDynamicZone,
   buildContentFieldData,
 };
