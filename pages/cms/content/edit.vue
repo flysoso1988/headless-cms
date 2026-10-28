@@ -92,18 +92,33 @@
           console.error('初始化失败', err);
         }
       },
-      // 加载模型配置：优先复用列表页写入 Vuex 的当前模型，直接进入页面时按 model_id 拉取
+      // 加载模型配置：始终按 model_id 拉取最新定义
+      // Vuex 中的模型是会被持久化的完整快照，字段在模型管理里增删改后会过期，
+      // 直接复用会导致新增字段不出现在表单中
       async loadModel() {
         let storeModel = vk.getVuex('$app.model') || {};
-        if (vk.pubfn.isNull(this.modelId) || storeModel._id === this.modelId) {
+        if (vk.pubfn.isNull(this.modelId)) {
           this.model = storeModel;
           return;
         }
-        let res = await vk.callFunction({
-          url: 'admin/cms/sys.model.getInfo',
-          data: { id: this.modelId },
-        });
-        this.model = res.info;
+        let info = null;
+        try {
+          let res = await vk.callFunction({
+            url: 'admin/cms/sys.model.getInfo',
+            data: { id: this.modelId },
+          });
+          info = res.info;
+        } catch (err) {
+          console.error('加载模型失败', err);
+        }
+        if (info && info._id) {
+          this.model = info;
+          // 回写最新定义，供列表页与后续页面复用
+          vk.setVuex('$app.model', info);
+          return;
+        }
+        // 拉取失败时退化为列表页写入的当前模型
+        if (storeModel._id === this.modelId) this.model = storeModel;
       },
       async loadContent(locale) {
         let data = { document_id: this.documentId };
@@ -124,7 +139,9 @@
       },
       resetForm(locale) {
         this.mode = 'add';
-        let formData = { model_id: this.modelId || this.model._id };
+        // vk-data-form 不会自动应用列上的 defaultValue，新增时必须显式拼入模型字段默认值
+        let formData = vk.myfn.buildFormDefaultData({ model: this.model });
+        formData.model_id = this.modelId || this.model._id;
         if (vk.pubfn.isNotNull(this.documentId)) formData.document_id = this.documentId;
         if (this.isInternationalization && vk.pubfn.isNotNull(locale)) formData.locale = locale;
         this.formData = formData;

@@ -4,10 +4,6 @@
 - Vue 2 + uni-app 前端 + uniCloud 云函数（单路由模式）后端，开发 IDE 为 HBuilderX
 - 基于 JSON 驱动的「万能表格」`vk-data-table` 和「万能表单」`vk-data-form` 快速搭建 CRUD 页面
 
-## 关键命令
-```
-npm test            # 仅存桩，无实际测试
-```
 **无构建/开发/类型检查脚本** — 构建与部署通过 HBuilderX IDE 菜单操作。
 
 ## 配置清单

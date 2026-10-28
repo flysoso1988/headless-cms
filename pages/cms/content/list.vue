@@ -62,6 +62,8 @@
         searchKeyword: '',
         // 从内容编辑页返回后才需要刷新表格，避免页面首次显示时重复请求
         needRefreshTable: false,
+        // 首次 onShow 与 onLoad 重叠，跳过以免重复请求
+        hasShown: false,
         singlePageData: {},
         singlePageFormType: 'add',
         singlePageSaving: false,
@@ -93,22 +95,52 @@
       this.options = options;
       this.init();
     },
-    // 从内容编辑页返回时刷新表格，展示编辑后的最新数据
     onShow() {
-      if (!this.needRefreshTable) return;
-      this.needRefreshTable = false;
-      if (this.$refs.contentTable) this.$refs.contentTable.refresh();
+      if (!this.hasShown) {
+        this.hasShown = true;
+        return;
+      }
+      // 从内容编辑页返回：只需刷新表格，展示编辑后的最新数据
+      if (this.needRefreshTable) {
+        this.needRefreshTable = false;
+        if (this.$refs.contentTable) this.$refs.contentTable.refresh();
+        return;
+      }
+      // 从其他页面（如模型管理）返回：字段定义可能已变化，静默重新拉取模型
+      this.loadModels({ silent: true });
     },
     methods: {
       init() {
+        this.loadModels();
+      },
+      loadModels({ silent = false } = {}) {
         vk.callFunction({
           url: 'admin/cms/sys.model.getList',
-          title: '请求中',
+          title: silent ? undefined : '请求中',
           success: (res) => {
-            this.modelList = res.rows.filter((m) => m.type !== 'component');
+            this.modelList = (res.rows || []).filter((m) => m.type !== 'component');
             this.filterModels();
+            this.syncCurrentModel();
           },
         });
+      },
+      /**
+       * Vuex 中的当前模型是带 fields 的完整快照且会被持久化，
+       * 模型字段在其他页面被增删改后必须按 _id 重新绑定到最新数据，
+       * 否则表格列与内容表单会一直使用旧字段。
+       */
+      syncCurrentModel() {
+        let current = this.currentModel;
+        if (!current || !current._id) return;
+        let found = this.modelList.find((m) => m._id === current._id);
+        if (!found) {
+          // 模型已被删除，清空选中状态
+          vk.setVuex('$app.model', {});
+          return;
+        }
+        // 定义未变化时不做替换，避免表格重复生成配置与重复请求
+        if (JSON.stringify(found) === JSON.stringify(current)) return;
+        vk.setVuex('$app.model', found);
       },
       filterModels() {
         if (!this.searchKeyword) {
@@ -119,9 +151,10 @@
         }
       },
       onModelClick(item) {
-        if (item._id === this.currentModel._id) return;
-        // this.currentModel = item;
+        let prevId = this.currentModel._id;
+        // 每次点击都写入最新模型定义，避免重复点击同一模型时保留旧的字段缓存
         vk.setVuex('$app.model', item);
+        if (item._id === prevId) return;
         if (item.type === 'single') {
           this.loadSinglePageData();
         }
