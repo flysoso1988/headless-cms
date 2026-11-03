@@ -11,10 +11,11 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">应用列表</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加应用</el-button>
-          <el-alert v-if="!appIdExist" :title="`⚠警告：当前项目的 appId：${currentAppId} 没有在下方表格中，请新增应用或修改应用！`" type="error"> </el-alert>
+          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加应用</el-button>
         </div>
       </div>
+
+      <el-alert v-if="!appIdExist" class="app-id-warning" :title="`⚠警告：当前项目的 appId：${currentAppId} 没有在下方表格中，请新增应用或修改应用！`" type="error"></el-alert>
 
       <!-- 表格区域 -->
       <div class="vk-page-card-table">
@@ -209,5 +210,9 @@
 <style lang="scss" scoped>
   page {
     background-color: var(--bgcolor);
+  }
+
+  .app-id-warning {
+    margin-bottom: 15px;
   }
 </style>

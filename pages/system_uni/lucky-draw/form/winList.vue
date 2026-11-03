@@ -57,7 +57,7 @@
             size="mini"
             @change="expressNameChange"
           >
-            <el-option v-for="item in expressOptions" :key="item.label" :label="item.label" :value="item.label"> </el-option>
+            <el-option v-for="item in expressOptions" :key="item.label" :label="item.label" :value="item.label"></el-option>
           </el-select>
           <div v-else>-</div>
         </template>

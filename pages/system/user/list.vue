@@ -16,11 +16,11 @@
         <div class="vk-page-card-title">用户列表</div>
         <!-- 右侧操作栏 -->
         <div class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加用户</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加用户</el-button>
           <el-tooltip :disabled="!!table1.selectItem" content="请先点击需要操作的用户" placement="top">
-            <el-button type="warning" :size="$global.size" icon="el-icon-user" :disabled="!table1.selectItem" @click="bindRoleBtn()">绑定角色</el-button>
+            <el-button type="warning" icon="el-icon-user" :disabled="!table1.selectItem" @click="bindRoleBtn()">绑定角色</el-button>
           </el-tooltip>
-          <el-button :size="$global.size" icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
+          <el-button icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
         </div>
       </div>
 
@@ -353,7 +353,9 @@
             ],
             // 表单对应的验证规则
             rules: {
-              username: [{ required: true, validator: vk.pubfn.validator('username'), message: '用户名以字母开头，长度在6~18之间，只能包含字母、数字和下划线', trigger: 'blur' }],
+              username: [
+                { required: true, validator: vk.pubfn.validator('username'), message: '用户名以字母开头，长度在2~32之间，只能包含字母、数字、下划线和短横线', trigger: 'blur' },
+              ],
               nickname: [
                 { required: true, message: '昵称为必填字段', trigger: 'blur' },
                 { min: 2, max: 20, message: '昵称长度在 2 到 20 个字符', trigger: 'blur' },
@@ -465,12 +467,13 @@
       },
       // 显示修改页面
       updateBtn({ item }) {
+        let formData = vk.pubfn.copyObject(item);
+        formData.login_appid_type = typeof formData.dcloud_appid === 'undefined' ? 0 : 1;
         this.form1.props.action = 'admin/system/user/sys/update';
         this.form1.props.formType = 'update';
         this.form1.props.title = '编辑';
+        this.form1.data = formData;
         this.form1.props.show = true;
-        item.login_appid_type = typeof item.dcloud_appid === 'undefined' ? 0 : 1;
-        this.form1.data = item;
       },
       // 删除按钮
       deleteBtn({ item, deleteFn }) {
@@ -498,21 +501,23 @@
       },
       // 详情弹窗 - 编辑用户
       detailEditUser(item) {
-        this.updateBtn({ item: vk.pubfn.copyObject(item) });
+        this.updateBtn({ item });
       },
       detailEditTags(item) {
+        let formData = vk.pubfn.copyObject(item);
         this.form1.props.action = 'admin/system/user/sys/update';
         this.form1.props.formType = 'tags';
         this.form1.props.title = '编辑标签';
+        this.form1.data = formData;
         this.form1.props.show = true;
-        this.form1.data = item;
       },
       detailEditComment(item) {
+        let formData = vk.pubfn.copyObject(item);
         this.form1.props.action = 'admin/system/user/sys/update';
         this.form1.props.formType = 'comment';
         this.form1.props.title = '编辑备注';
+        this.form1.data = formData;
         this.form1.props.show = true;
-        this.form1.data = item;
       },
       // 详情弹窗 - 重置密码
       detailResetPassword(item) {

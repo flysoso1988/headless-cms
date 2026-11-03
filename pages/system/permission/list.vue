@@ -6,7 +6,7 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">权限列表</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加权限</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加权限</el-button>
         </div>
       </div>
 
@@ -36,7 +36,7 @@
     </div>
 
     <!-- 添加或编辑的弹窗 -->
-    <vk-data-dialog v-model="form1.props.show" :title="form1.props.title" width="700px" top="2vh" mode="form">
+    <vk-data-dialog v-model="form1.props.show" :title="form1.props.title" width="700px" top="2vh" mode="form" :destroy-on-close="true">
       <vk-data-form
         v-model="form1.data"
         :rules="form1.props.rules"
@@ -220,7 +220,22 @@
                 type: 'tree-select',
                 tips: '父级的permission_id',
                 action: 'admin/system/permission/sys/getAll',
-                props: { list: 'rows', value: 'permission_id', label: 'label', children: 'children' },
+                props: {
+                  list: 'rows',
+                  value: 'permission_id',
+                  label: 'label',
+                  children: 'children',
+                  disabled: (data, node) => {
+                    if (this.form1.props.formType !== 'update') return false;
+                    // 当前节点的祖先链包含正在编辑的权限时，禁止选为父级。
+                    let currentNode = node;
+                    while (currentNode && currentNode.level > 0) {
+                      if (currentNode.data.permission_id === this.form1.data.permission_id) return true;
+                      currentNode = currentNode.parent;
+                    }
+                    return false;
+                  },
+                },
               },
               { key: 'sort', title: '排序值', type: 'number', tips: '越小越显示在前面' },
               {
@@ -348,6 +363,7 @@
       },
       // 显示修改页面
       updateBtn({ item }) {
+        if (typeof item.url === 'string') item.url = [item.url];
         this.form1.props.action = 'admin/system/permission/sys/update';
         this.form1.props.formType = 'update';
         this.form1.props.title = '编辑';

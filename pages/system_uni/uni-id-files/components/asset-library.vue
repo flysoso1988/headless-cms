@@ -75,9 +75,9 @@
                 <el-dropdown-item command="remote-file" divided>{{ $t('vk.assetLibrary.uploadRemoteFile') }}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-            <el-button type="success" plain size="small" icon="el-icon-video-play" @click="startSlideshow" :disabled="playableFiles.length === 0">{{
-              $t('vk.assetLibrary.slideshow')
-            }}</el-button>
+            <el-button type="success" plain size="small" icon="el-icon-video-play" @click="startSlideshow" :disabled="playableFiles.length === 0">
+              {{ $t('vk.assetLibrary.slideshow') }}
+            </el-button>
           </div>
         </div>
 

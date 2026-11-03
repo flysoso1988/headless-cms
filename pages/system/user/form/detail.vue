@@ -133,38 +133,41 @@
                 <div class="detail-card-title">基本信息</div>
                 <div class="detail-info-grid detail-info-grid-2">
                   <div class="detail-info-item">
-                    <span class="detail-info-label">用户名</span><span class="detail-info-value">{{ detailData.username || '-' }}</span>
+                    <span class="detail-info-label">用户名</span>
+                    <span class="detail-info-value">{{ detailData.username || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
                     <span class="detail-info-label">手机号码</span>
                     <span class="detail-info-value detail-info-value-row">
                       {{ detailData.mobile }}
                       <i v-if="detailData.mobile" class="el-icon-document-copy copy-icon" @click="copyText(detailData.mobile)"></i>
-                      <el-tag v-if="detailData.mobile" :type="Number(detailData.mobile_confirmed) === 1 ? 'success' : 'info'" size="mini" effect="light">{{
-                        Number(detailData.mobile_confirmed) === 1 ? '已验证' : '未验证'
-                      }}</el-tag>
+                      <el-tag v-if="detailData.mobile" :type="Number(detailData.mobile_confirmed) === 1 ? 'success' : 'info'" size="mini" effect="light">
+                        {{ Number(detailData.mobile_confirmed) === 1 ? '已验证' : '未验证' }}
+                      </el-tag>
                     </span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">性别</span><span class="detail-info-value">{{ genderText }}</span>
+                    <span class="detail-info-label">性别</span>
+                    <span class="detail-info-value">{{ genderText }}</span>
                   </div>
                   <div class="detail-info-item">
                     <span class="detail-info-label">邮箱</span>
                     <span class="detail-info-value detail-info-value-row">
                       {{ detailData.email || '-' }}
-                      <el-tag v-if="detailData.email" :type="Number(detailData.email_confirmed) === 1 ? 'success' : 'info'" size="mini" effect="light">{{
-                        Number(detailData.email_confirmed) === 1 ? '已验证' : '未验证'
-                      }}</el-tag>
+                      <el-tag v-if="detailData.email" :type="Number(detailData.email_confirmed) === 1 ? 'success' : 'info'" size="mini" effect="light">
+                        {{ Number(detailData.email_confirmed) === 1 ? '已验证' : '未验证' }}
+                      </el-tag>
                     </span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">用户状态</span
-                    ><span class="detail-info-value"
-                      ><el-tag :type="statusInfo.tagType" size="mini" effect="light">{{ statusInfo.label }}</el-tag></span
-                    >
+                    <span class="detail-info-label">用户状态</span>
+                    <span class="detail-info-value">
+                      <el-tag :type="statusInfo.tagType" size="mini" effect="light">{{ statusInfo.label }}</el-tag>
+                    </span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">备注</span><span class="detail-info-value">{{ detailData.comment || '-' }}</span>
+                    <span class="detail-info-label">备注</span>
+                    <span class="detail-info-value">{{ detailData.comment || '-' }}</span>
                   </div>
                 </div>
               </section>
@@ -185,16 +188,20 @@
                 <div class="detail-card-title">注册信息</div>
                 <div class="detail-info-grid detail-info-grid-2">
                   <div class="detail-info-item">
-                    <span class="detail-info-label">注册时间</span><span class="detail-info-value">{{ formatTime(detailData.register_date) }}</span>
+                    <span class="detail-info-label">注册时间</span>
+                    <span class="detail-info-value">{{ formatTime(detailData.register_date) }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">最后登录时间</span><span class="detail-info-value">{{ formatTime(detailData.last_login_date) }}</span>
+                    <span class="detail-info-label">最后登录时间</span>
+                    <span class="detail-info-value">{{ formatTime(detailData.last_login_date) }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">注册IP</span><span class="detail-info-value">{{ detailData.register_ip || '-' }}</span>
+                    <span class="detail-info-label">注册IP</span>
+                    <span class="detail-info-value">{{ detailData.register_ip || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">最后登录IP</span><span class="detail-info-value">{{ detailData.last_login_ip || '-' }}</span>
+                    <span class="detail-info-label">最后登录IP</span>
+                    <span class="detail-info-value">{{ detailData.last_login_ip || '-' }}</span>
                   </div>
                 </div>
               </section>
@@ -250,31 +257,38 @@
                 <div class="detail-card-title">实名认证信息</div>
                 <div class="detail-info-grid detail-info-grid-3">
                   <div class="detail-info-item">
-                    <span class="detail-info-label">认证状态</span
-                    ><span class="detail-info-value"
-                      ><el-tag :type="realnameStatusInfo.tagType" size="mini" effect="light">{{ realnameStatusInfo.label }}</el-tag></span
-                    >
+                    <span class="detail-info-label">认证状态</span>
+                    <span class="detail-info-value">
+                      <el-tag :type="realnameStatusInfo.tagType" size="mini" effect="light">{{ realnameStatusInfo.label }}</el-tag>
+                    </span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">认证类型</span><span class="detail-info-value">{{ realnameTypeText }}</span>
+                    <span class="detail-info-label">认证类型</span>
+                    <span class="detail-info-value">{{ realnameTypeText }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">认证时间</span><span class="detail-info-value">{{ formatTime(realnameAuth.auth_date) }}</span>
+                    <span class="detail-info-label">认证时间</span>
+                    <span class="detail-info-value">{{ formatTime(realnameAuth.auth_date) }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">真实姓名/企业名</span><span class="detail-info-value">{{ realnameAuth.real_name || '-' }}</span>
+                    <span class="detail-info-label">真实姓名/企业名</span>
+                    <span class="detail-info-value">{{ realnameAuth.real_name || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">证件号码</span><span class="detail-info-value">{{ realnameAuth.identity || '-' }}</span>
+                    <span class="detail-info-label">证件号码</span>
+                    <span class="detail-info-value">{{ realnameAuth.identity || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">联系人</span><span class="detail-info-value">{{ realnameAuth.contact_person || '-' }}</span>
+                    <span class="detail-info-label">联系人</span>
+                    <span class="detail-info-value">{{ realnameAuth.contact_person || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">联系人手机号</span><span class="detail-info-value">{{ realnameAuth.contact_mobile || '-' }}</span>
+                    <span class="detail-info-label">联系人手机号</span>
+                    <span class="detail-info-value">{{ realnameAuth.contact_mobile || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">联系人邮箱</span><span class="detail-info-value">{{ realnameAuth.contact_email || '-' }}</span>
+                    <span class="detail-info-label">联系人邮箱</span>
+                    <span class="detail-info-value">{{ realnameAuth.contact_email || '-' }}</span>
                   </div>
                 </div>
               </section>
@@ -287,28 +301,36 @@
                 <div class="detail-card-title">注册环境信息</div>
                 <div class="detail-info-grid detail-info-grid-3">
                   <div class="detail-info-item">
-                    <span class="detail-info-label">AppId</span><span class="detail-info-value">{{ registerEnv.appid || '-' }}</span>
+                    <span class="detail-info-label">AppId</span>
+                    <span class="detail-info-value">{{ registerEnv.appid || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">平台</span><span class="detail-info-value">{{ registerEnv.uni_platform || '-' }}</span>
+                    <span class="detail-info-label">平台</span>
+                    <span class="detail-info-value">{{ registerEnv.uni_platform || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">系统</span><span class="detail-info-value">{{ registerEnv.os_name || '-' }}</span>
+                    <span class="detail-info-label">系统</span>
+                    <span class="detail-info-value">{{ registerEnv.os_name || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">应用名称</span><span class="detail-info-value">{{ registerEnv.app_name || '-' }}</span>
+                    <span class="detail-info-label">应用名称</span>
+                    <span class="detail-info-value">{{ registerEnv.app_name || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">应用版本</span><span class="detail-info-value">{{ registerEnv.app_version || '-' }}</span>
+                    <span class="detail-info-label">应用版本</span>
+                    <span class="detail-info-value">{{ registerEnv.app_version || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">版本号</span><span class="detail-info-value">{{ registerEnv.app_version_code || '-' }}</span>
+                    <span class="detail-info-label">版本号</span>
+                    <span class="detail-info-value">{{ registerEnv.app_version_code || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">渠道/场景</span><span class="detail-info-value">{{ registerEnv.channel || '-' }}</span>
+                    <span class="detail-info-label">渠道/场景</span>
+                    <span class="detail-info-value">{{ registerEnv.channel || '-' }}</span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">客户端IP</span><span class="detail-info-value">{{ registerEnv.client_ip || '-' }}</span>
+                    <span class="detail-info-label">客户端IP</span>
+                    <span class="detail-info-value">{{ registerEnv.client_ip || '-' }}</span>
                   </div>
                 </div>
               </section>
@@ -331,15 +353,16 @@
                 <div class="detail-card-title">权限状态</div>
                 <div class="detail-info-grid">
                   <div class="detail-info-item">
-                    <span class="detail-info-label">允许登录后台</span
-                    ><span class="detail-info-value"
-                      ><el-tag :type="detailData.allow_login_background ? 'success' : 'danger'" size="mini" effect="light">{{
-                        detailData.allow_login_background ? '允许' : '禁止'
-                      }}</el-tag></span
-                    >
+                    <span class="detail-info-label">允许登录后台</span>
+                    <span class="detail-info-value">
+                      <el-tag :type="detailData.allow_login_background ? 'success' : 'danger'" size="mini" effect="light">
+                        {{ detailData.allow_login_background ? '允许' : '禁止' }}
+                      </el-tag>
+                    </span>
                   </div>
                   <div class="detail-info-item">
-                    <span class="detail-info-label">可登录应用</span><span class="detail-info-value">{{ appTagList.length > 0 ? appTagList.length + ' 个' : '全部应用' }}</span>
+                    <span class="detail-info-label">可登录应用</span>
+                    <span class="detail-info-value">{{ appTagList.length > 0 ? appTagList.length + ' 个' : '全部应用' }}</span>
                   </div>
                 </div>
               </section>

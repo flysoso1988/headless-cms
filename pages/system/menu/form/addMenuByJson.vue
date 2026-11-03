@@ -45,7 +45,34 @@
   };
   const normalizeJsonSymbols = (value) => {
     if (typeof value !== 'string') return value;
-    return value.replace(/[【】［］｛｝（），、：；“”＂「」『』﹁﹂﹃﹄‘’＇？！。]/g, (symbol) => jsonSymbolMap[symbol] || symbol);
+    let result = '';
+    let stringEnd = '';
+    let escaped = false;
+    for (const symbol of value) {
+      if (stringEnd) {
+        // 字符串内容原样保留，转义后的引号不能结束字符串。
+        if (escaped) {
+          result += symbol;
+          escaped = false;
+        } else if (symbol === '\\') {
+          result += symbol;
+          escaped = true;
+        } else if (symbol === stringEnd) {
+          result += '"';
+          stringEnd = '';
+        } else {
+          result += symbol;
+        }
+      } else {
+        const normalizedSymbol = jsonSymbolMap[symbol] || symbol;
+        if (normalizedSymbol === '"') {
+          // 中文或全角双引号仅在作为字符串边界时转换。
+          stringEnd = symbol === '“' ? '”' : symbol;
+        }
+        result += normalizedSymbol;
+      }
+    }
+    return result;
   };
   export default {
     props: {
@@ -112,12 +139,6 @@
                 title: 'JSON内容',
                 type: 'textarea',
                 autosize: { minRows: 18, maxRows: 18 },
-                watch: ({ value, $set }) => {
-                  const menus = normalizeJsonSymbols(value);
-                  if (menus !== value) {
-                    $set('menus', menus);
-                  }
-                },
               },
             ],
             // 表单验证规则

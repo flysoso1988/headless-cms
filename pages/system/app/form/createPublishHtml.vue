@@ -5,20 +5,21 @@
 
       <div style="margin-top: 20rpx">
         <div class="text-separated">
-          <span class="strong">uni-portal </span>
+          <span class="strong">uni-portal</span>
           <span>是 uni-app 提供的一套开箱即用的“统一发布页”。</span>
         </div>
         <div class="text-separated">
-          <span class="strong">uni-portal </span>
+          <span class="strong">uni-portal</span>
           <span>可作为面向用户的统一业务名片，在一个页面集中展现：App下载地址、小程序二维码、H5访问链接等信息。</span>
         </div>
 
         <!-- #ifdef WEB -->
         <div class="text-separated">
-          <span style="font-size: 16px"
-            >uni-app 官方示例的发布页就是基于<span class="strong">uni-portal </span> 制作的，<a href="https://hellouniapp.dcloud.net.cn/portal" target="_blank" class="a-label"
-              >点击体验</a
-            >
+          <span style="font-size: 16px">
+            uni-app 官方示例的发布页就是基于
+            <span class="strong">uni-portal</span>
+            制作的，
+            <a href="https://hellouniapp.dcloud.net.cn/portal" target="_blank" class="a-label">点击体验</a>
           </span>
         </div>
         <!-- #endif -->
@@ -37,18 +38,14 @@
 
       <div style="margin-top: 20rpx">
         <div class="text-separated">
-          <span> 步骤2下载的“统一发布页”，是一个静态HTML页面，你可以直接在本地浏览器中打开访问。 </span>
+          <span>步骤2下载的“统一发布页”，是一个静态HTML页面，你可以直接在本地浏览器中打开访问。</span>
         </div>
 
         <div class="text-separated">
           <span>
-            为了让用户访问到这个“统一发布页”，你需要将该静态HTML文件上传到你的服务器中；推荐使用<a
-              href="https://uniapp.dcloud.io/uniCloud/hosting"
-              target="_blank"
-              class="a-label"
-              style="padding: 5px"
-              >前端网页托管</a
-            >，因为前端网页托管具备使用更简单、价格更便宜、访问更快等优点。
+            为了让用户访问到这个“统一发布页”，你需要将该静态HTML文件上传到你的服务器中；推荐使用
+            <a href="https://uniapp.dcloud.io/uniCloud/hosting" target="_blank" class="a-label" style="padding: 5px">前端网页托管</a>
+            ，因为前端网页托管具备使用更简单、价格更便宜、访问更快等优点。
           </span>
         </div>
       </div>
