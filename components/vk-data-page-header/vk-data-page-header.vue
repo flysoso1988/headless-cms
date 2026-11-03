@@ -2,13 +2,13 @@
   <div class="vk-data-page-header" v-if="showCom" :style="styleCom">
     <div class="header-group">
       <div class="header-title">
-        <slot> {{ title }} </slot>
+        <slot>{{ title }}</slot>
       </div>
       <div class="header-sub-title">
-        <slot name="sub-title"> {{ subTitle }} </slot>
+        <slot name="sub-title">{{ subTitle }}</slot>
       </div>
     </div>
-    <div class="header-actions">
+    <div>
       <slot name="right">
         <el-button v-if="showBack" size="mini" type="primary" @click="_backBtn">{{ backText }}</el-button>
       </slot>
@@ -124,12 +124,6 @@
       font-size: 14px;
       color: #999;
     }
-	
-	.header-actions {
-		display: flex;
-		align-items: center;
-		gap:5px;
-	}
   }
 
   // 笔记本电脑、小屏幕电脑适配

@@ -1,32 +1,31 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">弹窗功能演示</div>
-    <el-alert title="成功提示的文案" type="success" show-icon> </el-alert>
+    <el-alert title="成功提示的文案" type="success" show-icon></el-alert>
 
-    <el-alert title="消息提示的文案" type="info" show-icon> </el-alert>
+    <el-alert title="消息提示的文案" type="info" show-icon></el-alert>
 
-    <el-alert title="警告提示的文案" type="warning" show-icon> </el-alert>
+    <el-alert title="警告提示的文案" type="warning" show-icon></el-alert>
 
-    <el-alert title="错误提示的文案" type="error" show-icon> </el-alert>
+    <el-alert title="错误提示的文案" type="error" show-icon></el-alert>
 
-    <el-alert title="成功提示的文案" type="success" center show-icon> </el-alert>
+    <el-alert title="成功提示的文案" type="success" center show-icon></el-alert>
 
-    <el-alert title="消息提示的文案" type="info" center show-icon> </el-alert>
+    <el-alert title="消息提示的文案" type="info" center show-icon></el-alert>
 
-    <el-alert title="警告提示的文案" type="warning" center show-icon> </el-alert>
+    <el-alert title="警告提示的文案" type="warning" center show-icon></el-alert>
 
-    <el-alert title="错误提示的文案" type="error" center show-icon> </el-alert>
+    <el-alert title="错误提示的文案" type="error" center show-icon></el-alert>
 
     <el-alert
       title="带辅助性文字介绍"
       type="success"
       description="这是一句绕口令：黑灰化肥会挥发发灰黑化肥挥发；灰黑化肥会挥发发黑灰化肥发挥。 黑灰化肥会挥发发灰黑化肥黑灰挥发化为灰……"
-    >
-    </el-alert>
+    ></el-alert>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

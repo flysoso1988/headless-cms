@@ -57,6 +57,12 @@ util.navigateTo = function (obj) {
   lastNavigate = { url: obj.url, time };
   if (!obj.__vkNavigateTo404 && !util.checkPageExists({ url: obj.url })) {
     vk.navigateTo404();
+    let err = { errMsg: `${obj.mode || 'navigateTo'}:fail page ${obj.url} not found` };
+    try {
+      if (typeof obj.fail === 'function') obj.fail(err);
+    } finally {
+      if (typeof obj.complete === 'function') obj.complete(err);
+    }
     return false;
   }
   util.checkNeedLogin({
@@ -114,6 +120,7 @@ util._navigateTo = function (obj) {
     navigateFn = uni.navigateTo;
   }
   // 此处写法仅为支持vue3，vue3不支持uni[apiName]的形式调用
+  let fallbackStarted = false;
   navigateFn({
     url: url,
     animationType: animationType,
@@ -132,12 +139,16 @@ util._navigateTo = function (obj) {
           let errUrl = vk.pubfn.getPageFullPath(url);
           vk.toast(`页面 ${errUrl} 不存在`, 'none');
         }
+        if (typeof obj.fail == 'function') obj.fail(err);
         return false;
       }
+      fallbackStarted = true;
+      let redirectStarted = false;
       uni.switchTab({
         url: url,
         success: obj.success,
         fail: function () {
+          redirectStarted = true;
           uni.redirectTo({
             url: url,
             success: obj.success,
@@ -145,12 +156,18 @@ util._navigateTo = function (obj) {
               console.error(err);
               if (typeof obj.fail == 'function') obj.fail(err);
             },
+            complete: function (res) {
+              if (typeof obj.complete == 'function') obj.complete(res);
+            },
           });
+        },
+        complete: function (res) {
+          if (!redirectStarted && typeof obj.complete == 'function') obj.complete(res);
         },
       });
     },
     complete: function (res) {
-      if (typeof obj.complete == 'function') obj.complete(res);
+      if (!fallbackStarted && typeof obj.complete == 'function') obj.complete(res);
     },
   });
 };
@@ -161,6 +178,7 @@ util._navigateTo = function (obj) {
  */
 util.redirectTo = function (obj) {
   obj = util.paramsInit(obj);
+  if (!obj) return false;
   obj.mode = 'redirectTo';
   util.navigateTo(obj);
 };
@@ -171,6 +189,7 @@ util.redirectTo = function (obj) {
  */
 util.reLaunch = function (obj) {
   obj = util.paramsInit(obj);
+  if (!obj) return false;
   obj.mode = 'reLaunch';
   util.navigateTo(obj);
 };
@@ -181,6 +200,7 @@ util.reLaunch = function (obj) {
  */
 util.switchTab = function (obj) {
   obj = util.paramsInit(obj);
+  if (!obj) return false;
   obj.mode = 'switchTab';
   util.navigateTo(obj);
 };
@@ -282,7 +302,7 @@ util.navigateToLogin = function (obj = {}) {
   let url = config.login.url;
   let { pagePath, fullPath } = vk.pubfn.getCurrentPage();
   // 如果已经在登录页面则不跳转
-  if (pagePath === url) {
+  if (pagePath === util.getPagePath(url)) {
     return false;
   }
   if (mode !== 'navigateTo') {
@@ -672,7 +692,7 @@ util.navigateToLuckyDraw = function (obj = {}) {
   // #endif
 
   // #ifdef APP-PLUS
-  plus.share.getServices((res) => {
+  const onGetServices = (res) => {
     let sweixin = null;
     for (let i in res) {
       if (res[i].id === 'weixin') {
@@ -697,8 +717,10 @@ util.navigateToLuckyDraw = function (obj = {}) {
       );
     } else {
       vk.alert('跳转失败：未安装微信');
+      failCallback({ errMsg: 'navigateToMiniProgram:fail 未安装微信' });
     }
-  });
+  };
+  plus.share.getServices(onGetServices, failCallback);
   // #endif
 
   // #ifdef MP-WEIXIN
@@ -714,7 +736,7 @@ util.navigateToLuckyDraw = function (obj = {}) {
     success,
     complete,
     fail: (err) => {
-      failCallback(err);
+      if (typeof fail === 'function') fail(err);
       let subMsg = err.errMsg || err.message;
       if (subMsg && subMsg.indexOf('cancel') > -1) {
         return;

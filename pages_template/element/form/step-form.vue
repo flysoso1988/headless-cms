@@ -1,20 +1,20 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">分步表单功能演示</div>
 
-    <view style="padding: 80rpx 400rpx; margin-left: 0rpx; width: 1700rpx">
+    <div style="padding: 80rpx 400rpx; margin-left: 0rpx; width: 1700rpx">
       <el-steps :active="data.step" align-center>
         <el-step title="填写转账信息" icon="el-icon-edit"></el-step>
         <el-step title="确认转账信息" icon="el-icon-edit-outline"></el-step>
         <el-step title="完成" icon="el-icon-circle-check"></el-step>
       </el-steps>
-    </view>
+    </div>
 
-    <view style="margin-left: 700rpx">
+    <div style="margin-left: 700rpx">
       <el-form :label-position="data.labelPosition" label-width="100px" :model="data.ruleForm" :rules="data.rules" ref="ruleForm">
         <!-- step为1的逻辑开始 -->
-        <view v-if="this.data.step == 1">
+        <div v-if="this.data.step == 1">
           <el-form-item label="付款账户" prop="account" required>
             <el-col :span="24">
               <el-select v-model="data.ruleForm.account" style="width: 800rpx">
@@ -37,7 +37,7 @@
 
           <el-form-item label="收款人姓名" prop="name" required>
             <el-col :span="24">
-              <el-input v-model="data.ruleForm.name" style="width: 800rpx"> </el-input>
+              <el-input v-model="data.ruleForm.name" style="width: 800rpx"></el-input>
             </el-col>
           </el-form-item>
 
@@ -48,77 +48,77 @@
               </el-input>
             </el-col>
           </el-form-item>
-        </view>
+        </div>
         <!-- step为1的逻辑结束 -->
 
         <!-- step为2的逻辑开始 -->
-        <view v-if="this.data.step == 2">
+        <div v-if="this.data.step == 2">
           <el-tag closable style="font-size: 40rpx; width: 1200rpx; height: 80rpx; line-height: 80rpx; letter-spacing: 4rpx; background-color: #f8f8f8; color: red">
             注意!确认转账后,资金将进到对方账户,无法退回
           </el-tag>
 
           <el-col :span="24" style="padding: 40rpx; letter-spacing: 4rpx; font-size: 30rpx">
-            <text style="color: #515a6e">付款账户:</text>
-            <text style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.account }}</text>
+            <span style="color: #515a6e">付款账户:</span>
+            <span style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.account }}</span>
           </el-col>
 
           <el-col :span="24" style="padding: 40rpx; letter-spacing: 4rpx; font-size: 30rpx">
-            <text style="color: #515a6e">收款账户:</text>
-            <text style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.pay }}</text>
+            <span style="color: #515a6e">收款账户:</span>
+            <span style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.pay }}</span>
           </el-col>
 
           <el-col :span="24" style="padding: 40rpx; letter-spacing: 4rpx; font-size: 30rpx">
-            <text style="color: #515a6e">收款人姓名:</text>
-            <text style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.name }}</text>
+            <span style="color: #515a6e">收款人姓名:</span>
+            <span style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.name }}</span>
           </el-col>
 
           <el-col :span="24" style="padding: 40rpx; letter-spacing: 4rpx; font-size: 30rpx; border-bottom: 1px solid #ccc; width: 1200rpx">
-            <text style="color: #515a6e">转账金额:</text>
-            <text style="margin-left: 20rpx; color: #515a6e; font-weight: bold">¥{{ data.ruleForm.price }}</text>
+            <span style="color: #515a6e">转账金额:</span>
+            <span style="margin-left: 20rpx; color: #515a6e; font-weight: bold">¥{{ data.ruleForm.price }}</span>
           </el-col>
 
           <el-col :span="24" style="padding: 40rpx 0rpx">
             <el-form-item label="支付密码" prop="password" required>
-              <el-input v-model="data.ruleForm.password" style="width: 800rpx"> </el-input>
+              <el-input v-model="data.ruleForm.password" style="width: 800rpx"></el-input>
             </el-form-item>
           </el-col>
-        </view>
+        </div>
         <!-- step为2的逻辑结束 -->
 
         <!-- step为3的逻辑开始 -->
-        <view v-if="this.data.step == 3">
+        <div v-if="this.data.step == 3">
           <el-col :span="24" style="margin-left: 500rpx">
             <i class="el-icon-success" style="color: green; font-size: 200rpx"></i>
 
-            <view style="font-family: kaiti; font-weight: bold; font-size: 80rpx; margin-left: -60rpx; margin-top: 20rpx">操作成功</view>
+            <div style="font-family: kaiti; font-weight: bold; font-size: 80rpx; margin-left: -60rpx; margin-top: 20rpx">操作成功</div>
 
-            <view style="letter-spacing: 4rpx; margin: 30rpx 0rpx 30rpx -40rpx; color: #8086a3">预计两小时内到账</view>
+            <div style="letter-spacing: 4rpx; margin: 30rpx 0rpx 30rpx -40rpx; color: #8086a3">预计两小时内到账</div>
           </el-col>
 
           <el-col :span="24" style="background-color: #f8f8f9; width: 1700rpx; margin-left: -200rpx">
-            <view style="display: flex; flex-flow: column">
-              <view style="padding: 40rpx 160rpx">
-                <text style="color: #515a6e">付款账户:</text>
-                <text style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.account }}</text>
-              </view>
+            <div style="display: flex; flex-flow: column">
+              <div style="padding: 40rpx 160rpx">
+                <span style="color: #515a6e">付款账户:</span>
+                <span style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.account }}</span>
+              </div>
 
-              <view style="padding: 40rpx 160rpx">
-                <text style="color: #515a6e">收款账户:</text>
-                <text style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.pay }}</text>
-              </view>
+              <div style="padding: 40rpx 160rpx">
+                <span style="color: #515a6e">收款账户:</span>
+                <span style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.pay }}</span>
+              </div>
 
-              <view style="padding: 40rpx 160rpx">
-                <text style="color: #515a6e">收款人姓名:</text>
-                <text style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.name }}</text>
-              </view>
+              <div style="padding: 40rpx 160rpx">
+                <span style="color: #515a6e">收款人姓名:</span>
+                <span style="margin-left: 20rpx; color: #515a6e">{{ data.ruleForm.name }}</span>
+              </div>
 
-              <view style="padding: 40rpx 160rpx">
-                <text style="color: #515a6e">转账金额:</text>
-                <text style="margin-left: 20rpx; color: #515a6e; font-weight: bold">¥{{ data.ruleForm.price }}</text>
-              </view>
-            </view>
+              <div style="padding: 40rpx 160rpx">
+                <span style="color: #515a6e">转账金额:</span>
+                <span style="margin-left: 20rpx; color: #515a6e; font-weight: bold">¥{{ data.ruleForm.price }}</span>
+              </div>
+            </div>
           </el-col>
-        </view>
+        </div>
 
         <el-col :span="24" style="padding: 40rpx 0rpx">
           <el-form-item>
@@ -130,10 +130,10 @@
         </el-col>
         <!-- step为3的逻辑结束 -->
       </el-form>
-    </view>
+    </div>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

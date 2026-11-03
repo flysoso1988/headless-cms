@@ -54,7 +54,7 @@ util.percentageFilter = function (n, needShowSymbol, defaultValue = ' - ') {
 util.discountFilter = function (n, needShowSymbol, defaultValue = ' - ') {
   return pubfn.discountFilter(n, needShowSymbol, defaultValue);
 };
-// 大小过滤器 sizeFilter(1024,3,["B","KB","MB","GB"])
+// 大小过滤器 sizeFilter(1024,["B","KB","MB","GB"],1024,3)
 util.sizeFilter = function (...obj) {
   let res = pubfn.calcSize(...obj);
   return res.title;

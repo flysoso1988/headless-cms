@@ -102,6 +102,7 @@
   "vk.select.refresh": "刷新选项",
 
   "vk.tableSelect.maximum": "最多只能选择",
+  "vk.tableSelect.missingItem": "未找到记录",
 
   "vk.dateTime.datePickerRangeTodayMorning": "今日-上午",
   "vk.dateTime.datePickerRangeTodayAfternoon": "今日-下午",

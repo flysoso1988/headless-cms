@@ -1,26 +1,25 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Form 表单" subTitle="复用同一个表单实现添加和修改"></vk-data-page-header>
-    <view class="page-body">
-      <view style="padding: 15px; color: #303133">
-        当两个表单内的字段有大部分相似时，同一个表单组件可以复用。<br />
-        通过控制 formType 可以切换表单的类型<br />
+    <div class="page-body">
+      <div style="padding: 15px; color: #303133">
+        当两个表单内的字段有大部分相似时，同一个表单组件可以复用。
+        <br />
+        通过控制 formType 可以切换表单的类型
+        <br />
         同时在 columns 中添加属性 show:["add"] 代表该字段只有 formType 为 "add" 时才显示
-      </view>
+      </div>
       <el-button @click="showForm('add')">弹出添加表单</el-button>
       <el-button @click="showForm('update')">弹出修改表单</el-button>
 
-      <view class="tips mt15">
-        <view class="mt15 json-view" v-if="form1.data">
-          <view style="font-size: 14px">表单数据</view>
-          <pre>
-						{{ form1.data }}
-					</pre
-          >
-        </view>
-      </view>
-    </view>
+      <div class="tips mt15">
+        <div class="mt15 json-view" v-if="form1.data">
+          <div style="font-size: 14px">表单数据</div>
+          <pre>{{ form1.data }}</pre>
+        </div>
+      </div>
+    </div>
     <!-- 弹窗开始 -->
     <vk-data-dialog v-model="form1.props.show" :title="form1.props.title" width="600px" mode="form">
       <vk-data-form
@@ -41,7 +40,7 @@
     <!-- 弹窗结束 -->
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

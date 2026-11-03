@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
 
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">抽屉功能演示</div>
@@ -15,7 +15,7 @@
         </el-radio-group>
 
         <el-col :span="24" style="padding: 40rpx 0rpx; margin-left: -40rpx">
-          <el-button @click="drawer = true" type="primary" size="small" style="margin-left: 18px; margin-top: 30rpx"> 点我打开 </el-button>
+          <el-button @click="drawer = true" type="primary" size="small" style="margin-left: 18px; margin-top: 30rpx">点我打开</el-button>
         </el-col>
 
         <el-drawer title="我是标题" :visible.sync="drawer" :direction="direction" :before-close="handleClose">
@@ -27,7 +27,7 @@
     <el-row>
       <el-col :span="24" style="padding: 40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">无标题:</div>
-        <el-button @click="data.drawer = true" type="success" size="small" style="width: 160rpx"> 点我打开 </el-button>
+        <el-button @click="data.drawer = true" type="success" size="small" style="width: 160rpx">点我打开</el-button>
 
         <el-drawer title="我是标题" :visible.sync="data.drawer" :with-header="false">
           <span>我来啦!</span>
@@ -74,7 +74,7 @@
     <el-row>
       <el-col :span="24" style="padding: 40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">多层嵌套:</div>
-        <el-button @click="drawer1 = true" type="danger" size="small" style="margin-left: -2px"> 点我打开 </el-button>
+        <el-button @click="drawer1 = true" type="danger" size="small" style="margin-left: -2px">点我打开</el-button>
 
         <el-drawer title="我是外面的 Drawer" :visible.sync="drawer1" size="50%">
           <div>
@@ -88,7 +88,7 @@
     </el-row>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

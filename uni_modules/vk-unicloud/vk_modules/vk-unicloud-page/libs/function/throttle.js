@@ -1,5 +1,5 @@
-let timeoutArr = [];
-let flagArr = [];
+let timeoutArr = Object.create(null);
+let flagArr = Object.create(null);
 /**
  * 节流函数
  * 节流原理：在一定时间内，只能触发一次
@@ -18,10 +18,13 @@ function throttle(fn, time = 500, isImmediate = true, timeoutName = 'default') {
     if (!flagArr[timeoutName]) {
       flagArr[timeoutName] = true;
       // 如果是立即执行，则在time毫秒内开始时执行
-      if (typeof fn === 'function') fn();
-      timeoutArr[timeoutName] = setTimeout(() => {
-        flagArr[timeoutName] = false;
-      }, time);
+      try {
+        if (typeof fn === 'function') fn();
+      } finally {
+        timeoutArr[timeoutName] = setTimeout(() => {
+          flagArr[timeoutName] = false;
+        }, time);
+      }
     }
   } else {
     if (!flagArr[timeoutName]) {

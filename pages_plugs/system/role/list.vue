@@ -11,12 +11,12 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">角色列表</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加角色</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加角色</el-button>
           <el-tooltip :disabled="!!table1.selectItem" content="请先点击需要操作的角色" placement="top">
-            <el-button type="success" :size="$global.size" icon="el-icon-key" :disabled="!table1.selectItem" @click="bindPermissionBtn">权限赋予</el-button>
+            <el-button type="success" icon="el-icon-key" :disabled="!table1.selectItem" @click="bindPermissionBtn">权限赋予</el-button>
           </el-tooltip>
           <el-tooltip :disabled="!!table1.selectItem" content="请先点击需要操作的角色" placement="top">
-            <el-button type="warning" :size="$global.size" icon="el-icon-menu" :disabled="!table1.selectItem" @click="bindMenu">菜单赋予</el-button>
+            <el-button type="warning" icon="el-icon-menu" :disabled="!table1.selectItem" @click="bindMenu">菜单赋予</el-button>
           </el-tooltip>
         </div>
       </div>
@@ -150,7 +150,6 @@
               align: 'left',
               show: ['detail'],
               formatter: (val, row, column, index) => {
-                console.log(`val`, val);
                 let str = ``;
                 if (row.role_id === 'admin') {
                   return '拥有所有权限';

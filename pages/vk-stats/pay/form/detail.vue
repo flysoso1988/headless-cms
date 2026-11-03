@@ -74,7 +74,10 @@
           </div>
           <div class="amount-item">
             <div class="amount-label">退款次数</div>
-            <div class="amount-value">{{ row.refund_num || 0 }} <span class="unit">次</span></div>
+            <div class="amount-value">
+              {{ row.refund_num || 0 }}
+              <span class="unit">次</span>
+            </div>
           </div>
         </div>
 
@@ -120,13 +123,16 @@
                 <el-row :gutter="0" class="card-grid">
                   <el-col :span="12">
                     <div class="grid-item">
-                      <span class="grid-label">支付方式：</span><span class="grid-value">{{ payTypeInfo.label }}</span>
+                      <span class="grid-label">支付方式：</span>
+                      <span class="grid-value">{{ payTypeInfo.label }}</span>
                     </div>
                     <div class="grid-item">
-                      <span class="grid-label">所属平台：</span><span class="grid-value">{{ row.platform || '-' }}</span>
+                      <span class="grid-label">所属平台：</span>
+                      <span class="grid-value">{{ row.platform || '-' }}</span>
                     </div>
                     <div class="grid-item">
-                      <span class="grid-label">支付时间：</span><span class="grid-value">{{ timeFilter(row.pay_date) || '-' }}</span>
+                      <span class="grid-label">支付时间：</span>
+                      <span class="grid-value">{{ timeFilter(row.pay_date) || '-' }}</span>
                     </div>
                     <div class="grid-item">
                       <span class="grid-label">支付状态：</span>
@@ -173,7 +179,8 @@
                       <el-tag v-else type="info" size="mini" effect="light">未执行</el-tag>
                     </div>
                     <div class="grid-item">
-                      <span class="grid-label">支付描述：</span><span class="grid-value">{{ row.description || '-' }}</span>
+                      <span class="grid-label">支付描述：</span>
+                      <span class="grid-value">{{ row.description || '-' }}</span>
                     </div>
                   </el-col>
                 </el-row>
@@ -190,16 +197,19 @@
                       <vk-data-icon v-if="row.user_id" name="el-icon-document-copy" color="#909399" size="14" class="copy-icon" @click="copyText(row.user_id)"></vk-data-icon>
                     </div>
                     <div class="grid-item">
-                      <span class="grid-label">用户昵称：</span><span class="grid-value">{{ row.nickname || '-' }}</span>
+                      <span class="grid-label">用户昵称：</span>
+                      <span class="grid-value">{{ row.nickname || '-' }}</span>
                     </div>
                   </el-col>
                   <el-col :span="12">
                     <div class="grid-item">
-                      <span class="grid-label">设备ID：</span><span class="grid-value">{{ row.device_id || '-' }}</span>
+                      <span class="grid-label">设备ID：</span>
+                      <span class="grid-value">{{ row.device_id || '-' }}</span>
                       <vk-data-icon v-if="row.device_id" name="el-icon-document-copy" color="#909399" size="14" class="copy-icon" @click="copyText(row.device_id)"></vk-data-icon>
                     </div>
                     <div class="grid-item">
-                      <span class="grid-label">客户端IP：</span><span class="grid-value">{{ row.client_ip || '-' }}</span>
+                      <span class="grid-label">客户端IP：</span>
+                      <span class="grid-value">{{ row.client_ip || '-' }}</span>
                       <vk-data-icon v-if="row.client_ip" name="el-icon-document-copy" color="#909399" size="14" class="copy-icon" @click="copyText(row.client_ip)"></vk-data-icon>
                     </div>
                   </el-col>
@@ -212,19 +222,22 @@
                 <el-row :gutter="0" class="card-grid">
                   <el-col :span="12">
                     <div class="grid-item">
-                      <span class="grid-label">订单总金额：</span><span class="grid-value">¥{{ priceFilter(row.total_fee) }} </span>
+                      <span class="grid-label">订单总金额：</span>
+                      <span class="grid-value">¥{{ priceFilter(row.total_fee) }}</span>
                     </div>
                     <div class="grid-item">
-                      <span class="grid-label">订单总退款金额：</span><span class="grid-value">¥{{ priceFilter(row.refund_fee) }} </span>
+                      <span class="grid-label">订单总退款金额：</span>
+                      <span class="grid-value">¥{{ priceFilter(row.refund_fee) }}</span>
                     </div>
                   </el-col>
                   <el-col :span="12">
                     <div class="grid-item">
-                      <span class="grid-label">当前退款笔数：</span><span class="grid-value">{{ row.refund_num || 0 }} 次</span>
+                      <span class="grid-label">当前退款笔数：</span>
+                      <span class="grid-value">{{ row.refund_num || 0 }} 次</span>
                     </div>
                     <div class="grid-item">
                       <span class="grid-label">实际支付金额：</span>
-                      <span class="grid-value text-danger">¥{{ priceFilter(actualPayFee) }} </span>
+                      <span class="grid-value text-danger">¥{{ priceFilter(actualPayFee) }}</span>
                     </div>
                   </el-col>
                 </el-row>
@@ -255,7 +268,8 @@
             <el-row :gutter="0" class="card-grid">
               <el-col :span="12">
                 <div class="grid-item">
-                  <span class="grid-label">通知模式：</span><span class="grid-value">{{ notifyModeLabel }}</span>
+                  <span class="grid-label">通知模式：</span>
+                  <span class="grid-value">{{ notifyModeLabel }}</span>
                 </div>
                 <div class="grid-item">
                   <span class="grid-label">通知URL：</span>
@@ -281,7 +295,8 @@
                   <el-tag v-else type="info" size="mini" effect="light">未执行</el-tag>
                 </div>
                 <div class="grid-item">
-                  <span class="grid-label">通知时间：</span><span class="grid-value">{{ timeFilter(row.notify_date) }}</span>
+                  <span class="grid-label">通知时间：</span>
+                  <span class="grid-value">{{ timeFilter(row.notify_date) }}</span>
                 </div>
               </el-col>
             </el-row>

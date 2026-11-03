@@ -47,8 +47,9 @@ class CloudStorage {
         let uploadTask = uni.uploadFile({
           ...uploadFileOptionsRes.uploadFileOptions,
           filePath, // 本地文件路径
+          fileType,
           success: (uploadFileRes) => {
-            if (![200, 201].includes(uploadFileRes.statusCode)) {
+            if (![200, 201].includes(Number(uploadFileRes.statusCode))) {
               reject(uploadFileRes);
             } else {
               // 上传成功

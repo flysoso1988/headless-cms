@@ -78,10 +78,11 @@
       },
       // 错误日志表格的右侧自定义按钮点击事件
       customRightBtns(row, btn) {
+        let keyword = encodeURIComponent(row.err);
         if (btn.title === this.$t('vk.errorLog.baidu')) {
-          window.open(`https://www.baidu.com/baidu?wd=${row.err}`);
+          window.open(`https://www.baidu.com/baidu?wd=${keyword}`);
         } else if (btn.title === this.$t('vk.errorLog.google')) {
-          window.open(`https://www.google.com/search?q=${row.err}`);
+          window.open(`https://www.google.com/search?q=${keyword}`);
         }
       },
       // 监听 - 页面打开

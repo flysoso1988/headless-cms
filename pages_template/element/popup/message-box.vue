@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">消息提示功能演示</div>
 
@@ -51,7 +51,7 @@
     </el-row>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

@@ -13,9 +13,9 @@
     <!-- 页面主体内容开始 -->
     <div class="body" v-if="total > 1">
       <div class="total-progress">
-        <span class="span">{{
-          $t('vk.assetLibrary.uploadProgress.totalProgress', { completed: completedCount + failedCount, total, success: completedCount, failed: failedCount })
-        }}</span>
+        <span class="span">
+          {{ $t('vk.assetLibrary.uploadProgress.totalProgress', { completed: completedCount + failedCount, total, success: completedCount, failed: failedCount }) }}
+        </span>
         <el-progress :percentage="totalPercentage"></el-progress>
       </div>
 

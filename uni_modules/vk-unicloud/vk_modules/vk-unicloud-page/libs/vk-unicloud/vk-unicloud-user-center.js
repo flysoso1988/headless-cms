@@ -259,7 +259,6 @@ export default {
    * @param {Object} userInfo 用户信息
    */
   getCurrentUserInfo(obj = {}) {
-    addLoading(obj, 'loading');
     return callFunction({
       ...obj,
       url: 'user/kh/getMyUserInfo',
@@ -469,20 +468,21 @@ export default {
     if (typeof obj.needAlert === 'undefined') obj.needAlert = true;
     // #ifdef APP
     return new Promise((resolve, reject) => {
+      const { univerifyStyle = {} } = obj;
       const univerifyManager = uni.getUniverifyManager();
       univerifyManager.login({
         // #ifdef APP-HARMONY
         univerifyStyle: {
-          fullScreen: obj.univerifyStyle.fullScreen,
-          logoPath: obj.univerifyStyle.icon && obj.univerifyStyle.icon.path,
-          loginBtnText: obj.univerifyStyle.authButton && obj.univerifyStyle.authButton.title,
+          fullScreen: univerifyStyle.fullScreen,
+          logoPath: univerifyStyle.icon && univerifyStyle.icon.path,
+          loginBtnText: univerifyStyle.authButton && univerifyStyle.authButton.title,
         },
         // #endif
         // #ifndef APP-HARMONY
         univerifyStyle: obj.univerifyStyle,
         // #endif
         success: (res) => {
-          let dataJson = Object.assign(obj.data, res.authResult);
+          let dataJson = Object.assign(obj.data || {}, res.authResult);
           callFunction({
             url: 'user/pub/loginByUniverify',
             ...obj,
@@ -1849,11 +1849,19 @@ export default {
           return;
         }
         const provider = 'apple';
-        const loginRes = await uni.login({
-          provider,
+        await new Promise((resolve, reject) => {
+          uni.login({
+            provider,
+            success: resolve,
+            fail: reject,
+          });
         });
-        const getUserInfoRes = await uni.getUserInfo({
-          provider,
+        const getUserInfoRes = await new Promise((resolve, reject) => {
+          uni.getUserInfo({
+            provider,
+            success: resolve,
+            fail: reject,
+          });
         });
         resolve(getUserInfoRes.userInfo);
       } catch (err) {

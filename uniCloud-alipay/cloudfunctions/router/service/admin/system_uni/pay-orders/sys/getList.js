@@ -22,7 +22,7 @@ module.exports = {
     let res = { code: 0, msg: '' };
     // 业务逻辑开始-----------------------------------------------------------
     let { formData = {} } = data;
-    let { status } = formData;
+    let { status, pay_type } = formData;
     let whereJson = {};
     if (vk.pubfn.isNotNull(status)) {
       if (status === 'paid-success') {
@@ -34,6 +34,9 @@ module.exports = {
       } else {
         whereJson.status = Number(status);
       }
+    }
+    if (vk.pubfn.isNotNull(pay_type)) {
+      whereJson.pay_type = new RegExp(`^${vk.pubfn.escapeRegExp(pay_type)}_`);
     }
     res = await vk.baseDao.getTableData({
       dbName: dbName.payOrder,

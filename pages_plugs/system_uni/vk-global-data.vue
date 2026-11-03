@@ -19,8 +19,8 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">全局缓存列表</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加</el-button>
-          <el-button :size="$global.size" icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加</el-button>
+          <el-button icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
         </div>
       </div>
 

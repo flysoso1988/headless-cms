@@ -37,6 +37,7 @@ module.exports = [
           },
           dataJson: initData,
         });
+        res.userInfo = vk.pubfn.deleteObjectKeys(res.userInfo, ['password', 'token']);
       }
       return res;
     },

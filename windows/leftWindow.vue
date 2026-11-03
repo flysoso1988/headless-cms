@@ -84,28 +84,20 @@
   };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .sidebar {
     position: fixed;
-    top: var(--window-top);
+    top: 50px;
     width: 240px;
-    height: calc(100vh - (var(--window-top)) + 50px);
+    height: calc(100vh - 50px);
     box-sizing: border-box;
     box-shadow: var(--boxShadow, 2px 0 0px rgba(0, 21, 4, 0.2));
     border-top: var(--borderTop);
     background-color: $left-window-bg-color;
     padding-bottom: 10px;
-    top: 50px;
     z-index: 998;
   }
   .sidebar.collapse {
     width: 64px;
-  }
-  .title {
-    margin-left: 5px;
-  }
-  .center {
-    text-align: center;
-    margin-top: 100px;
   }
 </style>

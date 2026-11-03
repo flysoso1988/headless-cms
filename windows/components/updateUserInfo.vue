@@ -84,12 +84,7 @@
         this.resetForm();
       },
       onFormSuccess() {
-        let { vk } = this;
-        let { nickname, avatar } = this.form1.data;
-        let userInfo = vk.getVuex('$user.userInfo');
-        userInfo.nickname = nickname;
-        userInfo.avatar = avatar;
-        vk.setVuex('$user.userInfo', userInfo);
+        // 框架已根据接口返回的 userInfo 同步缓存，避免用提交后被编辑或重置的表单覆盖。
         this.close();
         this.$emit('success');
       },

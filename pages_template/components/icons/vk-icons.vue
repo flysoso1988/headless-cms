@@ -1,13 +1,13 @@
 <template>
-  <view class="page">
+  <div class="page">
     <vk-data-page-header title="VK框架图标" subTitle="点击图标即可复制图标代码，如需其他图标，欢迎提交需求。Q群：22466457"></vk-data-page-header>
-    <view class="page-body icons">
-      <view v-for="(icon, index) in icons" :key="icon" class="icon-item pointer">
+    <div class="page-body icons">
+      <div v-for="(icon, index) in icons" :key="icon" class="icon-item pointer">
         <vk-data-icon :name="icon" size="30" @click="setClipboardData('tag', icon)"></vk-data-icon>
-        <text @click="setClipboardData('class', icon)" class="icon-text">{{ icon }}</text>
-      </view>
-    </view>
-  </view>
+        <span @click="setClipboardData('class', icon)" class="icon-text">{{ icon }}</span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>

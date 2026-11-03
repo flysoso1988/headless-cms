@@ -1,23 +1,23 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Input 表单输入" subTitle="remote-select 远程搜索选择器"></vk-data-page-header>
-    <view class="page-body">
-      <view class="tips"> 主要用于选择 user_id 等外键字段 </view>
-      <view class="mt15">
+    <div class="page-body">
+      <div class="tips">主要用于选择 user_id 等外键字段</div>
+      <div class="mt15">
         <vk-data-input-remote-select v-model="form1.user_id" placeholder="请输入用户名" action="admin/system/user/kh/select" width="300px"></vk-data-input-remote-select>
-      </view>
-      <view class="mt15 tips">
-        <view class="mt15 json-view" v-if="form1">
+      </div>
+      <div class="mt15 tips">
+        <div class="mt15 json-view" v-if="form1">
           <pre>
 						{{ form1 }}
 					</pre
           >
-        </view>
-      </view>
-    </view>
+        </div>
+      </div>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

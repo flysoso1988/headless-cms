@@ -1,9 +1,9 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Form 表单" subTitle="使用插糟自定义表单"></vk-data-page-header>
 
-    <view class="page-body" style="max-width: 800px; margin: 0 auto">
+    <div class="page-body" style="max-width: 800px; margin: 0 auto">
       <vk-data-form
         ref="form1"
         v-model="form1.data"
@@ -17,9 +17,9 @@
       >
         <!-- v-slot:rate 中的 rate 对应 columns中的 key, form对应 form1.data keyName 对应 columns中的 key -->
         <template v-slot:rate="{ form, keyName }">
-          <view style="height: 36px; display: flex; align-items: center">
+          <div style="height: 36px; display: flex; align-items: center">
             <el-rate v-model="form[keyName]"></el-rate>
-          </view>
+          </div>
         </template>
 
         <template v-slot:footer="{ loading }">
@@ -28,18 +28,15 @@
         </template>
       </vk-data-form>
 
-      <view class="tips mt15">
-        <view class="mt15 json-view" v-if="form1.data">
-          <view style="font-size: 14px">表单数据</view>
-          <pre>
-						{{ form1.data }}
-					</pre
-          >
-        </view>
-      </view>
-    </view>
+      <div class="tips mt15">
+        <div class="mt15 json-view" v-if="form1.data">
+          <div style="font-size: 14px">表单数据</div>
+          <pre>{{ form1.data }}</pre>
+        </div>
+      </div>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

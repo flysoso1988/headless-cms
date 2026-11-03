@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">弹窗功能演示</div>
 
@@ -66,7 +66,7 @@
         <el-button type="text" @click="outerVisible = true">点击打开外层 Dialog</el-button>
 
         <el-dialog title="外层 Dialog" :visible.sync="outerVisible">
-          <el-dialog width="30%" title="内层 Dialog" :visible.sync="innerVisible" append-to-body> </el-dialog>
+          <el-dialog width="30%" title="内层 Dialog" :visible.sync="innerVisible" append-to-body></el-dialog>
           <div slot="footer" class="dialog-footer">
             <el-button @click="outerVisible = false">取 消</el-button>
             <el-button type="primary" @click="innerVisible = true">打开内层 Dialog</el-button>
@@ -91,7 +91,7 @@
     </el-row>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

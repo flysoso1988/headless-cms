@@ -1,5 +1,5 @@
 <template>
-  <div class="header no-user-select" :class="showMenuTabs ? 'show-menu-tabs' : 'hide-menu-tabs'" v-loading="!appInitedCom" :style="'--textColor' + textColorCom">
+  <div class="header no-user-select" :class="showMenuTabs ? 'show-menu-tabs' : 'hide-menu-tabs'" v-loading="!appInitedCom" :style="{ '--textColor': textColorCom }">
     <!-- 左侧 -->
     <div class="left">
       <!-- 模式一：纯图片 -->
@@ -55,15 +55,24 @@
               </div>
             </div>
             <el-dropdown v-if="isLoginCom" trigger="hover" @command="handleUserMenuCommand">
-              <div class="menu-item user-info-item">
+              <div class="menu-item user-info-item" :style="{ color: textColorCom }">
                 <el-avatar :size="28" :src="avatarCom" icon="el-icon-user-solid" class="menu-avatar"></el-avatar>
                 <span class="text-overflow">{{ nicknameCom }}</span>
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </div>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="updateUserInfo"><i class="el-icon-user"></i>{{ $t('vk.user.updateUserInfo') }}</el-dropdown-item>
-                <el-dropdown-item command="updatePassword"><i class="el-icon-lock"></i>{{ $t('vk.user.updatePassword') }}</el-dropdown-item>
-                <el-dropdown-item command="logout"><i class="el-icon-switch-button"></i>{{ $t('vk.user.logout') }}</el-dropdown-item>
+                <el-dropdown-item command="updateUserInfo">
+                  <i class="el-icon-user"></i>
+                  {{ $t('vk.user.updateUserInfo') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="updatePassword">
+                  <i class="el-icon-lock"></i>
+                  {{ $t('vk.user.updatePassword') }}
+                </el-dropdown-item>
+                <el-dropdown-item command="logout">
+                  <i class="el-icon-switch-button"></i>
+                  {{ $t('vk.user.logout') }}
+                </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
             <div v-else class="menu-item user-info-item" @click="navigateToLogin">
@@ -76,7 +85,7 @@
       <!-- 右下 -->
       <div class="right-bottom" v-show="showMenuTabs">
         <!-- tabs标签组 -->
-        <vk-data-menu-tabs v-if="appInitedCom" ref="menuTabs"></vk-data-menu-tabs>
+        <vk-data-menu-tabs v-if="appInitedCom" ref="menuTabs" @hook:mounted="registerMenuTabs" @hook:beforeDestroy="unregisterMenuTabs"></vk-data-menu-tabs>
       </div>
     </div>
     <!-- 弹窗 - 错误日志 -->
@@ -135,11 +144,21 @@
     },
     // 组件挂载完毕时
     mounted() {
-      this.vk.menuTabs = this.$refs.menuTabs;
       this.checkMenuCollapse();
       this.checkMenuTabs();
     },
     methods: {
+      // 页签挂载后再注册，兼容应用延迟初始化
+      registerMenuTabs() {
+        this.vk.menuTabs = this.$refs.menuTabs;
+      },
+      // 只清理当前实例，避免保留已销毁的页签引用
+      unregisterMenuTabs() {
+        let { vk } = this;
+        if (vk.menuTabs === this.$refs.menuTabs) {
+          vk.menuTabs = null;
+        }
+      },
       // 跳转登录页
       navigateToLogin() {
         this.vk.navigateToLogin();
@@ -287,7 +306,7 @@
   };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .header {
     height: 100px;
     width: 100%;

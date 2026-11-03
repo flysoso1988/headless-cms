@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">文字提示功能演示</div>
 
@@ -76,7 +76,11 @@
       <el-col :span="24" style="padding: 40rpx; margin-top: -40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">设置主题:</div>
         <el-tooltip placement="top">
-          <div slot="content">多行信息<br />第二行信息</div>
+          <div slot="content">
+            多行信息
+            <br />
+            第二行信息
+          </div>
           <el-button>Top center</el-button>
         </el-tooltip>
       </el-col>
@@ -93,7 +97,7 @@
     </el-row>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

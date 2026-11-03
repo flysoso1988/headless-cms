@@ -404,7 +404,7 @@ class BaseDao {
    */
   async count(condition, db) {
     let res = {};
-    if (condition && condition.whereJson && (condition.groupJson || condition.db)) {
+    if (condition && (condition.whereJson || condition.groupJson || condition.lastWhereJson || condition.foreignDB)) {
       res = await this.dao.count({
         db,
         ...condition,

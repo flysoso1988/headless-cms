@@ -51,7 +51,7 @@ class CloudStorage {
     }).then((res) => {
       return new Promise((resolve, reject) => {
         // 获取临时URL，公共读的临时URL是永久的
-        uniCloud.getTempFileURL({
+        runCloud.getTempFileURL({
           fileList: [res.fileID],
           success: (data) => {
             let { fileID, tempFileURL } = data.fileList[0];

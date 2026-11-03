@@ -19,10 +19,10 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">抽奖活动列表</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-circle-plus-outline" @click="addBtn">添加</el-button>
-          <el-button type="success" :size="$global.size" icon="el-icon-circle-plus-outline" @click="showSetKey">设置key</el-button>
-          <el-button :size="$global.size" icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
-          <el-button :size="$global.size" @click="showHelp">查看教程</el-button>
+          <el-button type="primary" icon="el-icon-circle-plus-outline" @click="addBtn">添加</el-button>
+          <el-button type="success" icon="el-icon-circle-plus-outline" @click="showSetKey">设置key</el-button>
+          <el-button icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
+          <el-button @click="showHelp">查看教程</el-button>
         </div>
       </div>
 

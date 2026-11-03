@@ -56,9 +56,12 @@ vk.request({
  */
 
 requestUtil.request = function (obj = {}) {
+  obj = { ...obj };
   let vk = uni.vk;
+  const isArrayBuffer = Object.prototype.toString.call(obj.data) === '[object ArrayBuffer]';
+  const canMergeData = !isArrayBuffer && typeof obj.data !== 'string';
   // 去除值为 undefined 的参数
-  if (typeof obj.data === 'object') {
+  if (typeof obj.data === 'object' && !isArrayBuffer) {
     obj.data = vk.pubfn.copyObject(obj.data);
   }
   // 注入自定义全局参数开始-----------------------------------------------------------
@@ -67,13 +70,13 @@ requestUtil.request = function (obj = {}) {
   // 根据正则规格自动匹配全局请求参数
   for (let i in globalParam) {
     let customDate = globalParam[i];
-    if (customDate.regExp) {
+    if (canMergeData && customDate.regExp) {
       if (typeof customDate.regExp === 'object') {
         // 数组形式
         for (let i = 0; i < customDate.regExp.length; i++) {
           let regExp = new RegExp(customDate.regExp[i]);
           if (regExp.test(obj.url)) {
-            obj.data = Object.assign(customDate.data, obj.data);
+            obj.data = mergeRequestData(customDate.data, obj.data);
             break;
           }
         }
@@ -81,30 +84,33 @@ requestUtil.request = function (obj = {}) {
         // 字符串形式
         let regExp = new RegExp(customDate.regExp);
         if (regExp.test(obj.url)) {
-          obj.data = Object.assign(customDate.data, obj.data);
+          obj.data = mergeRequestData(customDate.data, obj.data);
         }
       }
     }
   }
   // 根据指定globalParamName匹配全局请求参数
   let customDate = requestUtil.getRequestGlobalParam(obj.globalParamName);
-  if (customDate && JSON.stringify(customDate) !== '{}') {
+  if (canMergeData && customDate && JSON.stringify(customDate) !== '{}') {
     if (customDate.regExp) {
-      obj.data = Object.assign(customDate.data, obj.data); // 新版本
+      obj.data = mergeRequestData(customDate.data, obj.data); // 新版本
     } else {
-      obj.data = Object.assign(customDate, obj.data); // 兼容旧版本
+      obj.data = mergeRequestData(customDate, obj.data); // 兼容旧版本
     }
   }
   // 注入自定义全局参数结束-----------------------------------------------------------
 
   if (!obj.method) obj.method = 'POST'; // 默认POST请求
   if (typeof obj.dataType === 'undefined') obj.dataType = 'json';
-  if (obj.dataType == 'default' || obj.dataType == 'buffer' || obj.dataType === '') delete obj.dataType;
+  if (obj.dataType == 'default' || obj.dataType == 'buffer' || obj.dataType === '') obj.dataType = 'text';
   if (typeof obj.header === 'undefined' && typeof obj.headers !== 'undefined') {
     obj.header = obj.headers;
   }
+  if (obj.header) obj.header = { ...obj.header };
   if (obj.encrypt) {
-    obj.uniIdToken = true;
+    if (typeof obj.uniIdToken !== 'string' || !obj.uniIdToken) {
+      obj.uniIdToken = (obj.header && obj.header['uni-id-token']) || true;
+    }
     if (!obj.clientInfo) obj.clientInfo = true;
   }
   // 自动注入token到请求头开始-----------------------------------------------------------
@@ -128,7 +134,7 @@ requestUtil.request = function (obj = {}) {
     if (obj.clientInfo === true) {
       clientInfo = uni.getSystemInfoSync();
     } else if (typeof obj.clientInfo === 'object') {
-      clientInfo = obj.clientInfo;
+      clientInfo = { ...obj.clientInfo };
     }
     if (vk.pubfn.isNotNull(clientInfo)) {
       if (!obj.header) obj.header = {};
@@ -204,33 +210,43 @@ requestUtil.request = function (obj = {}) {
       ...obj,
       success: (res) => {
         if (decryptFn) res.data = decryptFn(res.data);
+        let params = obj;
         if (interceptor && typeof interceptor.success === 'function') {
           let interceptorRes = interceptor.success(res);
           if (interceptorRes === false) {
-            return;
+            params = { ...obj, success: undefined };
           }
         }
-        requestSuccess({
-          res,
-          params: obj,
-          Logger,
-          resolve,
-          reject,
-        });
+        try {
+          requestSuccess({
+            res,
+            params,
+            Logger,
+            resolve,
+            reject,
+          });
+        } catch (error) {
+          reject(error);
+        }
       },
       fail: (res) => {
+        let params = obj;
         if (interceptor && typeof interceptor.fail === 'function') {
           let interceptorRes = interceptor.fail(res);
           if (interceptorRes === false) {
-            return;
+            params = { ...obj, fail: undefined, needAlert: false };
           }
         }
-        requestFail({
-          res,
-          params: obj,
-          Logger,
-          reject,
-        });
+        try {
+          requestFail({
+            res,
+            params,
+            Logger,
+            reject,
+          });
+        } catch (error) {
+          reject(error);
+        }
       },
       complete: (res) => {
         if (interceptor && typeof interceptor.complete === 'function') {
@@ -250,26 +266,36 @@ requestUtil.request = function (obj = {}) {
   promiseAction.catch((error) => {});
   return promiseAction;
 };
+// 浅合并全局参数，请求参数优先，不修改传入对象。
+function mergeRequestData(defaultData, requestData) {
+  return Object.assign({}, defaultData, requestData);
+}
+
 // 请求成功回调
 function requestSuccess(obj = {}) {
   let vk = uni.vk;
   let config = requestUtil.config;
   let { res = {}, params, Logger, resolve, reject } = obj;
   let { title, needOriginalRes, dataType, errorCodeName, errorMsgName, success, loading, responseType } = params;
-  let data = res.data || {};
+  let data = res.data === null || typeof res.data === 'undefined' ? {} : res.data;
   if (responseType !== 'arraybuffer') {
     if (vk.pubfn.isNotNullAll(errorCodeName, data[errorCodeName])) {
       data.code = data[errorCodeName];
-      delete data[errorCodeName];
+      if (errorCodeName !== 'code') delete data[errorCodeName];
     }
     if (vk.pubfn.isNotNullAll(errorMsgName, data[errorMsgName])) {
       data.msg = data[errorMsgName];
-      if (typeof data[errorMsgName] === 'string') {
+      if (errorMsgName !== 'msg' && typeof data[errorMsgName] === 'string') {
         delete data[errorMsgName];
       }
     }
     if (config.debug) Logger.result = typeof data == 'object' ? vk.pubfn.copyObject(data) : data;
-    if ([1301, 1302, 30201, 30202, 30203, 30204].indexOf(data.code) > -1 && data.msg.indexOf('token') > -1) {
+    if ([1301, 1302, 30201, 30202, 30203, 30204].indexOf(data.code) > -1 && String(data.msg || '').indexOf('token') > -1) {
+      if (title) vk.hideLoading();
+      if (loading) {
+        vk.setLoading(false, Logger.loading);
+        Logger.loading = null;
+      }
       // 执行 login 拦截器函数（跳转到页面页面）
       let { interceptor = {} } = vk.callFunctionUtil;
       if (typeof interceptor.login === 'function') {
@@ -279,18 +305,22 @@ function requestSuccess(obj = {}) {
           vk,
         });
       }
+      if (typeof params.fail === 'function') params.fail(data);
       reject(data);
       return;
-    } else if (res.statusCode >= 400 || (data.code && data.code != 200)) {
-      requestFail({
-        res: data,
-        params,
-        Logger,
-        reject,
-      });
-      return;
     }
-    if (needOriginalRes) data.originalRes = res;
+  }
+  if (res.statusCode >= 400 || (responseType !== 'arraybuffer' && data.code && data.code != 200)) {
+    requestFail({
+      res: responseType === 'arraybuffer' ? res : data,
+      params,
+      Logger,
+      reject,
+    });
+    return;
+  }
+  if (responseType !== 'arraybuffer') {
+    if (needOriginalRes && typeof data === 'object') data.originalRes = vk.pubfn.copyObject(res);
     if (data.vk_uni_token) vk.callFunctionUtil.saveToken(data.vk_uni_token);
     if (data.userInfo && data.needUpdateUserInfo) vk.callFunctionUtil.updateUserInfo(data);
   }
@@ -316,7 +346,7 @@ function requestFail(obj = {}) {
   let errMsg = '';
   let sysErr = false;
   if (typeof res.code !== 'undefined') {
-    errMsg = res.msg;
+    errMsg = String(res.msg || res.message || res.errMsg || '请求失败');
   } else {
     sysErr = true;
     errMsg = JSON.stringify(res);
@@ -353,8 +383,8 @@ function requestFail(obj = {}) {
       }
     }
     if (typeof fail === 'function') fail(res);
-    if (typeof reject === 'function') reject(res);
   }
+  if (typeof reject === 'function') reject(res);
 }
 
 // 请求完成回调
@@ -389,8 +419,8 @@ function requestComplete(obj = {}) {
     console.log('%c--------【结束】【' + functionType + '】【' + Logger.action + '】--------', 'color: ' + colorStr + ';font-size: 12px;font-weight: bold;');
   }
   let data = res.data;
-  if (needOriginalRes) data.originalRes = vk.pubfn.copyObject(res);
-  if (typeof complete === 'function') complete(data);
+  if (needOriginalRes && data && typeof data === 'object' && !data.originalRes) data.originalRes = vk.pubfn.copyObject(res);
+  if (typeof complete === 'function') complete('data' in res ? data : res);
   Logger = null; // 释放内存
 }
 
@@ -423,7 +453,8 @@ requestUtil.updateRequestGlobalParam = (data = {}, setKey) => {
     config.request.dataParam = data;
   } else {
     // 覆盖参数(有就覆盖,没有则新增)
-    config.request.dataParam = Object.assign(config.request.dataParam, data);
+    let dataParam = uni.getStorageSync(config.requestGlobalParamKeyName) || {};
+    config.request.dataParam = Object.assign(dataParam, data);
   }
   vk.setStorageSync(config.requestGlobalParamKeyName, config.request.dataParam);
 };

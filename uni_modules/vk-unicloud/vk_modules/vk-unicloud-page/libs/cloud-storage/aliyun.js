@@ -26,32 +26,27 @@ class CloudStorage {
     let fileName = fileNameObj.fileFullName;
     let formData = vk.pubfn.copyObject(cloudStorageConfig.uploadData);
     formData['key'] = fileName; // 存储在oss的文件路径
-    /**
-     * 特别说明
-     * 若已知本地图片,则使用formData["name"] = filePath
-     * 若已知base64,则是用formData["file"] = file;// file base64字符串转成blob对象
-     */
-    if (filePath.indexOf(';base64,') > -1) {
-      formData['file'] = dataURLtoBlob(filePath);
-    } else {
+    // Base64 文件由 uni.uploadFile 直接处理，避免重复添加 file 表单域
+    if (filePath.indexOf(';base64,') === -1) {
       formData['name'] = filePath;
     }
     return new Promise((resolve, reject) => {
       let uploadTask = uni.uploadFile({
         url: cloudStorageConfig.action,
         filePath,
+        fileType,
         name,
         header,
         formData: formData,
         success: (res) => {
-          if (![200, 201].includes(res.statusCode)) {
+          if (![200, 201].includes(Number(res.statusCode))) {
             reject(res);
           } else {
             // 上传成功
             let fileURL = fileNameObj.url;
             res = {
               filePath, // 本地文件路径
-              cloudPath: getCloudPath(fileURL), // 云端文件路径
+              cloudPath: fileName, // 云端文件路径
               fileID: fileURL, // 云端文件ID
               fileURL: fileURL, // 云端文件URL
               url: fileURL, // 云端文件URL，与fileURL一致
@@ -170,35 +165,9 @@ function createFileName(obj = {}) {
   // 文件名全称（包含文件路径） = 根目录 + 文件相对路径
   let fileFullName = dirname + '/' + fileRelativePath;
   // 外网地址 = 外网域名 + 文件名全称
-  let url = host + '/' + fileFullName;
+  let url = host + '/' + fileFullName.split('/').map(encodeURIComponent).join('/');
   fileObj.url = url;
   fileObj.fileFullName = fileFullName;
   fileObj.fileNickName = fileNickName;
   return fileObj;
-}
-
-function dataURLtoBlob(dataurl) {
-  let arr = dataurl.split(','),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new Blob([u8arr], { type: mime });
-}
-
-function getCloudPath(url) {
-  let cloudPath = '';
-  const match = url.match(/(?:https?:\/\/)?([^/]+)(\/.*)/);
-  if (match && match[2]) {
-    const extractedPath = match[2];
-    if (extractedPath.indexOf('//') === 0) {
-      cloudPath = extractedPath.substring(2);
-    } else {
-      cloudPath = extractedPath.substring(1);
-    }
-  }
-  return cloudPath;
 }

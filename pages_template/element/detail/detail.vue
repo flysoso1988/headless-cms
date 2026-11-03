@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <el-row>
       <div style="padding: 0rpx; font-size: 70rpx; font-family: kaiti">综合详情功能演示</div>
@@ -15,16 +15,16 @@
       <el-col :span="12">
         <div class="grid-content bg-purple-dark" style="padding: 20rpx; display: flex">
           <div style="flex: 1">
-            <text style="color: #3d475c">姓名：</text>
-            <text style="color: #978e94">蒙奇D-呵呵</text>
+            <span style="color: #3d475c">姓名：</span>
+            <span style="color: #978e94">蒙奇D-呵呵</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">年龄：</text>
-            <text style="color: #978e94">？？？？</text>
+            <span style="color: #3d475c">年龄：</span>
+            <span style="color: #978e94">？？？？</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">性别：</text>
-            <text style="color: #978e94">男</text>
+            <span style="color: #3d475c">性别：</span>
+            <span style="color: #978e94">男</span>
           </div>
         </div>
       </el-col>
@@ -32,16 +32,16 @@
       <el-col :span="12">
         <div class="grid-content bg-purple-dark" style="padding: 20rpx; display: flex">
           <div style="flex: 1">
-            <text style="color: #3d475c">星座：</text>
-            <text style="color: #978e94">天秤座</text>
+            <span style="color: #3d475c">星座：</span>
+            <span style="color: #978e94">天秤座</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">爱好：</text>
-            <text style="color: #978e94">女</text>
+            <span style="color: #3d475c">爱好：</span>
+            <span style="color: #978e94">女</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">民族：</text>
-            <text style="color: #978e94">神族</text>
+            <span style="color: #3d475c">民族：</span>
+            <span style="color: #978e94">神族</span>
           </div>
         </div>
       </el-col>
@@ -49,16 +49,16 @@
       <el-col :span="12">
         <div class="grid-content bg-purple-dark" style="padding: 20rpx; display: flex">
           <div style="flex: 1">
-            <text style="color: #3d475c">仙术：</text>
-            <text style="color: #978e94">凌波微步</text>
+            <span style="color: #3d475c">仙术：</span>
+            <span style="color: #978e94">凌波微步</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">仙骨：</text>
-            <text style="color: #978e94">百万年</text>
+            <span style="color: #3d475c">仙骨：</span>
+            <span style="color: #978e94">百万年</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">查克拉：</text>
-            <text style="color: #978e94">？？？？？</text>
+            <span style="color: #3d475c">查克拉：</span>
+            <span style="color: #978e94">？？？？？</span>
           </div>
         </div>
       </el-col>
@@ -66,21 +66,21 @@
       <el-col :span="12">
         <div class="grid-content bg-purple-dark" style="padding: 20rpx; display: flex">
           <div style="flex: 1">
-            <text style="color: #3d475c">斗气等级：</text>
-            <text style="color: #978e94">？？？？？</text>
+            <span style="color: #3d475c">斗气等级：</span>
+            <span style="color: #978e94">？？？？？</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">果实能力：</text>
-            <text style="color: #978e94">震震果实</text>
+            <span style="color: #3d475c">果实能力：</span>
+            <span style="color: #978e94">震震果实</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">所属派别：</text>
-            <text style="color: #978e94">黑手党</text>
+            <span style="color: #3d475c">所属派别：</span>
+            <span style="color: #978e94">黑手党</span>
           </div>
         </div>
       </el-col>
 
-      <el-col :span="24" style="border-bottom: 1px solid #ebeef5"> </el-col>
+      <el-col :span="24" style="border-bottom: 1px solid #ebeef5"></el-col>
 
       <!-- 其他信息 -->
       <el-col :span="24">
@@ -89,12 +89,12 @@
       <el-col :span="24">
         <div class="grid-content bg-purple-dark" style="padding: 20rpx; display: flex">
           <div style="flex: 1">
-            <text style="color: #3d475c">住址：</text>
-            <text style="color: #978e94">天界</text>
+            <span style="color: #3d475c">住址：</span>
+            <span style="color: #978e94">天界</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">家乡：</text>
-            <text style="color: #978e94">神界</text>
+            <span style="color: #3d475c">家乡：</span>
+            <span style="color: #978e94">神界</span>
           </div>
         </div>
       </el-col>
@@ -102,12 +102,12 @@
       <el-col :span="24">
         <div class="grid-content bg-purple-dark" style="padding: 20rpx; display: flex">
           <div style="flex: 1">
-            <text style="color: #3d475c">城市：</text>
-            <text style="color: #978e94">天宫</text>
+            <span style="color: #3d475c">城市：</span>
+            <span style="color: #978e94">天宫</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">仙龄：</text>
-            <text style="color: #978e94">6000年</text>
+            <span style="color: #3d475c">仙龄：</span>
+            <span style="color: #978e94">6000年</span>
           </div>
         </div>
       </el-col>
@@ -115,32 +115,32 @@
       <el-col :span="24">
         <div class="grid-content bg-purple-dark" style="padding: 20rpx; display: flex">
           <div style="flex: 1">
-            <text style="color: #3d475c">仙术：</text>
-            <text style="color: #978e94">炎咒</text>
+            <span style="color: #3d475c">仙术：</span>
+            <span style="color: #978e94">炎咒</span>
           </div>
           <div style="flex: 1">
-            <text style="color: #3d475c">公司：</text>
-            <text style="color: #978e94">魔界</text>
+            <span style="color: #3d475c">公司：</span>
+            <span style="color: #978e94">魔界</span>
           </div>
         </div>
       </el-col>
 
-      <el-col :span="24" style="border-bottom: 1px solid #ebeef5"> </el-col>
+      <el-col :span="24" style="border-bottom: 1px solid #ebeef5"></el-col>
 
       <el-col :span="24">
         <div style="padding: 20rpx" class="grid-content bg-purple-dark">表格信息</div>
 
         <el-table :data="data.tableData" style="width: 100%" border row-class-name="tableRowClassName">
-          <el-table-column prop="date" label="日期" width="180"> </el-table-column>
+          <el-table-column prop="date" label="日期" width="180"></el-table-column>
 
-          <el-table-column prop="name" label="姓名" width="180"> </el-table-column>
+          <el-table-column prop="name" label="姓名" width="180"></el-table-column>
 
-          <el-table-column prop="address" label="地址"> </el-table-column>
+          <el-table-column prop="address" label="地址"></el-table-column>
         </el-table>
       </el-col>
     </el-row>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

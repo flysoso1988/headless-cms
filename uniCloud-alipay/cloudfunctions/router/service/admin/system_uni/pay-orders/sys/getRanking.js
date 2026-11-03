@@ -15,6 +15,7 @@ module.exports = {
     const { vk, _ } = util;
     const $ = _.aggregate;
     const { formData = {} } = data;
+    const { pay_type } = formData;
 
     const whereJson = {
       user_id: _.exists(true),
@@ -33,6 +34,9 @@ module.exports = {
       whereJson.status = _.in([2, 3]);
     } else if (status !== 'all') {
       whereJson.status = Number(status);
+    }
+    if (vk.pubfn.isNotNull(pay_type)) {
+      whereJson.pay_type = new RegExp(`^${vk.pubfn.escapeRegExp(pay_type)}_`);
     }
 
     const res = await vk.baseDao.getTableData({
@@ -69,8 +73,12 @@ module.exports = {
     });
 
     const rows = Array.isArray(res.rows) ? res.rows : [];
+    const { pageIndex, pageSize } = res.pagination;
     // 此处金额不需要 / 100，因为前端展示时会自动除以100并保留两位小数
-    res.rows = rows.map((row) => {
+    res.rows = rows.map((row, index) => {
+      const userInfo = vk.pubfn.isNotNull(row.userInfo) ? row.userInfo : {};
+      row.rank = (pageIndex - 1) * pageSize + index + 1;
+      row.user = vk.pubfn.isNotNull(userInfo.nickname) ? userInfo.nickname : vk.pubfn.isNotNull(row.user_id) ? row.user_id : '-';
       const payAmount = getNumber(row.payAmount, 0);
       const refundAmount = getNumber(row.refundAmount, 0);
       const payCount = getNumber(row.payCount, 0);

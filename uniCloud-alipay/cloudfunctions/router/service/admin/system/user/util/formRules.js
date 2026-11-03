@@ -13,7 +13,7 @@ class Util {
     let res = { code: 0, msg: '' };
     // 验证规则开始 -----------------------------------------------------------
     let rules = {
-      username: [{ required: true, validator: vk.pubfn.validator('username'), message: '用户名以字母开头，长度在6~18之间，只能包含字母、数字和下划线', trigger: 'blur' }],
+      username: [{ required: true, validator: vk.pubfn.validator('username'), message: '用户名以字母开头，长度在2~32之间，只能包含字母、数字、下划线和短横线', trigger: 'blur' }],
       nickname: [
         { required: true, message: '昵称为必填字段', trigger: 'blur' },
         { min: 2, max: 20, message: '昵称长度在 2 到 20 个字符', trigger: 'blur' },

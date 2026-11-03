@@ -1,38 +1,38 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Input 表单输入" subTitle="number 数字"></vk-data-page-header>
-    <view class="page-body">
-      <view class="tips"> 正整数 </view>
-      <view class="mt15">
-        <vk-data-input-number v-model="form1.value1" :precision="0" width="300px" placeholder="请输入数字"></vk-data-input-number>
-      </view>
-      <view class="mt15 tips"> 2位小数 </view>
-      <view class="mt15">
-        <vk-data-input-number v-model="form1.value2" :precision="2" width="300px" placeholder="请输入数字"></vk-data-input-number>
-      </view>
+    <div class="page-body">
+      <div class="tips">正整数</div>
+      <div class="mt15">
+        <vk-data-input-numeric mode="number" v-model="form1.value1" :precision="0" width="300px" placeholder="请输入数字"></vk-data-input-numeric>
+      </div>
+      <div class="mt15 tips">2位小数</div>
+      <div class="mt15">
+        <vk-data-input-numeric mode="number" v-model="form1.value2" :precision="2" width="300px" placeholder="请输入数字"></vk-data-input-numeric>
+      </div>
 
-      <view class="mt15 tips"> 最大值100 </view>
-      <view class="mt15">
-        <vk-data-input-number ref="input-number-3" v-model="form1.value3" :precision="0" width="300px" placeholder="请输入数字" :max="100"></vk-data-input-number>
-      </view>
+      <div class="mt15 tips">最大值100</div>
+      <div class="mt15">
+        <vk-data-input-numeric mode="number" ref="input-number-3" v-model="form1.value3" :precision="0" width="300px" placeholder="请输入数字" :max="100"></vk-data-input-numeric>
+      </div>
 
-      <view class="mt15 tips">
+      <div class="mt15 tips">
         <el-button @click="focus">使上方输入框获得焦点</el-button>
         <el-button @click="blur">使上方输入框失去焦点</el-button>
         <el-button @click="select">选中上方输入框中的文字</el-button>
-      </view>
-    </view>
+      </div>
+    </div>
 
-    <view class="mt15 json-view" v-if="form1">
+    <div class="mt15 json-view" v-if="form1">
       <pre>
 				{{ form1 }}
 			</pre
       >
-    </view>
+    </div>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

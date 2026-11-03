@@ -14,7 +14,7 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">查询表格</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-plus" class="btn-add" @click="addBtn">添加</el-button>
+          <el-button type="primary" icon="el-icon-plus" class="btn-add" @click="addBtn">添加</el-button>
         </div>
       </div>
 

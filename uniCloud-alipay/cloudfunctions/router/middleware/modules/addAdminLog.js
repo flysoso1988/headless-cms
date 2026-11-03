@@ -12,7 +12,7 @@ const urlList = [
 
 // 生成regExp规则
 let regExp = urlList.map((item, index) => {
-  return `^${item.url}$`;
+  return `^${item.url.replace(/\./g, '\\.')}$`;
 });
 
 module.exports = [
@@ -35,7 +35,13 @@ module.exports = [
           // 只有请求成功的请求才添加日志
           let item = vk.pubfn.getListItem(urlList, 'url', url);
           let title = item && item.title ? item.title : '未分类';
-          delete data.uid;
+          // 递归过滤日志副本中的凭证，不修改原始请求和响应。
+          const logData = JSON.parse(
+            JSON.stringify({ request_param: data, response: serviceRes }, (key, value) => {
+              return ['password', 'token', 'uniIdToken', 'vk_uni_token'].includes(key) ? '***' : value;
+            })
+          );
+          delete logData.request_param.uid;
           // 日志写入数据库
           // 获取请求id（只有云端云函数才有请求id，本地运行的云函数无请求id）
           let request_id;
@@ -55,8 +61,8 @@ module.exports = [
               title,
               ip: originalParam.context.CLIENTIP,
               url: url,
-              request_param: data,
-              response: serviceRes,
+              request_param: logData.request_param,
+              response: logData.response,
               request_id,
             },
           });

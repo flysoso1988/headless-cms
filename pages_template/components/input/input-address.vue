@@ -1,27 +1,27 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Input 表单输入" subTitle="address 省市区选择"></vk-data-page-header>
-    <view class="page-body">
-      <view class="tips"> 同时支持下拉选择 和 输入搜索 </view>
-      <view class="mt15">
+    <div class="page-body">
+      <div class="tips">同时支持下拉选择 和 输入搜索</div>
+      <div class="mt15">
         <vk-data-input-address v-model="form1.address1" placeholder="请选择省市区"></vk-data-input-address>
-      </view>
-      <view class="mt15">
+      </div>
+      <div class="mt15">
         <vk-data-input-address v-model="form1.address2" placeholder="请选择省市" :level="2"></vk-data-input-address>
-      </view>
-      <view class="mt15">
+      </div>
+      <div class="mt15">
         <vk-data-input-address v-model="form1.address3" placeholder="请选择省" :level="1"></vk-data-input-address>
-      </view>
-      <view class="mt15 json-view" v-if="form1">
+      </div>
+      <div class="mt15 json-view" v-if="form1">
         <pre>
 					{{ form1 }}
 				</pre
         >
-      </view>
-    </view>
+      </div>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

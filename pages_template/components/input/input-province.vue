@@ -1,23 +1,23 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Input 表单输入" subTitle="province 省份选择"></vk-data-page-header>
-    <view class="page-body">
-      <view class="tips"> 同时支持下拉选择 和 输入搜索 </view>
-      <view class="mt15">
+    <div class="page-body">
+      <div class="tips">同时支持下拉选择 和 输入搜索</div>
+      <div class="mt15">
         <vk-data-input-province v-model="form1.value"></vk-data-input-province>
-      </view>
-      <view class="mt15 tips">
-        <view class="mt15 json-view" v-if="form1.value">
+      </div>
+      <div class="mt15 tips">
+        <div class="mt15 json-view" v-if="form1.value">
           <pre>
 						{{ form1.value }}
 					</pre
           >
-        </view>
-      </view>
-    </view>
+        </div>
+      </div>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

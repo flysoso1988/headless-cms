@@ -20,6 +20,8 @@ async test(){
 let importObject = function (name, importObjectOptions = {}) {
   const newObj = new Proxy(importObject, {
     get: function (target, key, receiver) {
+      // 避免云对象被 Promise 识别为 thenable。
+      if (key === 'then') return undefined;
       /**
        * 导出云对象内的某个方法
        * @param {Object}   data      请求参数，如 { a:1, b:"2" } 云对象内可通过 let { a, b } = data; 获取参数
@@ -27,7 +29,7 @@ let importObject = function (name, importObjectOptions = {}) {
        * @param {Boolean}  needAlert 为true代表请求错误时，会有弹窗提示。默认为true
        * @param {Object}   loading   与title二选一，格式为 { name: "loading", that: this }  name是变量名，that是数据源，当发起请求时，自动this[name] = true; 请求结束后，自动this[name] = false;
        */
-      return async function (options = {}) {
+      const method = async function (options = {}) {
         // 如果importObjectOptions中指定了easy为true，代表options的值就是请求参数
         if (importObjectOptions.easy) {
           options = {
@@ -36,6 +38,7 @@ let importObject = function (name, importObjectOptions = {}) {
         }
         // 如果importObjectOptions中指定了data，代表有默认请求参数，需要加到请求参数中
         if (importObjectOptions.data) {
+          options = { ...options };
           if (typeof importObjectOptions.data === 'function') {
             options.data = Object.assign({}, importObjectOptions.data(), options.data);
           } else {
@@ -47,6 +50,12 @@ let importObject = function (name, importObjectOptions = {}) {
           ...options,
           url: `${name}.${key}`,
         });
+      };
+      return function (options = {}) {
+        const promise = method(options);
+        // 兼容仅使用回调的调用方式，同时保留 await/catch 的错误处理能力。
+        promise.catch(() => {});
+        return promise;
       };
     },
     // set: function(target, key, value, receiver) {

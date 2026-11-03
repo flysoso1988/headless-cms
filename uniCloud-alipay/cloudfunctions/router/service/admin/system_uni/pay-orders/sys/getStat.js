@@ -195,7 +195,7 @@ function createQuery(data) {
     previousStartTime,
     previousEndTime,
     groupBy,
-    status: data.status || DEFAULT_STATUS,
+    status: vk.pubfn.isNotNull(data.status) ? data.status : DEFAULT_STATUS,
     platform: data.platform || '',
     payType: data.payType || '',
     orderType: data.orderType || '',
@@ -359,7 +359,7 @@ async function getCurrentPeriodOrderTypeBreakdown({ staticWhere, query }) {
 async function getCurrentPeriodRefundByDay({ staticWhere, query }) {
   const baseMatch = Object.assign({}, staticWhere, {
     refund_num: _.gt(0),
-    pay_date: _.gte(query.previousStartTime).lte(query.endTime),
+    pay_date: _.lte(query.endTime),
   });
   delete baseMatch.status;
 
@@ -389,7 +389,7 @@ async function getCurrentPeriodRefundByDay({ staticWhere, query }) {
 async function getRefundOverview({ staticWhere, query }) {
   const baseMatch = Object.assign({}, staticWhere, {
     refund_num: _.gt(0),
-    pay_date: _.gte(query.previousStartTime).lte(query.endTime),
+    pay_date: _.lte(query.endTime),
   });
   // 退款统计需统计所有有退款记录的订单，不受支付状态筛选限制，故移除 status 条件
   delete baseMatch.status;
@@ -445,7 +445,7 @@ async function getRefundOverview({ staticWhere, query }) {
 async function getRefundBreakdown({ staticWhere, query }) {
   const baseMatch = Object.assign({}, staticWhere, {
     refund_num: _.gt(0),
-    pay_date: _.gte(query.previousStartTime).lte(query.endTime),
+    pay_date: _.lte(query.endTime),
   });
   delete baseMatch.status;
 

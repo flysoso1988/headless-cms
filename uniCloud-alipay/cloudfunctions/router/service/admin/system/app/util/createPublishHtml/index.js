@@ -6,6 +6,12 @@ const TE = require('./lib/art-template.js');
 TE.defaults.openTag = '{@';
 TE.defaults.closeTag = '@}';
 
+// 内联脚本使用 JSON 序列化，保留 URL 参数并防止内容提前闭合 script 标签。
+TE.helper('jsonForScript', (value) => {
+  const json = JSON.stringify(value === undefined || value === null ? '' : value);
+  return json.replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+});
+
 const success = {
   code: 0,
   success: true,

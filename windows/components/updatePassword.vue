@@ -110,8 +110,12 @@
       },
       // 监听 - 提交成功后
       onFormSuccess() {
+        let { vk } = this;
         this.close();
+        // 修改密码后云端 token 已失效，清理本地登录态并重新登录。
+        vk.deleteToken();
         this.$emit('success');
+        vk.navigateToLogin();
       },
       // 打开页面
       open() {

@@ -1,21 +1,21 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Form 表单" subTitle="弹窗表单"></vk-data-page-header>
-    <view class="page-body">
+    <div class="page-body">
       <el-button @click="form1.props.show = true">弹出表单</el-button>
       <el-button @click="resetForm">重置表单</el-button>
 
-      <view class="tips mt15">
-        <view class="mt15 json-view" v-if="form1.data">
-          <view style="font-size: 14px">表单数据</view>
+      <div class="tips mt15">
+        <div class="mt15 json-view" v-if="form1.data">
+          <div style="font-size: 14px">表单数据</div>
           <pre>
 						{{ form1.data }}
 					</pre
           >
-        </view>
-      </view>
-    </view>
+        </div>
+      </div>
+    </div>
     <!-- 弹窗开始 -->
     <vk-data-dialog v-model="form1.props.show" title="表单标题" width="600px" mode="form">
       <vk-data-form
@@ -34,7 +34,7 @@
     <!-- 弹窗结束 -->
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

@@ -1,63 +1,47 @@
 <template>
-  <view>
-    <!-- 搜索区域卡片 -->
-    <view class="vk-page-card vk-page-search-card">
-      <vk-data-table-query
-        v-model="queryForm1.formData"
-        :columns="queryForm1.columns"
-        :span="3"
-        :collapse-rows="1"
-        :collapse-default-expand="true"
-        @search="search"
-        @collapse-change="collapseChange"
-      ></vk-data-table-query>
-    </view>
-    <!-- 表格内容卡片 -->
-    <view class="vk-page-card">
-      <!-- 操作按钮与表格标题区域 -->
-      <view class="vk-page-card-toolbar">
-        <!-- 左侧标题 -->
-        <view class="vk-page-card-title">列表</view>
-        <!-- 右侧操作栏 -->
-        <view class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加</el-button>
-          <el-dropdown v-if="table1.multipleSelection" :split-button="false" trigger="click" @command="batchBtn">
-            <el-button type="danger" :size="$global.size" style="margin-left: 20rpx" :disabled="table1.multipleSelection.length === 0">
-              批量操作<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item :command="1">批量操作1</el-dropdown-item>
-              <el-dropdown-item :command="2">批量操作2</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </view>
-      </view>
+  <div class="page-body">
+    <!-- 页面内容开始 -->
 
-      <!-- 表格区域 -->
-      <view class="vk-page-card-table">
-        <!-- 表格组件开始 -->
-        <vk-data-table
-          ref="table1"
-          :action="table1.action"
-          :columns="table1.columns"
-          :query-form-param="queryForm1"
-          :right-btns="['detail_auto', 'update', 'delete']"
-          :selection="true"
-          :row-no="true"
-          :pagination="true"
-          @update="updateBtn"
-          @delete="deleteBtn"
-          @current-change="currentChange"
-          @selection-change="selectionChange"
-        >
-          <!-- 排序值 -->
-          <template v-slot:sort="{ row, column, index }">
-            <el-input v-model="row.sort" size="mini" @change="sortChange($event, row)" />
-          </template>
-        </vk-data-table>
-        <!-- 表格组件结束 -->
-      </view>
-    </view>
+    <!-- 表格搜索组件开始 -->
+    <vk-data-table-query v-model="queryForm1.formData" :columns="queryForm1.columns" @search="search"></vk-data-table-query>
+    <!-- 表格搜索组件结束 -->
+
+    <!-- 自定义按钮区域开始 -->
+    <div>
+      <el-row>
+        <el-button type="success" icon="el-icon-circle-plus-outline" @click="addBtn">添加</el-button>
+        <!-- 批量操作 -->
+        <el-dropdown v-if="table1.multipleSelection" :split-button="false" trigger="click" @command="batchBtn">
+          <el-button type="danger" style="margin-left: 20rpx" :disabled="table1.multipleSelection.length === 0">
+            批量操作
+            <i class="el-icon-arrow-down el-icon--right"></i>
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item :command="1">批量操作1</el-dropdown-item>
+            <el-dropdown-item :command="2">批量操作2</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </el-row>
+    </div>
+    <!-- 自定义按钮区域结束 -->
+
+    <!-- 表格组件开始 -->
+    <vk-data-table
+      ref="table1"
+      :action="table1.action"
+      :columns="table1.columns"
+      :query-form-param="queryForm1"
+      :right-btns="['detail_auto', 'update', 'delete']"
+      :selection="true"
+      :row-no="true"
+      :pagination="true"
+      @update="updateBtn"
+      @delete="deleteBtn"
+      @current-change="currentChange"
+      @selection-change="selectionChange"
+    ></vk-data-table>
+    <!-- 表格组件结束 -->
+
     <!-- 添加或编辑的弹窗开始 -->
     <vk-data-dialog v-model="form1.props.show" :title="form1.props.title" width="500px" mode="form" :close-on-click-modal="false">
       <vk-data-form
@@ -76,7 +60,7 @@
     <!-- 添加或编辑的弹窗结束 -->
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>
@@ -172,10 +156,6 @@
       search() {
         this.$refs.table1.search();
       },
-      // 监听 - 查询表单折叠面板变化事件
-      collapseChange() {
-        this.$refs.table1.doLayout();
-      },
       // 刷新
       refresh() {
         this.$refs.table1.refresh();
@@ -230,16 +210,6 @@
             break;
         }
       },
-      sortChange(sort, item) {
-        vk.callFunction({
-          url: 'admin/business/sys.notice.updateSort',
-          data: {
-            _id: item._id,
-            sort: Number(sort),
-          },
-          success: (data) => {},
-        });
-      },
     },
     // 监听属性
     watch: {},
@@ -248,7 +218,6 @@
   };
 </script>
 <style lang="scss" scoped>
-  page {
-    background-color: #f5f5f5;
+  .page-body {
   }
 </style>

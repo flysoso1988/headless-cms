@@ -1,11 +1,11 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Dialog 弹窗" subTitle="弹窗表格"></vk-data-page-header>
-    <view class="page-body">
+    <div class="page-body">
       <el-button @click="show = true">显示弹窗</el-button>
-    </view>
-    <view class="page-dialog">
+    </div>
+    <div class="page-dialog">
       <!-- 页面弹窗内容开始 -->
       <vk-data-dialog v-model="show" title="标题" width="900px" top="14vh" center :close-on-click-modal="true">
         <!-- 表格组件开始 -->
@@ -17,10 +17,10 @@
         </template>
       </vk-data-dialog>
       <!-- 页面弹窗内容开始 -->
-    </view>
+    </div>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

@@ -8,10 +8,6 @@
  * 数据库表名配置类型定义
  * @typedef {Object} DatabaseTables
  * @property {string} test - 测试表
- * @property {string} content - 内容表
- * @property {string} model - 模型表
- * @property {string} modelField - 模型字段表
- * @property {string} settingI18n - 国际化表
  * @property {string} user - 用户表
  * @property {string} role - 角色表
  * @property {string} permission - 权限表
@@ -44,10 +40,7 @@ module.exports = {
   // ==================== 项目业务表 ====================
   // 新增表标记点（请勿删除此行注释，自动化建Dao工具需要）
   test: "vk-test", // 测试表
-  content: "vk-cms-content",
-  model: "vk-cms-model",
-  modelField: "vk-cms-model-field",
-  settingI18n: "vk-setting-i18n",
+
   // ==================== vk框架内置表 ====================
   user: "uni-id-users", // 用户表
   role: "uni-id-roles", // 角色表

@@ -213,10 +213,10 @@
 
 		<script type="text/javascript">
 			window.$app = {
-				appid: '{@appid@}',
-				android_url: '{@android_url@}',
-				ios_url: '{@ios_url@}',
-				icon_url: '{@icon_url@}',
+				appid: {@#jsonForScript(appid)@},
+				android_url: {@#jsonForScript(android_url)@},
+				ios_url: {@#jsonForScript(ios_url)@},
+				icon_url: {@#jsonForScript(icon_url)@},
 				android_size: '',
 				ios_size: '',
 				mpPlatforms: {

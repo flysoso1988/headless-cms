@@ -14,7 +14,7 @@ util.treeToArrayFn = function (treeData, treeProps = {}, arr = [], current_paren
   let { id = '_id', parent_id = 'parent_id', children = 'children', deleteChildren = true } = treeProps;
   for (let i in treeData) {
     let item = treeData[i];
-    if (current_parent_id) item[parent_id] = current_parent_id;
+    if (current_parent_id || current_parent_id === 0) item[parent_id] = current_parent_id;
     arr.push(item);
     if (item[children] && item[children].length > 0) {
       arr = util.treeToArrayFn(item[children], treeProps, arr, item[id]);
@@ -37,7 +37,7 @@ util.arrayToTree = function (originalArrayData, treeProps) {
   let arrayData = deepClone(originalArrayData);
   let { id = '_id', parent_id = 'parent_id', children = 'children', deleteParentId = false, need_field } = treeProps;
   let result = [];
-  let temp = {};
+  let temp = Object.create(null);
   for (let i = 0; i < arrayData.length; i++) {
     temp[arrayData[i][id]] = arrayData[i]; // 以id作为索引存储元素，可以无需遍历直接定位元素
   }

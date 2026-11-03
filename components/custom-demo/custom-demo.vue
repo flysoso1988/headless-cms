@@ -1,7 +1,7 @@
 <template>
   <!-- 万能表单 -->
   <div v-if="scene === 'form'">
-    <el-input :value="value" @input="_input"></el-input>
+    <el-input :value="value" :disabled="disabled" @input="_input"></el-input>
   </div>
   <!-- 万能表格 -->
   <div v-else-if="scene === 'table'">
@@ -20,6 +20,11 @@
       value: {
         type: String,
         default: '',
+      },
+      // 是否禁用
+      disabled: {
+        type: Boolean,
+        default: false,
       },
       // 字段规则
       column: {

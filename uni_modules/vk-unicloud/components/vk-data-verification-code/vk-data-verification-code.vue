@@ -129,6 +129,7 @@
       return {
         secNum: this.seconds,
         timer: null,
+        isDestroyed: false,
         canGetCode: true, // 是否可以执行验证码操作
         tips: '',
         locale: {}, // 语言
@@ -137,7 +138,7 @@
     created() {
       if (typeof vk !== 'undefined') {
         let locale = vk.pubfn.getLocale();
-        this.locale = localeObj[locale];
+        this.locale = localeObj[locale] || localeObj.en;
       } else {
         this.locale = localeObj['zh-Hans'];
       }
@@ -177,7 +178,7 @@
           // 剩余尚未执行完的倒计秒数
           this.secNum = lastTimestamp - nowTimestamp;
           // 清除本地保存的变量
-          uni.removeStorageSync(this.uniqueKey + '_$uCountDownTimestamp');
+          this.removeTimeFromStorage();
           // 开始倒计时
           this.start();
         } else {
@@ -196,25 +197,28 @@
         this.canGetCode = false;
         // 这里放这句，是为了一开始时就提示，否则要等setInterval的1秒后才会有提示
         this.changeEvent(this.changeTextCom.replace(/x|X/, this.secNum));
-        this.setTimeToStorage();
         this.timer = setInterval(() => {
-          if (--this.secNum) {
+          if (--this.secNum > 0) {
             // 用当前倒计时的秒数替换提示字符串中的"x"字母
             this.changeEvent(this.changeTextCom.replace(/x|X/, this.secNum));
           } else {
             clearInterval(this.timer);
             this.timer = null;
+            this.removeTimeFromStorage();
             this.changeEvent(this.endTextCom);
             this.secNum = this.seconds;
             this.$emit('end');
             this.canGetCode = true;
           }
         }, 1000);
+        this.setTimeToStorage();
       },
       // 重置，可以让用户再次获取验证码
       reset(text) {
         this.canGetCode = true;
         clearInterval(this.timer);
+        this.timer = null;
+        this.removeTimeFromStorage();
         this.secNum = this.seconds;
         this.changeEvent(text || this.endTextCom);
       },
@@ -222,19 +226,29 @@
         this.codeChange(text);
         this.$emit('change', text);
       },
+      // 清除倒计时缓存，失败时仍继续更新组件状态
+      removeTimeFromStorage() {
+        if (!this.keepRunning) return;
+        try {
+          uni.removeStorageSync(this.uniqueKey + '_$uCountDownTimestamp');
+        } catch (err) {
+          // 缓存删除失败不应中断倒计时恢复、结束或重置
+        }
+      },
       // 保存时间戳，为了防止倒计时尚未结束，H5刷新或者各端的右上角返回上一页再进来
       setTimeToStorage() {
         if (!this.keepRunning || !this.timer) return;
         // 记录当前的时间戳，为了下次进入页面，如果还在倒计时内的话，继续倒计时
-        // 倒计时尚未结束，结果大于0；倒计时已经开始，就会小于初始值，如果等于初始值，说明没有开始倒计时，无需处理
+        // 倒计时尚未结束，剩余秒数大于0，刚开始时等于初始值
         if (this.secNum > 0 && this.secNum <= this.seconds) {
           // 获取当前时间戳(+ new Date()为特殊写法)，除以1000变成秒，再去除小数部分
           let nowTimestamp = Math.floor(+new Date() / 1000);
           // 将本该结束时候的时间戳保存起来 => 当前时间戳 + 剩余的秒数
-          uni.setStorage({
-            key: this.uniqueKey + '_$uCountDownTimestamp',
-            data: nowTimestamp + Number(this.secNum),
-          });
+          try {
+            uni.setStorageSync(this.uniqueKey + '_$uCountDownTimestamp', nowTimestamp + Number(this.secNum));
+          } catch (err) {
+            // 缓存写入失败不应中断成功事件和定时器清理
+          }
         }
       },
       // 倒计时进行时
@@ -268,11 +282,13 @@
             checkUserExist,
           },
           success: (data) => {
+            if (this.isDestroyed) return;
             vk.toast(this.locale.verificationCodeSent);
             this.start();
             this.$emit('success', data);
           },
           fail: (err) => {
+            if (this.isDestroyed) return;
             this.tips = this.startTextCom;
             if (err.errMsg && err.errMsg.indexOf('触发天级流控') > -1) {
               vk.alert(this.locale.pleaseTryAgainTomorrow, () => {
@@ -302,16 +318,18 @@
     // 组件销毁的时候，清除定时器，否则定时器会继续存在，系统不会自动清除
     // #ifdef VUE2
     beforeDestroy() {
+      this.isDestroyed = true;
       this.setTimeToStorage();
-      clearTimeout(this.timer);
+      clearInterval(this.timer);
       this.timer = null;
     },
     // #endif
 
     // #ifdef VUE3
     beforeUnmount() {
+      this.isDestroyed = true;
       this.setTimeToStorage();
-      clearTimeout(this.timer);
+      clearInterval(this.timer);
       this.timer = null;
     },
     // #endif

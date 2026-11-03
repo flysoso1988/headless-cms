@@ -5,7 +5,7 @@
       <span class="code">403</span>
       <span class="tips">{{ $t('vk.error.noPermissionTips') }}</span>
       <span class="tips">{{ errMsg }}</span>
-      <span class="btn" @tap="toHome">{{ $t('vk.error.backToHome') }}</span>
+      <el-button class="btn" type="primary" @click="toHome">{{ $t('vk.error.backToHome') }}</el-button>
     </div>
   </div>
 </template>
@@ -59,19 +59,7 @@
       line-height: 28px;
     }
     .btn {
-      display: inline-block;
-      color: #fff;
-      background-color: #2d8cf0;
-      border-color: #2d8cf0;
       width: 150px;
-      height: 42px;
-      border-radius: 3px;
-      text-align: center;
-      line-height: 42px;
-    }
-    .btn:hover {
-      cursor: pointer;
-      background-color: #57a3f3 !important;
     }
   }
 </style>

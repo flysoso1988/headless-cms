@@ -1,22 +1,22 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <!-- 左边 -->
-    <view class="left">
-      <view>
+    <div class="left">
+      <div>
         <i class="el-icon-s-operation"></i>
-        <text>个人设置</text>
-      </view>
-      <view :class="display_list == index ? 'select_list' : ''" v-for="(item, index) of left_list" :key="index" @click="change_left(index)">
-        <text>{{ item.name }}</text>
-        <text>{{ item.title }}</text>
-      </view>
-    </view>
+        <span>个人设置</span>
+      </div>
+      <div :class="display_list == index ? 'select_list' : ''" v-for="(item, index) of left_list" :key="index" @click="change_left(index)">
+        <span>{{ item.name }}</span>
+        <span>{{ item.title }}</span>
+      </div>
+    </div>
     <!-- 右边 -->
-    <view class="right">
-      <view v-show="display_list == 0" class="form">
-        <view class="base_set">
-          <view class="right_title">基本设置</view>
+    <div class="right">
+      <div v-show="display_list == 0" class="form">
+        <div class="base_set">
+          <div class="right_title">基本设置</div>
           <el-form class="form_input" label-width="800px" label-position="top" :model="form1" :rules="rules" ref="form1">
             <el-form-item label="昵称" prop="name" required>
               <el-input v-model="form1.name"></el-input>
@@ -35,33 +35,36 @@
             </el-form-item>
             <el-button type="primary">更新基本信息</el-button>
           </el-form>
-        </view>
-        <view class="avater">
-          <text>头像</text>
+        </div>
+        <div class="avater">
+          <span>头像</span>
           <image src="../../../static/logo.png"></image>
-          <el-button class="avater_but" size="mini" style="margin-left: -2px" plain><i class="el-icon-camera-solid"></i>修改头像</el-button>
-        </view>
-      </view>
-      <view v-show="display_list == index + 1" v-for="(item, index) of right_list" :key="index">
-        <view class="right_title">{{ item.title }}</view>
-        <view class="name_tips" v-for="(value, key) of item.list" :key="key">
-          <view class="name">
+          <el-button class="avater_but" size="mini" style="margin-left: -2px" plain>
+            <i class="el-icon-camera-solid"></i>
+            修改头像
+          </el-button>
+        </div>
+      </div>
+      <div v-show="display_list == index + 1" v-for="(item, index) of right_list" :key="index">
+        <div class="right_title">{{ item.title }}</div>
+        <div class="name_tips" v-for="(value, key) of item.list" :key="key">
+          <div class="name">
             <image src="" v-if="index == 1 && key == 0"></image>
             <image src="" v-if="index == 1 && key == 1"></image>
             <image src="" v-if="index == 1 && key == 2"></image>
             <image src="" v-if="index == 1 && key == 3"></image>
-            <text>{{ value.name }}</text>
-          </view>
-          <text class="tips">{{ value.tips }}</text>
-          <text class="operation">
+            <span>{{ value.name }}</span>
+          </div>
+          <span class="tips">{{ value.tips }}</span>
+          <span class="operation">
             <el-switch v-show="index == 2" v-model="switch_value" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-            <text class="operation_modify" v-show="index == 1 || index == 0">修改</text>
-          </text>
-        </view>
-      </view>
-    </view>
+            <span class="operation_modify" v-show="index == 1 || index == 0">修改</span>
+          </span>
+        </div>
+      </div>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>
@@ -271,8 +274,8 @@
   };
 </script>
 <style lang="scss" scoped>
-  view,
-  text {
+  div,
+  span {
     box-sizing: border-box;
   }
 
@@ -286,7 +289,7 @@
     display: flex;
     background-color: #f5f7f9;
 
-    > view {
+    > div {
       border-radius: 8rpx;
     }
   }
@@ -306,7 +309,7 @@
       margin-right: 10rpx;
     }
 
-    > view {
+    > div {
       &:first-of-type {
         font-size: 32rpx;
         border-bottom: 2rpx solid #e8eaec;
@@ -329,7 +332,7 @@
           background-color: #f3f3f3 !important;
         }
 
-        > text {
+        > span {
           &:first-of-type {
             font-size: 28rpx;
           }
@@ -348,7 +351,7 @@
     color: #2d8cf0 !important;
     background-color: #f0faff !important;
 
-    > text {
+    > span {
       color: #2d8cf0 !important;
     }
   }
@@ -427,7 +430,7 @@
       margin-left: 100rpx;
       margin-top: 100rpx;
 
-      text {
+      span {
         font-size: 28rpx;
         color: #515a6e;
       }

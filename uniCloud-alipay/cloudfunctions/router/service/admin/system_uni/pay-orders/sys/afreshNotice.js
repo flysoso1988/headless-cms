@@ -27,6 +27,16 @@ module.exports = {
     if (orderInfo.status !== 1) return { code: -1, msg: '订单状态错误' };
     if (orderInfo.user_order_success) return { code: -1, msg: '无需重新通知' };
 
+    let { original_data, out_trade_no, notify_url } = orderInfo;
+    if (!notify_url) {
+      // 获取异步回调配置
+      let spaceId = originalParam.context.SPACEINFO.spaceId; // 服务空间ID
+      notify_url = getNotifyUrl(config, spaceId);
+      if (!notify_url || notify_url.indexOf('http') !== 0) {
+        return { code: -1, msg: '请先配置正确的异步回调URL，参考配置文档：https://vkdoc.fsq.pub/vk-uni-pay/config.html' };
+      }
+    }
+
     // 先将订单的状态改为未支付（重新回调需要）
     let updateNum = await vk.baseDao.update({
       dbName: dbName.payOrder,
@@ -43,15 +53,6 @@ module.exports = {
       return { code: -1, msg: '订单状态错误' };
     }
 
-    let { original_data, out_trade_no, notify_url } = orderInfo;
-    if (!notify_url) {
-      // 获取异步回调配置
-      let spaceId = originalParam.context.SPACEINFO.spaceId; // 服务空间ID
-      notify_url = getNotifyUrl(config, spaceId);
-      if (!notify_url || notify_url.indexOf('http') !== 0) {
-        return { code: -1, msg: '请先配置正确的异步回调URL，参考配置文档：https://vkdoc.fsq.pub/vk-uni-pay/config.html' };
-      }
-    }
     try {
       // 执行回调
       let requestRes = await vk.request({

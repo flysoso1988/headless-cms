@@ -1,9 +1,9 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Input 表单输入" subTitle="select 下拉选择"></vk-data-page-header>
-    <view class="page-body">
-      <view class="mt15">
+    <div class="page-body">
+      <div class="mt15">
         <vk-data-input-select
           class="width-box"
           v-model="form1.value1"
@@ -15,9 +15,9 @@
           clearable
           placeholder="请选择"
         ></vk-data-input-select>
-      </view>
+      </div>
 
-      <view class="mt15">
+      <div class="mt15">
         <vk-data-input-select
           class="width-box"
           v-model="form1.value2"
@@ -42,19 +42,19 @@
           clearable
           placeholder="请选择"
         ></vk-data-input-select>
-      </view>
+      </div>
 
-      <view class="mt15 tips">
-        <view class="mt15 json-view" v-if="form1">
+      <div class="mt15 tips">
+        <div class="mt15 json-view" v-if="form1">
           <pre>
 						{{ form1 }}
 					</pre
           >
-        </view>
-      </view>
-    </view>
+        </div>
+      </div>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

@@ -24,61 +24,83 @@ module.exports = {
     }
     let platform = vk.pubfn.getPlatformForUniId(clientInfo);
 
-    // 查找用户是否存在
-    let userInfo = await getUser(
-      {
-        clientInfo,
-        provider,
-        unionid,
-        openid,
-      },
-      util
-    );
-
-    // 定义openid和unionid存在userInfo的哪个字段中
-    let fieldInfo = {
-      [`${provider}_openid`]: {
-        [platform]: openid,
-      },
-    };
-    if (appid) {
-      fieldInfo[`${provider}_openid`][`${platform}_${appid}`] = openid;
-    }
-    if (unionid) {
-      fieldInfo[`${provider}_unionid`] = unionid;
-    }
-
-    // 执行登录接口
-    res = await vk.login({
-      clientInfo, // 客户端信息
-      type, // 操作类型，login: 仅登录，register: 仅注册 不传则自动判断
-      customData, // 自定义数据
-      userInfo, // 用户信息
-      fieldInfo, // 登录相关字段存储信息
+    // 获得锁的实例
+    const lockManage = vk.getReentrantLockManage({
+      id: `sys-login:${provider}-${unionid || openid}`, // 锁的id
+      timeout: 5, // 锁的超时时间，超时后强制归还锁，单位秒，0代表永不超时，默认5秒
     });
 
-    Object.assign(res, extraRes);
-    res.provider = provider;
-
-    if (res.code !== 0) {
-      // 登录失败
-      return res;
+    // 尝试获取锁
+    let lock = await lockManage.lock();
+    if (!lock) {
+      return { code: -1, msg: `请求失败，请稍后再试` };
     }
-
-    // 登录成功
-
-    if (addLog) {
-      // 添加登录日志
-      const loginLog = vk.require('service/user/util/loginLog');
-      await loginLog.add(
+    // 注意必须 try 包裹，防止自己的代码出现异常，锁无法及时归还
+    try {
+      // 查找用户是否存在
+      let userInfo = await getUser(
         {
-          type: 'login',
-          login_type: provider,
-          user_id: res.uid,
-          context: clientInfo,
+          clientInfo,
+          provider,
+          appid,
+          unionid,
+          openid,
         },
         util
       );
+
+      if (vk.pubfn.isNotNull(userInfo) && vk.pubfn.isNotNullAll(userInfo[`${provider}_unionid`], unionid) && userInfo[`${provider}_unionid`] !== unionid) {
+        return { code: -1, msg: '第三方账号与已有绑定信息不一致，请使用其他方式登录后处理绑定关系' };
+      }
+
+      // 定义openid和unionid存在userInfo的哪个字段中
+      let fieldInfo = {
+        [`${provider}_openid`]: {
+          [platform]: openid,
+        },
+      };
+      if (appid) {
+        fieldInfo[`${provider}_openid`][`${platform}_${appid}`] = openid;
+      }
+      if (unionid) {
+        fieldInfo[`${provider}_unionid`] = unionid;
+      }
+
+      // 执行登录接口
+      res = await vk.login({
+        clientInfo, // 客户端信息
+        type, // 操作类型，login: 仅登录，register: 仅注册 不传则自动判断
+        customData, // 自定义数据
+        userInfo, // 用户信息
+        fieldInfo, // 登录相关字段存储信息
+      });
+
+      Object.assign(res, extraRes);
+      res.provider = provider;
+
+      if (res.code !== 0) {
+        // 登录失败
+        return res;
+      }
+
+      // 登录成功
+
+      if (addLog) {
+        // 添加登录日志
+        const loginLog = vk.require('service/user/util/loginLog');
+        await loginLog.add(
+          {
+            type: 'login',
+            login_type: provider,
+            user_id: res.uid,
+            context: clientInfo,
+          },
+          util
+        );
+      }
+    } finally {
+      // 归还锁
+      await lock.unlock();
     }
 
     // 业务逻辑结束-----------------------------------------------------------
@@ -109,6 +131,10 @@ module.exports = {
     let nullKey = vk.pubfn.isNullOneByObject({ clientInfo, userInfo, provider, openid });
     if (nullKey) return { code: -1, msg: '参数 ' + nullKey + ' 不能为空' };
 
+    if (vk.pubfn.isNotNullAll(userInfo[`${provider}_unionid`], unionid) && userInfo[`${provider}_unionid`] !== unionid) {
+      return { code: 1, msg: `当前账号已绑定其他${providerName || '第三方'}账号，请先解绑后再绑定` };
+    }
+
     let platform = vk.pubfn.getPlatformForUniId(clientInfo);
 
     // 判断当前登录用户是否已经绑定过
@@ -126,6 +152,7 @@ module.exports = {
       {
         clientInfo,
         provider,
+        appid,
         unionid,
         openid,
       },
@@ -219,9 +246,9 @@ module.exports = {
       let hasOtherPlatformAppidKey = openidKeys.some((item) => {
         return item !== key && item.indexOf(`${platform}_`) === 0;
       });
-      let needUnbindPlatform = !hasOtherPlatformAppidKey && openidData[platform];
+      let needUnbindPlatform = vk.pubfn.isNotNull(openidData[platform]) && (!hasOtherPlatformAppidKey || openidData[platform] === openidData[key]);
       let removeKeyList = [key];
-      // 如果解绑后当前平台没有其他appid的key了，则平台也解绑
+      // 平台字段指向本次解绑的openid，或当前平台已无其他appid时，一并清除
       if (needUnbindPlatform) {
         removeKeyList.push(platform);
       }
@@ -259,7 +286,7 @@ module.exports = {
 
 async function getUser(obj = {}, util) {
   let { vk, _ } = util;
-  let { clientInfo, provider, unionid, openid } = obj;
+  let { clientInfo, provider, appid, unionid, openid } = obj;
   let platform = vk.pubfn.getPlatformForUniId(clientInfo);
   let orArr = [];
   if (unionid) {
@@ -268,9 +295,16 @@ async function getUser(obj = {}, util) {
     });
   }
   if (openid) {
-    orArr.push({
+    let openidWhereJson = {
       [`${provider}_openid.${platform}`]: openid,
-    });
+    };
+    if (appid) {
+      let appidOpenidKey = `${provider}_openid.${platform}_${appid}`;
+      orArr.push({ [appidOpenidKey]: openid });
+      // 兼容缺少当前应用专属字段的旧数据，已有专属字段时不回退
+      openidWhereJson[appidOpenidKey] = _.exists(false);
+    }
+    orArr.push(openidWhereJson);
   }
   let userInfo = await getCurrentAppUser(
     {

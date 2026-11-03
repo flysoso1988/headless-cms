@@ -1,27 +1,27 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <i class="el-icon-close"></i>
-    <text class="fail">提交失败</text>
-    <text class="txt">请核对并修改以下信息后，再重新提交。</text>
-    <view class="examine">
-      <text class="title">您提交的内容有如下错误：</text>
-      <view>
+    <span class="fail">提交失败</span>
+    <span class="txt">请核对并修改以下信息后，再重新提交。</span>
+    <div class="examine">
+      <span class="title">您提交的内容有如下错误：</span>
+      <div>
         <i class="el-icon-circle-close"></i>
-        <text>您的账户已被冻结</text>
-        <text class="thaw">立即解冻</text>
+        <span>您的账户已被冻结</span>
+        <span class="thaw">立即解冻</span>
         <i class="el-icon-arrow-right"></i>
-      </view>
-      <view>
+      </div>
+      <div>
         <i class="el-icon-circle-close"></i>
-        <text>您的账户还不具备申请资格</text>
-        <text class="upgrade">立即升级</text>
+        <span>您的账户还不具备申请资格</span>
+        <span class="upgrade">立即升级</span>
         <i class="el-icon-arrow-right"></i>
-      </view>
-    </view>
-    <text class="modify">返回修改</text>
+      </div>
+    </div>
+    <span class="modify">返回修改</span>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>
@@ -110,7 +110,7 @@
       display: flex;
       flex-direction: column;
 
-      view {
+      div {
         &:first-of-type {
           margin: 40rpx 0rpx;
         }

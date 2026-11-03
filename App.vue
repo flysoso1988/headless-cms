@@ -4,7 +4,7 @@
   export default {
     computed: {},
     methods: {
-      // 初始化菜单权限等数据
+      // 初始化菜单权限等数据，返回是否已完成初始化，供登录页等待后再跳转。
       init() {
         let { vk } = this;
         // 如果token失效，直接跳登录页面
@@ -18,7 +18,10 @@
           });
           return false;
         }
-        vk.userCenter.getMenu({
+        const menuPromise = vk.callFunction({
+          url: 'user/kh/getMenu',
+          retryCount: 3,
+          retryInterval: 500,
           success: (data) => {
             // 初始化菜单
             let { menus = [] } = data;
@@ -47,7 +50,15 @@
             vk.setVuex('$app.inited', true);
             this.checkCurrentAppId();
           },
+          fail: (err) => {
+            this.$message.error(vk.pubfn.isNotNull(err.msg) ? err.msg : '菜单加载失败，请刷新页面重试');
+          },
         });
+        return menuPromise.then(
+          () => true,
+          // 最终失败已提示，返回false阻止登录页继续跳转。
+          () => false
+        );
       },
       // 初始化系统环境变量
       initApp() {

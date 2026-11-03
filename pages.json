@@ -105,61 +105,71 @@
       ]
     },
     {
-      "root": "pages_plugs",
+      "root": "pages/error",
       "pages": [
         {
-          "path": "error/404",
+          "path": "404",
           "style": {
             "navigationBarTitleText": "页面不存在"
           }
         },
         {
-          "path": "error/403",
+          "path": "403",
           "style": {
             "navigationBarTitleText": "无权访问"
           }
         },
         {
-          "path": "error/500",
+          "path": "500",
           "style": {
             "navigationBarTitleText": "服务器出错了"
           }
+        }
+      ]
+    },
+    {
+      "root": "pages/system",
+      "pages": [
+        {
+          "path": "user/list"
         },
         {
-          "path": "system/user/list"
+          "path": "role/list"
         },
         {
-          "path": "system/role/list"
+          "path": "permission/list"
         },
         {
-          "path": "system/permission/list"
+          "path": "menu/list"
         },
         {
-          "path": "system/menu/list"
+          "path": "app/list"
         },
         {
-          "path": "system/app/list"
+          "path": "app-upgrade-center/list"
+        }
+      ]
+    },
+    {
+      "root": "pages/system_uni",
+      "pages": [
+        {
+          "path": "vk-global-data"
         },
         {
-          "path": "system/app-upgrade-center/list"
+          "path": "opendb-admin-log"
         },
         {
-          "path": "system_uni/vk-global-data"
+          "path": "vk-components-dynamic"
         },
         {
-          "path": "system_uni/opendb-admin-log"
+          "path": "uni-id-files/list"
         },
         {
-          "path": "system_uni/vk-components-dynamic"
+          "path": "vk-ws-connection"
         },
         {
-          "path": "system_uni/uni-id-files/list"
-        },
-        {
-          "path": "system_uni/vk-ws-connection"
-        },
-        {
-          "path": "system_uni/lucky-draw/list",
+          "path": "lucky-draw/list",
           "style": {
             "navigationBarTitleText": "抽奖活动"
           }

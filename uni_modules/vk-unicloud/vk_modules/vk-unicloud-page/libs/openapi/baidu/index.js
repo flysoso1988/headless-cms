@@ -34,11 +34,17 @@ baidu.open.ocr.business_license = function (obj = {}) {
   obj.action = 'ocr/v1/business_license';
   let file = obj.data.file;
   if (file) {
-    vk.pubfn.fileToBase64({ file }).then((base64) => {
-      obj.data.image = base64;
-      delete obj.data.file;
-      baidu.request(obj);
-    });
+    vk.pubfn.fileToBase64({ file }).then(
+      (base64) => {
+        obj.data.image = base64;
+        delete obj.data.file;
+        baidu.request(obj);
+      },
+      (err) => {
+        if (typeof obj.fail === 'function') obj.fail(err);
+        if (typeof obj.complete === 'function') obj.complete(err);
+      }
+    );
   } else {
     baidu.request(obj);
   }
@@ -66,11 +72,17 @@ baidu.open.ocr.idcard = function (obj = {}) {
   let file = obj.data.file;
   if (!obj.data.id_card_side) obj.data.id_card_side = 'front';
   if (file) {
-    vk.pubfn.fileToBase64({ file }).then((base64) => {
-      obj.data.image = base64;
-      delete obj.data.file;
-      baidu.request(obj);
-    });
+    vk.pubfn.fileToBase64({ file }).then(
+      (base64) => {
+        obj.data.image = base64;
+        delete obj.data.file;
+        baidu.request(obj);
+      },
+      (err) => {
+        if (typeof obj.fail === 'function') obj.fail(err);
+        if (typeof obj.complete === 'function') obj.complete(err);
+      }
+    );
   } else {
     baidu.request(obj);
   }
@@ -112,7 +124,8 @@ baidu.request = function (obj = {}) {
       success: (tokenRes) => {
         vk.setStorageSync(baiduOpenApiAccessTokenCacheName, {
           accessToken: tokenRes.access_token,
-          expTime: 2590000000 + new Date().getTime(),
+          // 后端缓存提前1小时过期，前端缓存50分钟，避免延长旧token的有效期
+          expTime: 50 * 60 * 1000 + new Date().getTime(),
         });
         obj.accessToken = tokenRes.access_token;
         request(obj);
@@ -131,9 +144,7 @@ function request(obj = {}) {
   vk.request({
     url: `https://aip.baidubce.com/rest/${actionVersion}/${action}?access_token=${accessToken}`,
     method: 'POST',
-    header: {
-      'content-type': 'application/x-www-form-urlencoded',
-    },
+    header,
     errorCodeName: 'error_code',
     errorMsgName: 'error_msg',
     data,
@@ -149,7 +160,7 @@ function request(obj = {}) {
     fail: (data) => {
       if (title) vk.hideLoading();
       // 如果是因为token失效报的错误,则清空下本地token缓存
-      if (data && data.code === 110) vk.removeStorageSync(baiduOpenApiAccessTokenCacheName);
+      if (data && (data.code === 110 || data.code === 111)) vk.removeStorageSync(baiduOpenApiAccessTokenCacheName);
       if (typeof obj.fail === 'function') obj.fail(data);
     },
     complete: (data) => {

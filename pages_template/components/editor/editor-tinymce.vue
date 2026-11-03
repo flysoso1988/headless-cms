@@ -1,60 +1,58 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面头部内容开始 -->
     <vk-data-page-header title="富文本编辑器" subTitle="tinymce" @back="pageBack"></vk-data-page-header>
     <!-- 页面头部内容结束 -->
-    <view class="page-body">
+    <div class="page-body">
       <!-- 页面主体内容开始 -->
-      <view style="display: flex">
+      <div style="display: flex">
         <el-button @click="setContent('<p>123</p>')">设置固定值123</el-button>
         <el-button @click="setContent('<p>789</p>')">设置固定值789</el-button>
         <el-button @click="save">保存草稿</el-button>
         <el-button @click="restore">从草稿恢复</el-button>
         <el-button @click="setContent('')">清空</el-button>
         <el-select v-model="language.value" placeholder="语言" :clearable="false" style="margin-left: 10px; width: 150px">
-          <el-option v-for="item in language.list" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+          <el-option v-for="item in language.list" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
-      </view>
-      <view style="display: flex; flex-direction: column; margin-top: 20px">
-        <view style="flex: 1">
+      </div>
+      <div style="display: flex; flex-direction: column; margin-top: 20px">
+        <div style="flex: 1">
           <custom-editor-tinymce
             ref="editorTinymce1"
             id="editor-tinymce"
             v-model="content"
             scene="form"
-            placeholder="开始输入..."
             :language="language.value"
             :width="750"
             :height="800"
           ></custom-editor-tinymce>
-        </view>
-        <view style="flex: 1">
-          <view style="display: block; font-size: 35px; font-family: kaiti; color: red"> HTML效果展示 </view>
+        </div>
+        <div style="flex: 1">
+          <div style="display: block; font-size: 35px; font-family: kaiti; color: red">HTML效果展示</div>
           <custom-editor-tinymce
             id="editorTinymce2"
             v-model="content"
             scene="detail"
-            placeholder="开始输入..."
             :language="language.value"
             :width="750"
             class="custom-editor-tinymce-detail"
           ></custom-editor-tinymce>
-        </view>
-      </view>
+        </div>
+      </div>
 
-      <view class="tips" style="margin-top: 50px">
-        <view style="display: block; font-size: 35px; font-family: kaiti; color: red"> HTML源码 </view>
-        <view class="json-view" v-if="content">
+      <div class="tips" style="margin-top: 50px">
+        <div style="display: block; font-size: 35px; font-family: kaiti; color: red">HTML源码</div>
+        <div class="json-view" v-if="content">
           <pre>
 						{{ content }}
 					</pre
           >
-        </view>
-      </view>
+        </div>
+      </div>
 
       <!-- 页面主体内容结束 -->
-    </view>
-  </view>
+    </div>
+  </div>
 </template>
 
 <script>

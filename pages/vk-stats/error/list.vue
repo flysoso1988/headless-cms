@@ -18,17 +18,10 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">错误日志列表</div>
         <div class="vk-page-card-actions">
-          <el-button
-            type="warning"
-            :size="$global.size"
-            icon="el-icon-circle-check"
-            :loading="loading"
-            :disabled="loading"
-            @click="markAllPendingHandled"
-          >
+          <el-button type="warning" icon="el-icon-circle-check" :loading="loading" :disabled="loading" @click="markAllPendingHandled">
             全部标记已处理
           </el-button>
-          <el-button :size="$global.size" icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
+          <el-button icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
         </div>
       </div>
 
@@ -114,15 +107,15 @@
             {
               key: 'err',
               title: '错误堆栈',
-              type: 'html',
+              type: 'text',
+              style: { whiteSpace: 'pre-wrap' },
               width: 200,
               show: ['detail'],
               formatter: (val, row, column, index) => {
                 if (typeof val.stack === 'undefined') {
                   return JSON.stringify(val);
                 }
-                let str = val.stack.replace(/\n/g, '<br>');
-                return str;
+                return val.stack;
               },
             },
             { key: '_add_time', title: '添加时间', type: 'time', width: 160, sortable: 'custom' },

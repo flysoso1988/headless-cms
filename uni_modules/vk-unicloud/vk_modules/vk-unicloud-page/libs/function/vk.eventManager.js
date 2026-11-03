@@ -32,7 +32,7 @@
  */
 const eventManager = (function () {
   // 创建一个对象，用于存储不同 eventName 对应的状态和回调函数
-  const eventStatus = {};
+  const eventStatus = Object.create(null);
 
   return {
     /**
@@ -53,12 +53,13 @@ const eventManager = (function () {
       eventStatus[eventName].executed = true;
       eventStatus[eventName].data = data;
 
+      // 执行前清空队列，避免回调中再次通知同一事件时重复执行
+      const callbacks = eventStatus[eventName].callbacks;
+      eventStatus[eventName].callbacks = [];
       // 执行所有该事件等待的回调函数
-      eventStatus[eventName].callbacks.forEach((callback) => {
+      callbacks.forEach((callback) => {
         callback(data);
       });
-      // 清空该事件已执行过的回调函数
-      eventStatus[eventName].callbacks = [];
     },
     /**
      * 注册回调函数，并在 notifyEventReady 后执行回调函数
@@ -67,13 +68,21 @@ const eventManager = (function () {
      */
     awaitEventReady(eventName, callback) {
       return new Promise((resolve, reject) => {
+        // 单个回调异常只拒绝自身的 Promise，不影响其他等待者
+        const runCallback = (data) => {
+          try {
+            if (typeof callback === 'function') {
+              callback(data);
+            }
+            resolve(data);
+          } catch (error) {
+            reject(error);
+          }
+        };
         // 如果指定的 eventName 存在且已执行过
         if (eventStatus[eventName] && eventStatus[eventName].executed) {
           // 执行回调函数
-          if (typeof callback === 'function') {
-            callback(eventStatus[eventName].data);
-          }
-          resolve(eventStatus[eventName].data);
+          runCallback(eventStatus[eventName].data);
         } else {
           // 如果指定的 eventName 不存在，则初始化相应的状态对象
           if (!eventStatus[eventName]) {
@@ -84,11 +93,7 @@ const eventManager = (function () {
             };
           }
           // 将回调函数加入相应 eventName 的待执行函数队列数组
-          if (typeof callback === 'function') {
-            eventStatus[eventName].callbacks.push(callback);
-          }
-          // 将resolve函数加入相应 eventName 的待执行函数队列数组
-          eventStatus[eventName].callbacks.push(resolve);
+          eventStatus[eventName].callbacks.push(runCallback);
         }
       });
     },

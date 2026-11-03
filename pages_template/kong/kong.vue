@@ -1,11 +1,11 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
 
     这里是页面内容
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

@@ -1,12 +1,12 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Upload 上传" subTitle="拖拽上传"></vk-data-page-header>
-    <view class="page-body" style="max-width: 800px; margin: 0 auto">
-      <vk-data-upload v-model="form1.images" :drag="true" :limit="5" list-type="picture"> </vk-data-upload>
-    </view>
+    <div class="page-body" style="max-width: 800px; margin: 0 auto">
+      <vk-data-upload v-model="form1.images" :drag="true" :limit="5" list-type="picture"></vk-data-upload>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

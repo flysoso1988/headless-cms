@@ -53,6 +53,15 @@
       isMenuNavigable(menu) {
         return typeof menu.url === 'string' && menu.url.trim().length > 0;
       },
+      isMenuRenderable(menu) {
+        if (menu.hiddenMenu || menu.hidden_menu) {
+          return false;
+        }
+        if (this.isMenuNavigable(menu)) {
+          return true;
+        }
+        return Array.isArray(menu.children) && menu.children.some((item) => this.isMenuRenderable(item));
+      },
       handleSelect(item) {
         this.$emit('select', item);
       },
@@ -93,7 +102,7 @@
         if (!Array.isArray(list) || list.length === 0) {
           return [];
         }
-        return list.filter((item) => !item.hiddenMenu && !item.hidden_menu);
+        return list.filter((item) => this.isMenuRenderable(item));
       },
       iconCom() {
         let { data, defaultMenuIcon, defaultSubMenuIcon, visibleChildrenCom } = this;

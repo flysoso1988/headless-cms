@@ -18,7 +18,12 @@
     >
       <template v-slot:menus="{ form, keyName }">
         <div>
-          <vk-data-table style="margin-top: 0" :data="table1.data" :columns="table1.columns" row-key="menu_id" :default-expand-all="true"></vk-data-table>
+          <vk-data-table style="margin-top: 0" :data="table1.data" :columns="table1.columns" row-key="menu_id" :default-expand-all="true">
+            <template v-slot:name="{ row }">
+              <vk-data-icon :name="vk.pubfn.isNotNull(row.icon) ? row.icon : 'el-icon-tickets'" style="margin-right: 10px"></vk-data-icon>
+              <span>{{ row.name }}</span>
+            </template>
+          </vk-data-table>
         </div>
       </template>
     </vk-data-form>
@@ -89,14 +94,9 @@
             {
               key: 'name',
               title: '菜单名称',
-              type: 'html',
+              type: 'text',
               minWidth: 200,
               align: 'left',
-              formatter: function (val, row, column, index) {
-                let icon = row.icon || 'el-icon-tickets';
-                if (icon.indexOf('vk-icon') > -1) icon = 'vk-icon ' + icon;
-                return `<i class="${icon}" style="margin-right: 10px;"></i><span>${row.name}</span>`;
-              },
             },
             { key: 'url', title: '菜单URL', type: 'text', minWidth: 300, align: 'left' },
             { key: 'sort', title: '排序值', type: 'number', minWidth: 80 },

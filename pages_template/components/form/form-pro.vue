@@ -1,8 +1,8 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Form 表单" subTitle="高级表单"></vk-data-page-header>
-    <view class="page-body">
+    <div class="page-body">
       <!-- 页面主体内容开始 -->
       <vk-data-form
         ref="form1"
@@ -15,34 +15,26 @@
         label-width="140px"
         input-width="400px"
         @success="onFormSuccess"
-      >
-        <!-- v-slot:editor 中的 editor 对应 columns中的 key, form对应 form1.data keyName 对应 columns中的 key -->
-        <!-- <template v-slot:editor="{ form, keyName }">
-					<vk-data-input-editor v-model="form[keyName]" placeholder="开始输入" width="750px"></vk-data-input-editor>
-				</template> -->
-      </vk-data-form>
+      ></vk-data-form>
       <!-- 页面主体内容结束 -->
-    </view>
+    </div>
 
-    <view class="page-footer">
+    <div class="page-footer">
       <!-- 页面底部内容开始 -->
       <el-button :loading="form1.props.loading" type="primary" class="footer-update-btn" @click="submitForm">确定</el-button>
       <el-button plain class="footer-back-btn" @click="onCancel" style="margin-left: 30px">返回</el-button>
       <!-- 页面底部内容开始 -->
-    </view>
+    </div>
 
-    <view class="tips" style="position: fixed; right: 0px; top: 100px; bottom: 15px; overflow: auto; max-width: 400px">
-      <view class="json-view" v-if="form1.data">
-        <view style="font-size: 14px">表单数据</view>
-        <pre>
-					{{ form1.data }}
-				</pre
-        >
-      </view>
-    </view>
+    <div class="tips" style="position: fixed; right: 0px; top: 100px; bottom: 15px; overflow: auto; max-width: 400px; z-index: 99">
+      <div class="json-view" style="font-size: 12px;" v-if="form1.data">
+        <div>表单数据</div>
+        <pre>{{ form1.data }}</pre>
+      </div>
+    </div>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>
@@ -468,7 +460,7 @@
               },
               // 特殊类型
               { key: '', title: '特殊类型', type: 'bar-title' },
-              { key: 'editor', title: '富文本类型', type: 'editor', width: '1000px' },
+              { key: 'editor', title: '富文本类型', type: 'editor', width: 750, height: 500 },
               { key: 'json', title: 'json类型', type: 'json' },
               { key: 'position', title: '地图位置', type: 'map', width: 600, height: 300, defaultLocation: { latitude: 30.224781, longitude: 120.12438 } },
               { key: 'array1', title: '数组字符串类型', type: 'array<string>' },

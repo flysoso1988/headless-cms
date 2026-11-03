@@ -4,7 +4,7 @@
       <div v-for="(item, index) in menuMapCom" :key="index" @click="pageTo(item)" class="top-bar">
         <div class="item-content" v-if="item.name">
           {{ item.name }}
-          <span v-if="index !== menuMapCom.length - 1" class="item-content-text"> / </span>
+          <span v-if="index !== menuMapCom.length - 1" class="item-content-text">/</span>
         </div>
       </div>
     </div>

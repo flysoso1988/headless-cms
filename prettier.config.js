@@ -19,8 +19,8 @@ module.exports = {
   arrowParens: 'always',
   // 换行符使用 lf
   endOfLine: 'lf',
-  // HTML 空白敏感度按 CSS display 属性决定
-  htmlWhitespaceSensitivity: 'css',
+  // HTML 空白敏感度按 CSS display 属性决定（css、strict、ignore）
+  htmlWhitespaceSensitivity: 'ignore',
   // Vue 文件中 <script> 和 <style> 内容缩进
   vueIndentScriptAndStyle: true,
   // 对象属性仅必要时加引号

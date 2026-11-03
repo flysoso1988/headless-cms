@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">高级表单功能演示</div>
     <!-- 页面内容开始 -->
 
@@ -24,7 +24,7 @@
           <!-- 选择对应的出差时间 -->
           <el-col :span="8" style="margin: 0rpx 20rpx">
             <el-form-item label="出差日期" prop="travelDate" required>
-              <el-date-picker style="width: 800rpx" v-model="data.ruleForm.travelDate" type="date" placeholder="选择日期"> </el-date-picker>
+              <el-date-picker style="width: 800rpx" v-model="data.ruleForm.travelDate" type="date" placeholder="选择日期"></el-date-picker>
             </el-form-item>
           </el-col>
 
@@ -81,13 +81,13 @@
             <div class="block" style="margin: 0rpx 20rpx">
               <el-col :span="8">
                 <el-form-item label="出发时间">
-                  <el-date-picker v-model="data.gotime" type="date" placeholder="选择出发日期"> </el-date-picker>
+                  <el-date-picker v-model="data.gotime" type="date" placeholder="选择出发日期"></el-date-picker>
                 </el-form-item>
               </el-col>
 
               <el-col :span="8">
                 <el-form-item label="返程时间">
-                  <el-date-picker style="" v-model="data.backtime" type="date" placeholder="选择返程日期"> </el-date-picker>
+                  <el-date-picker style="" v-model="data.backtime" type="date" placeholder="选择返程日期"></el-date-picker>
                 </el-form-item>
               </el-col>
             </div>
@@ -99,9 +99,9 @@
           <el-col :span="8" style="margin: 0rpx 20rpx">
             <el-form-item label="交通类型">
               <el-select v-model="data.ruleForm.traffic" placeholder="选择交通类型" style="width: 800rpx">
-                <el-option label="飞机" value="shanghai" style="height: 100rpx"> </el-option>
+                <el-option label="飞机" value="shanghai" style="height: 100rpx"></el-option>
 
-                <el-option label="坦克" value="beijing" style="height: 100rpx"> </el-option>
+                <el-option label="坦克" value="beijing" style="height: 100rpx"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -181,11 +181,11 @@
 
           <el-form-item label="序号" prop="name">
             <el-select v-model="data.add.three" placeholder="选择对应部门" style="width: 800rpx">
-              <el-option label="战忽部" value="zhanhu" style="height: 100rpx"> </el-option>
-              <el-option label="策划部" value="cehua" style="height: 100rpx"> </el-option>
-              <el-option label="财政部" value="caizheng" style="height: 100rpx"> </el-option>
+              <el-option label="战忽部" value="zhanhu" style="height: 100rpx"></el-option>
+              <el-option label="策划部" value="cehua" style="height: 100rpx"></el-option>
+              <el-option label="财政部" value="caizheng" style="height: 100rpx"></el-option>
 
-              <el-option label="人事部" value="renshi" style="height: 100rpx"> </el-option>
+              <el-option label="人事部" value="renshi" style="height: 100rpx"></el-option>
             </el-select>
           </el-form-item>
 
@@ -194,7 +194,7 @@
       </el-dialog>
     </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

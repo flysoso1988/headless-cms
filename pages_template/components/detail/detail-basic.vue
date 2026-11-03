@@ -1,13 +1,13 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Form 表单详情" subTitle="展示表单详情"></vk-data-page-header>
 
-    <view class="page-body" style="max-width: 800px; margin: 0 auto">
+    <div class="page-body" style="max-width: 800px; margin: 0 auto">
       <vk-data-detail :data="data" :columns="columns" size="medium" label-width="150px"></vk-data-detail>
-    </view>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

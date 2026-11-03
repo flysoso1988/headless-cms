@@ -6,14 +6,14 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">菜单列表</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加菜单</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加菜单</el-button>
           <el-tooltip :disabled="!!table1.selectItem" content="请先点击需要操作的菜单" placement="top">
-            <el-button type="success" :size="$global.size" icon="el-icon-key" :disabled="!table1.selectItem" @click="bindPermissionBtn">设置内置权限</el-button>
+            <el-button type="success" icon="el-icon-key" :disabled="!table1.selectItem" @click="bindPermissionBtn">设置内置权限</el-button>
           </el-tooltip>
-          <el-button :size="$global.size" icon="el-icon-upload2" @click="addMenuByJsonBtn">通过JSON批量导入</el-button>
-          <el-button :size="$global.size" icon="el-icon-data-line" @click="initVkStatBtn">初始化vk统计</el-button>
+          <el-button icon="el-icon-upload2" @click="addMenuByJsonBtn">通过JSON批量导入</el-button>
+          <el-button icon="el-icon-data-line" @click="initVkStatBtn">初始化vk统计</el-button>
           <el-badge v-if="pluginMenus && pluginMenus.length > 0" :value="pluginMenus.length" class="item">
-            <el-button type="warning" :size="$global.size" icon="el-icon-plus" style="margin-right: 0" @click="addPluginMenuMenu">待添加的插件菜单</el-button>
+            <el-button type="warning" icon="el-icon-plus" style="margin-right: 0" @click="addPluginMenuMenu">待添加的插件菜单</el-button>
           </el-badge>
         </div>
       </div>
@@ -35,6 +35,10 @@
           @selection-change="selectionChange"
           @success="tableSuccess"
         >
+          <template v-slot:name="{ row }">
+            <vk-data-icon :name="vk.pubfn.isNotNull(row.icon) ? row.icon : 'el-icon-tickets'" style="margin-right: 10px"></vk-data-icon>
+            <span>{{ row.name }}</span>
+          </template>
           <!-- 排序值 -->
           <template v-slot:sort="{ row, column, index }">
             <el-input v-model="row.sort" size="mini" @change="sortChange($event, row)" />
@@ -123,14 +127,9 @@
             {
               key: 'name',
               title: '菜单名称',
-              type: 'html',
+              type: 'text',
               width: 340,
               align: 'left',
-              formatter: function (val, row, column, index) {
-                let icon = row.icon || 'el-icon-tickets';
-                if (icon.indexOf('vk-icon') > -1) icon = 'vk-icon ' + icon;
-                return `<i class="${icon}" style="margin-right: 10px;"></i><span>${row.name}</span>`;
-              },
             },
             { key: 'menu_id', title: '菜单唯一标识', type: 'text', width: 350, align: 'left' },
             { key: 'url', title: '菜单URL', type: 'text', width: 250, align: 'left' },
@@ -224,7 +223,22 @@
                 type: 'tree-select',
                 tips: '父级的menu_id',
                 action: 'admin/system/menu/sys/getAll',
-                props: { list: 'rows', value: 'menu_id', label: 'label', children: 'children' },
+                props: {
+                  list: 'rows',
+                  value: 'menu_id',
+                  label: 'label',
+                  children: 'children',
+                  disabled: (data, node) => {
+                    if (this.form1.props.formType !== 'update') return false;
+                    // 当前节点的祖先链包含正在编辑的菜单时，禁止选为父级。
+                    let currentNode = node;
+                    while (currentNode && currentNode.level > 0) {
+                      if (currentNode.data.menu_id === this.form1.data.menu_id) return true;
+                      currentNode = currentNode.parent;
+                    }
+                    return false;
+                  },
+                },
               },
               {
                 key: 'comment',

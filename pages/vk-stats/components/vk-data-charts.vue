@@ -83,7 +83,7 @@
       </view>
     </view>
     <view class="box-card-body" :style="bodyStyleCom">
-      <qiun-data-charts v-show="url && viewMode === 'chart'" :type="type" :echarts-h5="true" :eopts="data.eopts" :chartData="data.chartData" />
+      <qiun-data-charts v-show="url && viewMode === 'chart'" :reshow="viewMode === 'chart'" :type="type" :echarts-h5="true" :eopts="data.eopts" :chartData="data.chartData" />
       <vk-data-table v-show="url && viewMode === 'table'" ref="table1" :data="tableData.data" :columns="tableData.columns" size="small" :max-height="300"></vk-data-table>
     </view>
   </el-card>
@@ -162,6 +162,7 @@
         },
         loading: false,
         showValue: false,
+        requestId: 0,
       };
     },
     mounted() {
@@ -208,6 +209,8 @@
       },
       getList() {
         let { vk, useCache } = this;
+        const requestId = ++this.requestId;
+        const cacheKey = this.getCacheKey();
         const successFn = (data) => {
           this.data.chartData = data.chartData;
           if (data.options) {
@@ -229,9 +232,10 @@
           url: this.url,
           data: this.formData,
           success: (data) => {
+            if (requestId !== this.requestId) return;
             successFn(data);
             if (useCache) {
-              this.setCache(data);
+              this.setCache(data, cacheKey);
             }
           },
         });
@@ -271,9 +275,9 @@
           return null;
         }
       },
-      setCache(data) {
+      setCache(data, cacheKey = this.getCacheKey()) {
         let { vk } = this;
-        vk.setSessionStorageSync(this.getCacheKey(), {
+        vk.setSessionStorageSync(cacheKey, {
           data,
           expire: Date.now() + 1000 * 60 * 5,
         });

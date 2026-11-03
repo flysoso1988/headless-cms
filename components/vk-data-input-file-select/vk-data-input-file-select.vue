@@ -2,10 +2,27 @@
   <div class="vk-data-input-file-select" :style="rootStyle">
     <div v-if="controls" class="selector-panel vk-contents" :class="disabled ? 'is-disabled' : ''">
       <template v-if="multiple">
-        <draggable class="image-list" tag="div" :value="currentValueList" :disabled="disabled" :animation="300" ghost-class="ghost" filter=".add-btn" @input="onDraggableInput">
+        <draggable
+          class="image-list"
+          tag="div"
+          :value="currentValueList"
+          :disabled="disabled"
+          :animation="300"
+          ghost-class="ghost"
+          draggable=".image-item"
+          filter=".add-btn"
+          @input="onDraggableInput"
+        >
           <div v-for="(item, index) in displayValueList" :key="item.key" class="image-item" :style="!disabled ? 'cursor: move' : ''">
-            <image v-if="isImageType" :src="item.url" :mode="imageMode" class="image"></image>
-            <image v-else-if="isVideoType" :src="getVideoCover(item.url)" :mode="imageMode" class="image"></image>
+            <el-image v-if="isImageType" :key="getFileRenderKey(item.rawValue)" :src="item.url" :fit="imageFit" class="image" @error="refreshFileUrl(item.rawValue)"></el-image>
+            <el-image
+              v-else-if="isVideoType"
+              :key="getFileRenderKey(item.rawValue)"
+              :src="getVideoCover(item.url)"
+              :fit="imageFit"
+              class="image"
+              @error="refreshFileUrl(item.rawValue)"
+            ></el-image>
             <div v-else-if="isAudioType" class="other-icon selector-audio-icon">
               <vk-data-icon name="el-icon-headset" :size="26" color="#916cff"></vk-data-icon>
             </div>
@@ -31,8 +48,22 @@
       <template v-else>
         <div class="image-list">
           <div v-if="displayValueList.length" class="image-item">
-            <image v-if="isImageType" :src="displayValueList[0].url" :mode="imageMode" class="image"></image>
-            <image v-else-if="isVideoType" :src="getVideoCover(displayValueList[0].url)" :mode="imageMode" class="image"></image>
+            <el-image
+              v-if="isImageType"
+              :key="getFileRenderKey(displayValueList[0].rawValue)"
+              :src="displayValueList[0].url"
+              :fit="imageFit"
+              class="image"
+              @error="refreshFileUrl(displayValueList[0].rawValue)"
+            ></el-image>
+            <el-image
+              v-else-if="isVideoType"
+              :key="getFileRenderKey(displayValueList[0].rawValue)"
+              :src="getVideoCover(displayValueList[0].url)"
+              :fit="imageFit"
+              class="image"
+              @error="refreshFileUrl(displayValueList[0].rawValue)"
+            ></el-image>
             <div v-else-if="isAudioType" class="other-icon selector-audio-icon">
               <vk-data-icon name="el-icon-headset" :size="26" color="#916cff"></vk-data-icon>
             </div>
@@ -97,12 +128,27 @@
     </vk-data-dialog>
 
     <vk-data-dialog v-model="preview.visible" :title="$t('vk.assetLibrary.previewFile')" width="820px" top="6vh" :append-to-body="true">
-      <div class="preview-body">
-        <image v-if="preview.type === 'image'" :src="preview.url" mode="widthFix" class="preview-image"></image>
-        <video v-else-if="preview.type === 'video'" :src="preview.url" controls autoplay class="preview-video"></video>
+      <div v-if="preview.visible" v-loading="previewLoading" class="preview-body">
+        <image
+          v-if="preview.type === 'image'"
+          :key="getFileRenderKey(preview.rawValue, 'preview')"
+          :src="previewUrl"
+          mode="widthFix"
+          class="preview-image"
+          @error="refreshFileUrl(preview.rawValue, 'preview')"
+        ></image>
+        <video
+          v-else-if="preview.type === 'video'"
+          :key="getFileRenderKey(preview.rawValue, 'preview')"
+          :src="previewUrl"
+          controls
+          autoplay
+          class="preview-video"
+          @error="refreshFileUrl(preview.rawValue, 'preview')"
+        ></video>
         <div v-else class="preview-fallback">
           <div class="preview-name">{{ preview.name }}</div>
-          <el-button type="primary" @click="openExternal(preview.url)">{{ $t('vk.form.fileSelect.openFile') }}</el-button>
+          <el-button type="primary" :disabled="previewLoading" @click="openExternal(previewUrl)">{{ $t('vk.form.fileSelect.openFile') }}</el-button>
         </div>
       </div>
     </vk-data-dialog>
@@ -211,11 +257,15 @@
         dialogVisible: false,
         formDatas: {},
         fileMap: {},
+        fileUrlRequestMap: {},
+        fileUrlRetryMap: {},
+        fileLoadErrorMap: {},
+        fileReloadMap: {},
         itemUidCounter: 0,
         itemUidList: [],
         preview: {
           visible: false,
-          url: '',
+          rawValue: '',
           name: '',
           type: '',
         },
@@ -265,14 +315,11 @@
       isMaxCom() {
         return this.multiple && this.currentValueCount >= this.multipleLimit;
       },
-      imageMode() {
-        if (this.imageFit === 'fill') {
-          return 'scaleToFill';
-        }
-        if (['contain', 'none', 'scale-down'].includes(this.imageFit)) {
-          return 'aspectFit';
-        }
-        return 'aspectFill';
+      previewUrl() {
+        return this.getFileUrl(this.preview.rawValue);
+      },
+      previewLoading() {
+        return this.fileUrlRequestMap[this.preview.rawValue] === true;
       },
       addButtonText() {
         return this.currentValueCount ? this.$t('vk.form.fileSelect.continueAdd') : this.$t('vk.assetLibrary.uploadAssets');
@@ -297,12 +344,18 @@
       },
     },
     watch: {
+      disabled(value) {
+        if (value) this.dialogVisible = false;
+      },
       value: {
         immediate: true,
-        handler(newVal) {
-          this.syncTempUrls();
+        handler(newVal, oldVal) {
+          this.syncTempUrls(oldVal);
           this.syncItemUidList(newVal);
         },
+      },
+      returnType() {
+        this.syncTempUrls();
       },
     },
     methods: {
@@ -312,14 +365,19 @@
         }
         this.dialogVisible = true;
       },
-      syncTempUrls() {
+      syncTempUrls(oldValue) {
         if (this.returnType !== 'id') {
           return;
         }
-        let ids = this.currentValueList.filter((item) => item && !this.fileMap[item]);
+        const vk = uni.vk;
+        let oldList = Array.isArray(oldValue) ? oldValue : [oldValue];
+        let ids = this.currentValueList.filter((item) => vk.pubfn.isNotNull(item) && (oldList.indexOf(item) === -1 || vk.pubfn.isNull(this.fileMap[item])));
         if (!ids.length) {
           return;
         }
+        ids.forEach((id) => {
+          this.fileUrlRetryMap[id] = false;
+        });
         this.getTempFileURL(ids);
       },
       syncItemUidList(newVal) {
@@ -336,6 +394,13 @@
       },
       getTempFileURL(ids) {
         let vk = uni.vk;
+        ids = [...new Set(ids)].filter((id) => vk.pubfn.isNotNull(id) && !this.fileUrlRequestMap[id]);
+        if (!ids.length) {
+          return;
+        }
+        ids.forEach((id) => {
+          this.$set(this.fileUrlRequestMap, id, true);
+        });
         vk.callFunction({
           url: 'admin/system_uni/uni-id-files/files/sys/getTempFileURL',
           needAlert: false,
@@ -346,17 +411,63 @@
           success: (data) => {
             let fileList = data.fileList || [];
             let fileMap = fileList.reduce((acc, item, index) => {
+              if (vk.pubfn.isNull(item.tempFileURL)) {
+                return acc;
+              }
               acc[item.fileID] = item.tempFileURL;
               acc[ids[index]] = item.tempFileURL;
               return acc;
             }, {});
             this.fileMap = Object.assign({}, this.fileMap, fileMap);
+            ids.forEach((id) => {
+              if (vk.pubfn.isNull(fileMap[id])) {
+                return;
+              }
+              ['thumbnail', 'preview'].forEach((target) => {
+                let key = `${target}:${id}`;
+                if (this.fileLoadErrorMap[key]) {
+                  this.fileLoadErrorMap[key] = false;
+                  // URL 未变时也要重建失败节点，确保真正重试媒体加载。
+                  this.$set(this.fileReloadMap, key, (this.fileReloadMap[key] || 0) + 1);
+                }
+              });
+            });
+          },
+          complete: () => {
+            ids.forEach((id) => {
+              this.$set(this.fileUrlRequestMap, id, false);
+            });
           },
         });
       },
+      refreshFileUrl(value, target = 'thumbnail') {
+        const vk = uni.vk;
+        if (this.returnType !== 'id' || vk.pubfn.isNull(value)) {
+          return;
+        }
+        if (this.fileUrlRetryMap[value] && !this.fileUrlRequestMap[value]) {
+          return;
+        }
+        // 同一轮选择或预览最多补偿一次，避免无效文件反复触发请求。
+        this.fileUrlRetryMap[value] = true;
+        this.fileLoadErrorMap[`${target}:${value}`] = true;
+        // 在途请求返回后统一重载已失败的节点，无需重复请求链接。
+        if (this.fileUrlRequestMap[value]) {
+          return;
+        }
+        this.getTempFileURL([value]);
+      },
+      getFileRenderKey(value, target = 'thumbnail') {
+        let key = `${target}:${value}`;
+        return `${key}:${this.fileReloadMap[key] || 0}`;
+      },
       getFileUrl(value) {
-        if (!value) {
+        const vk = uni.vk;
+        if (vk.pubfn.isNull(value)) {
           return '';
+        }
+        if (this.returnType === 'id') {
+          return this.fileMap[value] || (/^https?:\/\//i.test(value) ? value : '');
         }
         return this.fileMap[value] || value;
       },
@@ -370,12 +481,14 @@
         return arr[arr.length - 1] || rawValue || this.$t('vk.form.fileSelect.defaultFileName');
       },
       handleSingleSelect(item) {
+        if (this.disabled) return;
         let returnValue = this.getReturnValue(item);
         this._updateValue(returnValue, item);
         this.$emit('selected', returnValue, item);
         this.dialogVisible = false;
       },
       handleMultipleSelect(items) {
+        if (this.disabled) return;
         let currentList = this.currentValueList.slice();
         let selectedList = [];
         let selectedInfoList = [];
@@ -428,11 +541,19 @@
       },
       previewValue(item) {
         this.preview.visible = true;
-        this.preview.url = item.url;
+        this.preview.rawValue = item.rawValue;
         this.preview.name = item.name;
         this.preview.type = this.fileType;
+        if (this.returnType === 'id') {
+          this.fileUrlRetryMap[item.rawValue] = false;
+          this.getTempFileURL([item.rawValue]);
+        }
       },
       openExternal(url) {
+        const vk = uni.vk;
+        if (vk.pubfn.isNull(url)) {
+          return;
+        }
         window.open(url, '_blank');
       },
       getVideoCover(url) {
@@ -449,6 +570,7 @@
         return src;
       },
       onDraggableInput(newList) {
+        if (this.disabled) return;
         let oldValue = this.currentValueList || [];
         let newUidList = [];
         let usedIndices = [];
@@ -595,6 +717,8 @@
   }
 
   .selector-add-card {
+    // 拖动到末尾时 Sortable 可能将图片插到 footer 后，保持添加按钮始终显示在最后。
+    order: 1;
     text-align: center;
     background-color: #fbfdff;
     border: 1px dashed #c0ccda;

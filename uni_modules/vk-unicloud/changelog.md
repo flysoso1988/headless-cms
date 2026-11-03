@@ -1,3 +1,23 @@
+## 2.26.3（2026-10-25）
+- 【新增】前后端统一提供 `vk.pubfn.deepMerge`：普通对象递归合并，数组整体覆盖，保留显式 `null` 等覆盖值 [传送门](https://vkdoc.fsq.pub/client/jsapi.html#deepmerge)
+- 【优化】`vk.callFunction` 和 `vk.request` 注入全局请求参数时，使用新对象承接浅合并结果，避免直接修改参与合并的全局参数对象 [传送门](https://vkdoc.fsq.pub/client/pages/updateRequestGlobalParam.html#mode2-merge)
+
+* 完整框架项目地址：`https://ext.dcloud.net.cn/plugin?id=2204`[点击查看](https://ext.dcloud.net.cn/plugin?id=2204)
+## 2.26.2（2026-10-24）
+- 【修复】`vk.pubfn.escapeRegExp` 的数据库 PCRE 兼容性问题，避免搜索内容含空格、连字符等字符时正则查询报错
+
+* 完整框架项目地址：`https://ext.dcloud.net.cn/plugin?id=2204`[点击查看](https://ext.dcloud.net.cn/plugin?id=2204)
+## 2.26.1（2026-10-21）
+- 【修复】`2.26.0` 重构 `toDecimal` 导致的处理空值时报错的问题，空值统一返回 `0`
+- 【修复】批量导入菜单时忽略重复标识失效、覆盖导入丢失内置权限的问题
+- 【修复】支付统计已知的问题
+
+* 完整框架项目地址：`https://ext.dcloud.net.cn/plugin?id=2204`[点击查看](https://ext.dcloud.net.cn/plugin?id=2204)
+## 2.26.0（2026-10-14）
+- 【优化】三方登录逻辑细节问题
+- 【优化】前后端公共函数细节问题
+
+* 完整框架项目地址：`https://ext.dcloud.net.cn/plugin?id=2204`[点击查看](https://ext.dcloud.net.cn/plugin?id=2204)
 ## 2.25.2（2026-09-10）
 - 【重要】恢复 `"runtime": "Nodejs18"` 配置，注意：此配置不兼容 `HBuilderX 5.15` 版本，请尽快升级到 HBuilderX 最新版
 - 【重要】修复定时任务在部分情况下可能不运行的问题

@@ -348,7 +348,7 @@ util.getHourOffsetStartAndEnd = function (count = 0, date = new Date(), targetTi
   let offsetMillisecond = 1000 * 60 * 60;
   // 相对于当前日期count个天的日期
   nowDate = new Date(nowDate.getTime() + offsetMillisecond * 1 * count);
-  let dateInfo = util.getDateInfo(nowDate);
+  let dateInfo = util.getDateInfo(nowDate, targetTimezone);
   // 获得当天的起始时间
   res.startTime = new Date(`${dateInfo.year}/${dateInfo.month}/${dateInfo.day} ${dateInfo.hour}:00:00`).getTime() - timeDif;
   // 获得当天的结束时间
@@ -372,7 +372,7 @@ util.getDayOffsetStartAndEnd = function (count = 0, date = new Date(), targetTim
   let offsetMillisecond = 1000 * 60 * 60 * 24;
   // 相对于当前日期count个天的日期
   nowDate = new Date(nowDate.getTime() + offsetMillisecond * 1 * count);
-  let dateInfo = util.getDateInfo(nowDate);
+  let dateInfo = util.getDateInfo(nowDate, targetTimezone);
   // 获得当天的起始时间
   res.startTime = new Date(`${dateInfo.year}/${dateInfo.month}/${dateInfo.day}`).getTime() - timeDif;
   // 获得当天的结束时间
@@ -391,11 +391,12 @@ util.getWeekOffsetStartAndEnd = function (count = 0, date = new Date(), targetTi
   targetTimezone = util.getTargetTimezone(targetTimezone);
   const dif = nowDate.getTimezoneOffset();
   const timeDif = dif * 60 * 1000 + targetTimezone * 60 * 60 * 1000;
-  let nowDay = nowDate.getDay() === 0 ? 7 : nowDate.getDay();
+  const { week } = util.getDateInfo(nowDate, targetTimezone);
+  let nowDay = week === 0 ? 7 : week;
   nowDate.setDate(nowDate.getDate() - nowDay + 1 + count * 7);
-  let dateInfo1 = util.getDateInfo(nowDate);
+  let dateInfo1 = util.getDateInfo(nowDate, targetTimezone);
   nowDate.setDate(nowDate.getDate() + 7);
-  let dateInfo2 = util.getDateInfo(nowDate);
+  let dateInfo2 = util.getDateInfo(nowDate, targetTimezone);
   // 开始时间
   res.startTime = new Date(`${dateInfo1.year}/${dateInfo1.month}/${dateInfo1.day}`).getTime() - timeDif;
   // 结束时间
@@ -415,12 +416,12 @@ util.getMonthOffsetStartAndEnd = function (count = 0, date = new Date(), targetT
   targetTimezone = util.getTargetTimezone(targetTimezone);
   const dif = nowDate.getTimezoneOffset();
   const timeDif = dif * 60 * 1000 + targetTimezone * 60 * 60 * 1000;
-  let dateInfo = util.getDateInfo(nowDate);
+  let dateInfo = util.getDateInfo(nowDate, targetTimezone);
   let month = dateInfo.month + count;
   let year = dateInfo.year;
   if (month > 12) {
-    year = year + Math.floor(month / 12);
-    month = Math.abs(month) % 12;
+    year = year + Math.floor((month - 1) / 12);
+    month = ((month - 1) % 12) + 1;
   } else if (month <= 0) {
     year = year - 1 - Math.floor(Math.abs(month) / 12);
     month = 12 - (Math.abs(month) % 12);
@@ -442,12 +443,12 @@ util.getMonthOffsetStartAndEnd = function (count = 0, date = new Date(), targetT
 util.getQuarterOffsetStartAndEnd = function (count = 0, date = new Date(), targetTimezone) {
   let res = {};
   let nowDate = util.getDateObject(date);
-  nowDate.setMonth(nowDate.getMonth() + count * 3);
   targetTimezone = util.getTargetTimezone(targetTimezone);
   const dif = nowDate.getTimezoneOffset();
   const timeDif = dif * 60 * 1000 + targetTimezone * 60 * 60 * 1000;
-  let dateInfo = util.getDateInfo(nowDate);
-  let month = dateInfo.month;
+  let dateInfo = util.getDateInfo(nowDate, targetTimezone);
+  nowDate = new Date(dateInfo.year, dateInfo.month - 1 + count * 3, 1);
+  let month = nowDate.getMonth() + 1;
   if ([1, 2, 3].indexOf(month) > -1) {
     // 第1季度
     month = 1;
@@ -462,13 +463,11 @@ util.getQuarterOffsetStartAndEnd = function (count = 0, date = new Date(), targe
     month = 10;
   }
   nowDate.setMonth(month - 1); // 因为0代表1月，所以这里要减1
-  let dateInfo1 = util.getDateInfo(nowDate);
-  nowDate.setMonth(nowDate.getMonth() + 3);
-  let dateInfo2 = util.getDateInfo(nowDate);
   // 开始时间
-  res.startTime = new Date(`${dateInfo1.year}/${dateInfo1.month}/1`).getTime() - timeDif;
+  res.startTime = nowDate.getTime() - timeDif;
+  nowDate.setMonth(nowDate.getMonth() + 3);
   // 结束时间
-  res.endTime = new Date(`${dateInfo2.year}/${dateInfo2.month}/1`).getTime() - 1 - timeDif;
+  res.endTime = nowDate.getTime() - 1 - timeDif;
   return res;
 };
 
@@ -484,7 +483,7 @@ util.getYearOffsetStartAndEnd = function (count = 0, date = new Date(), targetTi
   targetTimezone = util.getTargetTimezone(targetTimezone);
   const dif = nowDate.getTimezoneOffset();
   const timeDif = dif * 60 * 1000 + targetTimezone * 60 * 60 * 1000;
-  let dateInfo = util.getDateInfo(nowDate);
+  let dateInfo = util.getDateInfo(nowDate, targetTimezone);
   let year = dateInfo.year + count;
   // 开始时间
   res.startTime = new Date(`${year}/1/1`).getTime() - timeDif;
@@ -518,7 +517,7 @@ vk.pubfn.getOffsetTime(new Date(), {
  */
 util.getOffsetTime = function (date = new Date(), obj, targetTimezone) {
   let nowDate = util.getDateObject(date);
-  let dateInfo = util.getDateInfo(nowDate);
+  let dateInfo = util.getDateInfo(nowDate, targetTimezone);
 
   targetTimezone = util.getTargetTimezone(targetTimezone);
   const dif = nowDate.getTimezoneOffset();

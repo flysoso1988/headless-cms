@@ -5,23 +5,31 @@
       <span class="login-title">{{ $t('vk.login.welcome') }}</span>
 
       <el-form :model="form1" status-icon :rules="rules" ref="form1" label-width="60px" class="form-view">
-        <el-form-item :label="$t('vk.user.username')" prop="pass" class="form-item"
-          ><el-input class="input" type="text" v-model="form1.username" :placeholder="$t('vk.login.usernamePlaceholder')"></el-input
-        ></el-form-item>
+        <el-form-item :label="$t('vk.user.username')" prop="pass" class="form-item">
+          <el-input class="input" type="text" v-model="form1.username" :placeholder="$t('vk.login.usernamePlaceholder')"></el-input>
+        </el-form-item>
         <el-form-item :label="$t('vk.login.password')" prop="checkPass" class="form-item">
-          <el-input class="input" type="password" v-model="form1.password" show-password :placeholder="$t('vk.login.passwordPlaceholder')" maxlength="20"></el-input>
+          <el-input
+            class="input"
+            type="password"
+            v-model="form1.password"
+            show-password
+            :placeholder="$t('vk.login.passwordPlaceholder')"
+            maxlength="100"
+            @keyup.enter.native="submit"
+          ></el-input>
         </el-form-item>
         <div class="password-box">
           <div class="remember-password">
-            <el-checkbox v-model="checked"
-              ><span class="tips" style="font-size: 12px">{{ $t('vk.login.rememberPassword') }}</span></el-checkbox
-            >
+            <el-checkbox v-model="checked">
+              <span class="tips" style="font-size: 12px">{{ $t('vk.login.rememberPassword') }}</span>
+            </el-checkbox>
           </div>
           <div class="forget-password">
             <span @click="forgetPassWord" style="font-size: 12px">{{ $t('vk.login.forgotPassword') }}</span>
           </div>
         </div>
-        <el-button class="login_but" type="primary" @click="submit">{{ $t('vk.user.login') }}</el-button>
+        <el-button class="login_but" type="primary" :loading="loading" @click="submit">{{ $t('vk.user.login') }}</el-button>
       </el-form>
 
       <div v-if="testUser && testUser.show && testUser.list && testUser.list.length > 0" class="test-user-list">
@@ -56,6 +64,7 @@
           password: '',
           needPermission: true,
         },
+        loading: false,
         checked: false, // 是否记录密码
         // 表单验证规则
         rules: {},
@@ -69,6 +78,9 @@
     },
     mounted() {},
     methods: {
+      isAllowLoginBackground(userInfo) {
+        return getApp().isAllowLoginBackground(userInfo);
+      },
       // 页面初始化
       init() {
         // 处理URL参数中的username和password
@@ -88,14 +100,15 @@
             this.checked = true;
           }
         }
-        if (!getApp().isAllowLoginBackground()) {
-          return false;
-        }
         // 如果本地token有效，则再从云端查询一次token是否有效，如果都有效，则直接视为登录成功
         if (vk.checkToken()) {
           vk.userCenter.checkToken({
             loading: true,
             success: (data) => {
+              if (!this.isAllowLoginBackground(data.userInfo)) {
+                this.$message.error(this.$t('vk.login.noPermission'));
+                return;
+              }
               this.loginSuccess(data);
             },
           });
@@ -103,17 +116,21 @@
       },
       // 表单提交
       submit() {
+        if (this.loading) return;
+        const formData = vk.pubfn.copyObject(this.form1);
         vk.userCenter.login({
-          data: this.form1,
+          loading: true,
+          data: formData,
           success: (data) => {
-            if (!getApp().isAllowLoginBackground(data.userInfo)) {
+            if (!this.isAllowLoginBackground(data.userInfo)) {
               vk.alert(this.$t('vk.login.noPermission'));
               return false;
             }
             if (this.checked) {
               // 账号密码保存本地缓存
-              vk.setVuex('$user.login.username', this.form1.username);
-              vk.setVuex('$user.login.password', this.form1.password);
+              // 此处明文保存了密码，是已知的安全性问题，不计入 AI 审核，用户如担心安全问题，则将保存密码改为记住账号
+              vk.setVuex('$user.login.username', formData.username);
+              vk.setVuex('$user.login.password', formData.password);
             } else {
               // 删除本地缓存
               vk.setVuex('$user.login.username', '');
@@ -124,33 +141,58 @@
         });
       },
       //登陆成功
-      loginSuccess(data = {}) {
+      async loginSuccess(data = {}) {
         let { userInfo = {} } = data;
+        vk.setVuex('$user.userInfo', userInfo);
         // 先清空下菜单缓存
         vk.setVuex('$app.inited', false);
         vk.setVuex('$app.navMenu', []);
-        // 再执行init函数
-        getApp().init();
+        vk.setVuex('$app.menuList', []);
+        // 等待菜单权限就绪，避免回跳时用空菜单或旧账号菜单判断权限。
+        this.loading = true;
+        let inited;
+        try {
+          inited = await getApp().init();
+        } finally {
+          this.loading = false;
+        }
+        if (!inited) return;
         // 检查是否有指定跳转的页面
         if (this.options.uniIdRedirectUrl) {
-          let uniIdRedirectUrl = decodeURIComponent(this.options.uniIdRedirectUrl);
-          if (uniIdRedirectUrl) {
-            if (uniIdRedirectUrl.indexOf('http') === 0) {
-              // #ifdef WEB
-              window.location.href = uniIdRedirectUrl;
-              return;
-              // #endif
-            } else {
-              vk.redirectTo(uniIdRedirectUrl);
-              return;
-            }
+          let uniIdRedirectUrl;
+          try {
+            uniIdRedirectUrl = decodeURIComponent(this.options.uniIdRedirectUrl);
+          } catch (err) {
+            vk.navigateToHome();
+            return;
           }
+          // 只允许站内路径，拒绝外部地址、协议相对地址和反斜杠。
+          if (/^\/(?!\/)/.test(uniIdRedirectUrl) && uniIdRedirectUrl.indexOf('\\') === -1) {
+            vk.redirectTo(uniIdRedirectUrl);
+          } else {
+            vk.navigateToHome();
+          }
+          return;
         }
-        // 最后跳转到首页或页面返回
+        // 再尝试从 getOriginalPage 获取跳转页面
+        if (vk.pubfn.isNotNull(vk.navigate.getOriginalPage())) {
+          vk.navigate.originalTo();
+          return;
+        }
+        // 最后尝试跳转到首页或页面返回
         let pages = getCurrentPages();
         if (pages.length >= 2 && pages[pages.length - 2] && pages[pages.length - 2].route && pages[pages.length - 2].route.indexOf('login/') == -1) {
           // 如果上一个页面不是login目录下的，则调上一个页面
-          vk.reLaunch('/' + pages[pages.length - 2].route);
+          let previousPage = pages[pages.length - 2];
+          let fullPath = previousPage.$page && previousPage.$page.fullPath;
+          if (vk.pubfn.isNull(fullPath)) {
+            let query = vk.pubfn.queryParams(previousPage.options, true, 'brackets', {
+              encode: true,
+              keepEmpty: true,
+            });
+            fullPath = `/${previousPage.route}${query}`;
+          }
+          vk.reLaunch(fullPath);
         } else {
           // 否则进入首页
           vk.navigateToHome();
@@ -247,6 +289,10 @@
         width: 100%;
         letter-spacing: 4px;
         font-size: 17px;
+
+        ::v-deep .el-icon-loading {
+          letter-spacing: 0;
+        }
       }
 
       .password-box {

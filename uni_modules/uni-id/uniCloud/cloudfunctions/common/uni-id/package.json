@@ -14,7 +14,7 @@
         "uni-config-center": "file:../../../../../uni-config-center/uniCloud/cloudfunctions/common/uni-config-center"
     },
     "origin-plugin-dev-name": "vk-unicloud-admin",
-    "origin-plugin-version": "1.25.2",
+    "origin-plugin-version": "1.26.2",
     "plugin-dev-name": "vk-unicloud-admin",
-    "plugin-version": "1.25.2"
+    "plugin-version": "1.26.2"
 }

@@ -18,9 +18,9 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">支付订单列表</div>
         <div class="vk-page-card-actions">
-          <el-button :size="$global.size" icon="el-icon-data-line" @click="pageTo('./overview')">支付统计</el-button>
-          <el-button :size="$global.size" icon="el-icon-s-data" @click="pageTo('./ranking')">用户价值排行</el-button>
-          <el-button :size="$global.size" icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
+          <el-button icon="el-icon-data-line" @click="pageTo('./overview')">支付统计</el-button>
+          <el-button icon="el-icon-s-data" @click="pageTo('./ranking')">用户价值排行</el-button>
+          <el-button icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
         </div>
       </div>
 
@@ -142,6 +142,7 @@
             { key: 'out_trade_no', title: '商户单号', type: 'text', mode: '%%' },
             { key: 'transaction_id', title: '平台单号', type: 'text', mode: '%%' },
             { key: 'user_id', title: '用户ID', type: 'text', mode: '=' },
+            { key: 'pid', title: 'PID/商户', type: 'text', mode: '=' },
             {
               key: 'platform',
               title: '平台',
@@ -167,7 +168,7 @@
               key: 'pay_type',
               title: '支付类型',
               type: 'select',
-              mode: '%*',
+              mode: 'custom',
               data: payTypeSearchData,
             },
             { key: 'total_fee', title: '金额范围', type: 'money', placeholder: ['最小金额', '最大金额'], range: true, mode: '[]', span: 8 },
@@ -183,7 +184,7 @@
       this.options = options;
       this.init(options);
       // 处理从统计页面传递过来的筛选参数
-      if (options.platform || options.orderType || options.startTime || options.user_id || options.pay_type) {
+      if (options.platform || options.orderType || options.startTime || options.user_id || options.pay_type || vk.pubfn.isNotNull(options.pid)) {
         this.applyExternalFilter(options);
       }
     },
@@ -207,6 +208,9 @@
         }
         if (options.user_id) {
           formData.user_id = options.user_id;
+        }
+        if (vk.pubfn.isNotNull(options.pid)) {
+          formData.pid = options.pid;
         }
         if (options.pay_type) {
           formData.pay_type = options.pay_type;

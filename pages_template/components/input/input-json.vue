@@ -1,22 +1,22 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Input JSON" subTitle="JSON编辑器"></vk-data-page-header>
-    <view class="page-body">
-      <view class="mt15">
+    <div class="page-body">
+      <div class="mt15">
         <vk-data-input-json v-model="form1.value1" mode="code" placeholder="请输入数字"></vk-data-input-json>
-      </view>
-    </view>
+      </div>
+    </div>
 
-    <view class="mt15 json-view" v-if="form1">
+    <div class="mt15 json-view" v-if="form1">
       <pre>
 				{{ form1 }}
 			</pre
       >
-    </view>
+    </div>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

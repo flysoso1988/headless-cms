@@ -8,6 +8,7 @@
       v-if="fileSelect.fileType"
       ref="fileSelectDialog"
       :controls="false"
+      :disabled="readonlyCom"
       :file-type="fileSelect.fileType"
       :multiple="fileSelect.multipleLimit > 1 ? true : false"
       :multipleLimit="fileSelect.multipleLimit"
@@ -225,24 +226,8 @@
           })(),
           language,
           height: that._getProp('height') || 600,
-          readonly: that._getProp('disabled'),
           toolbar,
           menubar,
-          init_instance_callback: (editor) => {
-            editor.setContent(that.value || '');
-            that.hasInit = true;
-            editor.on('input change', (e) => {
-              let content = editor.getContent();
-              if (content !== that.editorData) {
-                that.editorData = content;
-                that._updateValue(content);
-              }
-            });
-            // 处理弹窗z-index问题
-            let zIndex = PopupManager.nextZIndex();
-            let body = document.querySelector('body');
-            body.style.setProperty('--el-zindex', zIndex);
-          },
           // 没有用到images_upload_handler方法上传文件用的是下面的file_picker_callback方法
           images_upload_handler: (blobInfo, progress) => {
             return new Promise(async (resolve, reject) => {
@@ -334,6 +319,29 @@
             return htmlStr;
           },
           ...editorConfig,
+          readonly: that.readonlyCom,
+          init_instance_callback(editor) {
+            editor.setContent(that.value || '');
+            that.editorData = editor.getContent();
+            // 先同步初始化的只读模式，再应用初始化期间可能变化的禁用状态。
+            editor.mode.set(editor.mode.isReadOnly() ? 'readonly' : 'design');
+            editor.mode.set(that.readonlyCom ? 'readonly' : 'design');
+            that.hasInit = true;
+            editor.on('input change undo redo', () => {
+              let content = editor.getContent();
+              if (content !== that.editorData) {
+                that.editorData = content;
+                that._updateValue(content);
+              }
+            });
+            // 处理弹窗z-index问题
+            let zIndex = PopupManager.nextZIndex();
+            let body = document.querySelector('body');
+            body.style.setProperty('--el-zindex', zIndex);
+            if (typeof editorConfig.init_instance_callback === 'function') {
+              editorConfig.init_instance_callback.call(this, editor);
+            }
+          },
           setup(editor) {
             editor.on('FullscreenStateChanged', (e) => {
               that.fullscreen = e.state;
@@ -349,6 +357,9 @@
                 that._openFileSelectDialog();
               },
             });
+            if (typeof editorConfig.setup === 'function') {
+              editorConfig.setup.call(this, editor);
+            }
           },
         });
       },
@@ -435,12 +446,17 @@
       // 打开素材库弹窗
       _openFileSelectDialog() {
         setTimeout(() => {
+          if (this.readonlyCom) return;
           this.$refs.fileSelectDialog.open();
         }, 50);
       },
       // 素材库选择结束事件
       _selected(url, file = {}) {
-        if (typeof url === 'object' && url.length > 0) {
+        if (this.readonlyCom) return;
+        if (Array.isArray(url)) {
+          if (url.length === 0) {
+            return;
+          }
           // 多图上传
           this.insertImages(file);
         } else {
@@ -451,8 +467,17 @@
     },
     watch: {
       value(val = '') {
-        if (this.hasInit && (this.editorData !== val || val == '')) {
-          this.getEditor().setContent(val);
+        if (this.hasInit) {
+          const editor = this.getEditor();
+          if (editor.getContent() !== val) {
+            editor.setContent(val);
+          }
+          this.editorData = editor.getContent();
+        }
+      },
+      readonlyCom(val) {
+        if (this.hasInit) {
+          this.getEditor().mode.set(val ? 'readonly' : 'design');
         }
       },
       language(val) {
@@ -461,6 +486,15 @@
       },
     },
     computed: {
+      readonlyCom() {
+        if (this.disabled) return true;
+        const editorConfig = this._getProp('editorConfig') || {};
+        if (typeof editorConfig.readonly === 'boolean') {
+          return editorConfig.readonly;
+        }
+        // 万能表单已将字符串、函数或数组规则计算为 disabled 属性。
+        return typeof this.column.disabled === 'boolean' ? this.column.disabled : this.disabled;
+      },
       widthCom() {
         const width = this._getProp('width');
         if (/^[\d]+(\.[\d]+)?$/.test(width)) {

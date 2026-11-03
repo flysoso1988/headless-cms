@@ -3,7 +3,7 @@
     <template slot="title">
       <div class="stat-alert-content">
         <span class="stat-alert-text">{{ text }}</span>
-        <el-link type="warning" :underline="false" @click="$emit('refresh')" class="stat-alert-link">刷新</el-link>
+        <el-button type="text" :size="$global.size" @click="$emit('refresh')" class="stat-alert-link">刷新</el-button>
       </div>
       <slot></slot>
     </template>
@@ -38,7 +38,13 @@
   }
 
   .stat-alert-link {
+    padding: 0;
+    color: inherit;
     font-size: 13px;
     text-decoration: underline;
+
+    &:focus-visible {
+      outline: 1px solid currentColor;
+    }
   }
 </style>

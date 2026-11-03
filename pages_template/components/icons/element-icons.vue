@@ -1,14 +1,14 @@
 <template>
   <!-- 页面内容开始 -->
-  <view class="page">
+  <div class="page">
     <vk-data-page-header title="Element 图标" subTitle="点击图标即可复制图标代码"></vk-data-page-header>
-    <view class="page-body icons">
-      <view v-for="(icon, index) in icons" :key="icon" class="icon-item pointer">
+    <div class="page-body icons">
+      <div v-for="(icon, index) in icons" :key="icon" class="icon-item pointer">
         <vk-data-icon :name="icon" size="30" @click="setClipboardData('tag', icon)"></vk-data-icon>
-        <text @click="setClipboardData('class', icon)" class="icon-text">{{ icon }}</text>
-      </view>
-    </view>
-  </view>
+        <span @click="setClipboardData('class', icon)" class="icon-text">{{ icon }}</span>
+      </div>
+    </div>
+  </div>
   <!-- 页面内容结束 -->
 </template>
 

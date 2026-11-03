@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">普通表单功能演示</div>
 
@@ -35,7 +35,7 @@
             </el-form-item>
           </el-col>
           <el-col class="line" style="text-align: center" :span="1">
-            <text style="color: #ccc">—</text>
+            <span style="color: #ccc">—</span>
           </el-col>
           <el-col :span="4">
             <el-form-item prop="date2">
@@ -84,7 +84,7 @@
       </el-form>
     </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

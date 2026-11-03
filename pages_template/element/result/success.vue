@@ -1,17 +1,17 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <i class="el-icon-check"></i>
-    <text class="success">提交成功</text>
-    <text class="txt">提交结果页用于反馈一系列操作任务的处理结果，如果仅是简单操作，使用 Message 全局提示反馈即可。灰色区域可以显示一些补充的信息。</text>
-    <text class="examine">已提交申请，等待部门审核。</text>
-    <view class="project_list">
-      <text>返回列表</text>
-      <text>查看项目</text>
-      <text>打印</text>
-    </view>
+    <span class="success">提交成功</span>
+    <span class="txt">提交结果页用于反馈一系列操作任务的处理结果，如果仅是简单操作，使用 Message 全局提示反馈即可。灰色区域可以显示一些补充的信息。</span>
+    <span class="examine">已提交申请，等待部门审核。</span>
+    <div class="project_list">
+      <span>返回列表</span>
+      <span>查看项目</span>
+      <span>打印</span>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>
@@ -109,7 +109,7 @@
     align-items: center;
     justify-content: center;
 
-    > text {
+    > span {
       display: inline-block;
       width: 180rpx;
       height: 60rpx;

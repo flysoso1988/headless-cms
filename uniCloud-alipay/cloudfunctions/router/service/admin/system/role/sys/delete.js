@@ -18,6 +18,9 @@ module.exports = {
     if (vk.pubfn.isNullOne(role_id)) {
       return { code: -1, msg: 'role_id不能为空' };
     }
+    if (role_id === 'admin' || (Array.isArray(role_id) && role_id.includes('admin'))) {
+      return { code: -1, msg: '系统内置 admin 角色不可删除' };
+    }
     res = await uniID.deleteRole({
       roleID: role_id,
     });

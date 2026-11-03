@@ -66,7 +66,7 @@ h5.getEnvInfo = function () {
   const isH5Alipay = isAlipay && !isMiniProgram ? true : false;
   const isDevAlipay = isAlipay && /alipayide/i.test(ua);
   // QQ
-  const isQQ = /qq/i.test(ua);
+  const isQQ = !isWeixin && !isAlipay && /qq/i.test(ua);
   const isMpQQ = isQQ && isMiniProgram ? true : false;
   const isH5QQ = isQQ && !isMiniProgram ? true : false;
   const isDevQQ = isQQ && /webdebugger/i.test(ua);
@@ -200,6 +200,10 @@ h5.init = function (obj = {}) {
   }
   const env = vk.h5.getEnv();
   if (env === 'h5-weixin') {
+    // 提前注册，避免自动获取签名后覆盖业务的错误监听。
+    wx.error((err) => {
+      console.error(err);
+    });
     const setConfig = (config = {}) => {
       wx.config(
         Object.assign(
@@ -215,9 +219,6 @@ h5.init = function (obj = {}) {
         )
       );
       vk.h5.wxReady = true;
-      wx.error((err) => {
-        console.error(err);
-      });
     };
     if (appId) {
       setConfig();
@@ -244,17 +245,21 @@ h5.getWeiXinJsApi = function () {
   const proxyObj = {};
   const newObj = new Proxy(proxyObj, {
     get: function (target, key, receiver) {
-      return async function (options) {
+      return async function (...args) {
         const env = vk.h5.getEnv();
         if (env === 'h5-weixin') {
+          if (key === 'error') {
+            wx.error(...args);
+            return;
+          }
           wx.ready(() => {
-            wx[key](options);
+            wx[key](...args);
             // wx.checkJsApi({
             // 	jsApiList: [key],
             // 	success: (res) => {
             // 		if (res.checkResult[key]) {
             // 			// 支持
-            // 			wx[key](options);
+            // 			wx[key](...args);
             // 		} else {
             // 			// 不支持
             // 			console.error(`不支持接口${key}`);

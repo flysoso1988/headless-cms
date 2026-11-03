@@ -1,16 +1,16 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
 
-    <view style="padding: 40rpx; font-size: 70rpx; font-family: kaiti"> 加载功能演示 </view>
+    <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">加载功能演示</div>
 
     <el-row>
       <el-col :span="24" style="padding: 40rpx">
-        <view style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun"> 区域加载: </view>
+        <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">区域加载:</div>
         <el-table v-loading="loading" :data="tableData" style="width: 100%">
-          <el-table-column prop="date" label="日期" width="180"> </el-table-column>
-          <el-table-column prop="name" label="姓名" width="180"> </el-table-column>
-          <el-table-column prop="address" label="地址"> </el-table-column>
+          <el-table-column prop="date" label="日期" width="180"></el-table-column>
+          <el-table-column prop="name" label="姓名" width="180"></el-table-column>
+          <el-table-column prop="address" label="地址"></el-table-column>
         </el-table>
       </el-col>
     </el-row>
@@ -18,7 +18,7 @@
     <!-- 自定义加载的内容从这个地方开始 -->
     <el-row>
       <el-col :span="24" style="padding: 30rpx 40rpx">
-        <view style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun"> 自定义加载: </view>
+        <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">自定义加载:</div>
         <el-table
           v-loading="loading"
           element-loading-text="拼命加载中"
@@ -27,32 +27,32 @@
           :data="tableData"
           style="width: 100%"
         >
-          <el-table-column prop="date" label="日期" width="180"> </el-table-column>
-          <el-table-column prop="name" label="姓名" width="180"> </el-table-column>
-          <el-table-column prop="address" label="地址"> </el-table-column>
+          <el-table-column prop="date" label="日期" width="180"></el-table-column>
+          <el-table-column prop="name" label="姓名" width="180"></el-table-column>
+          <el-table-column prop="address" label="地址"></el-table-column>
         </el-table>
       </el-col>
     </el-row>
 
     <el-row>
       <el-col :span="24" style="padding: 40rpx">
-        <view style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun"> 全屏加载: </view>
-        <el-button type="primary" @click="openFullScreen1" v-loading.fullscreen.lock="fullscreenLoading"> 指令方式 </el-button>
+        <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">全屏加载:</div>
+        <el-button type="primary" @click="openFullScreen1" v-loading.fullscreen.lock="fullscreenLoading">指令方式</el-button>
 
-        <el-button type="primary" @click="openFullScreen2"> 服务方式 </el-button>
+        <el-button type="primary" @click="openFullScreen2">服务方式</el-button>
 
-        <el-button type="primary" @click="doudou = true"> 自定义方式 </el-button>
+        <el-button type="primary" @click="doudou = true">自定义方式</el-button>
       </el-col>
     </el-row>
 
-    <!-- <view class='popContainer' v-show="doudou" @click="doudou=false">
+    <!-- <div class='popContainer' v-show="doudou" @click="doudou=false">
 			<el-image :draggable="false"
 			style="width: 200rpx; height: 200rpx;text-align: center; margin-left: 50%; margin-top: 800rpx;"
 			src="/static/icon/loading.gif"
 			></el-image>
-		</view> -->
+		</div> -->
 
-    <view class="popContainer" v-show="doudou" @click="doudou = false">
+    <div class="popContainer" v-show="doudou" @click="doudou = false">
       <div class="loadingio-spinner-bean-eater-v394si28re">
         <div class="ldio-fk6s8i3hzwa">
           <div>
@@ -67,10 +67,10 @@
           </div>
         </div>
       </div>
-    </view>
+    </div>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>
@@ -158,7 +158,7 @@
     position: absolute !important;
     left: 300 !important;
   }
-  view.popContainer {
+  div.popContainer {
     position: fixed;
     top: 0;
     left: 0;

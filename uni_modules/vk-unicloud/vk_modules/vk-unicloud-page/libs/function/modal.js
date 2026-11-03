@@ -186,7 +186,7 @@ export default {
       placeholderText: localeObj.placeholderText[locale],
     };
     if (typeof a === 'object') {
-      obj = a;
+      obj = { ...obj, ...a };
     } else {
       if (typeof a === 'string') {
         obj.placeholderText = a;
@@ -241,7 +241,7 @@ export default {
         if (confirm) {
           data.content = res.inputValue;
         }
-        obj.success(data);
+        if (typeof obj.success === 'function') obj.success(data);
       },
       fail: obj.fail,
       complete: obj.complete,
@@ -336,6 +336,7 @@ export default {
     let fail = object.fail;
     let complete = object.complete;
     return uni.showActionSheet({
+      title: title,
       itemList: list,
       // #ifndef MP-ALIPAY
       itemColor: color,
@@ -399,7 +400,7 @@ export default {
         let { data, name, that } = obj;
         if (!data) data = that;
         updateCustomLoading({ loading, name, that: data });
-        return { that, name };
+        return { that: data, name };
       } else if (typeof obj === 'string') {
         let pages = getCurrentPages();
         let page = pages[pages.length - 1];

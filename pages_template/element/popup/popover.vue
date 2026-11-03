@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">提示弹框功能演示</div>
 
@@ -15,7 +15,7 @@
           <el-button slot="reference">click 激活</el-button>
         </el-popover>
 
-        <el-popover ref="popover" placement="right" title="标题" width="200" style="" trigger="focus" content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"> </el-popover>
+        <el-popover ref="popover" placement="right" title="标题" width="200" style="" trigger="focus" content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"></el-popover>
         <el-button v-popover:popover style="margin-right: 30rpx">focus 激活</el-button>
 
         <el-popover placement="bottom" title="标题" width="200" trigger="manual" content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。" v-model="visible">
@@ -55,7 +55,7 @@
       </el-col>
     </el-row>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

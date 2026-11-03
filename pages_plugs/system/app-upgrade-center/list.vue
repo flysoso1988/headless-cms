@@ -20,7 +20,7 @@
         <div class="vk-page-card-title">版本列表</div>
         <div class="vk-page-card-actions">
           <el-dropdown placement="bottom-start" @command="addBtn">
-            <el-button type="primary" :size="$global.size" icon="el-icon-plus" :disabled="!queryForm1.formData.appid">添加版本</el-button>
+            <el-button type="primary" icon="el-icon-plus" :disabled="!queryForm1.formData.appid">添加版本</el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="native_app">原生App安装包</el-dropdown-item>
               <el-dropdown-item command="wgt">wgt资源包</el-dropdown-item>
@@ -215,6 +215,7 @@
           url: 'admin/system/app/sys/getList',
           loading: true,
           data: {
+            pageSize: -1,
             formData: {
               enable_upgrade_center: true,
             },

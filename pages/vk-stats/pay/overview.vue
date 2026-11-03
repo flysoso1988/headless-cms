@@ -349,13 +349,21 @@
         const formData = this.queryForm1.formData;
         const dateRange = normalizeDateRange(formData.dateRange);
         // 跳转到列表页面，传递筛选参数
-        const params = new URLSearchParams({
+        const params = {
+          platform: formData.platform,
+          pay_type: formData.payType,
+          orderType: formData.orderType,
+          pid: formData.pid,
           [fieldName]: value,
           startTime: dateRange[0],
           endTime: dateRange[1],
           status: formData.status,
+        };
+        const query = new URLSearchParams();
+        Object.keys(params).forEach((key) => {
+          if (vk.pubfn.isNotNull(params[key])) query.set(key, params[key]);
         });
-        vk.navigateTo(`./list?${params.toString()}`);
+        vk.navigateTo(`./list?${query.toString()}`);
       },
       syncQueryColumns() {
         const dataMap = {
@@ -615,7 +623,7 @@
               name: '支付金额占比',
               data: this.payTypeShareDisplay.map((item) => ({
                 name: item.label,
-                value: item.amount,
+                value: formatAmount(item.amount),
               })),
             },
           ],
@@ -851,7 +859,7 @@
     const count = offsetMap[shortcut];
     if (count === undefined) return [];
     const start = vk.pubfn.getDayOffsetStartAndEnd(count, new Date());
-    const end = vk.pubfn.getDayOffsetStartAndEnd(0, new Date());
+    const end = shortcut === 'yesterday' ? start : vk.pubfn.getDayOffsetStartAndEnd(0, new Date());
     return [start.startTime, end.endTime];
   }
 
@@ -1038,7 +1046,7 @@
     margin-bottom: 0;
   }
 
-  .el-col:last-child {
+  .pay-stat-page > .el-row:last-child > .el-col:last-child {
     margin-bottom: 0;
   }
 

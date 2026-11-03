@@ -1,3 +1,29 @@
+## 1.26.2（2026-10-25）
+* 【升级】`vk-unicloud-admin-ui` 的 npm 包（执行`npm i vk-unicloud-admin-ui@1.26.2 --registry https://registry.npmjs.org/`）
+* 【升级】`vk依赖` [详情](https://ext.dcloud.net.cn/plugin?id=4157&update_log)
+* 【优化】其他细节问题
+
+## 1.26.1（2026-10-24）
+* 【升级】`vk-unicloud-admin-ui` 的 npm 包（执行`npm i vk-unicloud-admin-ui@1.26.1 --registry https://registry.npmjs.org/`）
+* 【升级】`vk依赖` [详情](https://ext.dcloud.net.cn/plugin?id=4157&update_log)
+* 【修复】`万能表格` 全量导出时 dataPreprocess 不生效、本页及指定范围导出数据可能不正确的问题
+* 【修复】`万能表格` 的 disabled 在部分操作按钮及批量菜单中不生效的问题
+* 【修复】`万能表单` checkbox radio 修改数据源或请求参数后选项可能未刷新的问题
+* 【修复】`万能表单` cascader 懒加载失败后无法重试的问题
+* 【修复】`万能表单` image avatar file 绑定值变化后文件列表未同步、拖拽排序异常的问题
+* 【修复】`万能表单` map 定位加载及搜索分页异常的问题
+* 【修复】`vk.pubfn.escapeRegExp` 的数据库 PCRE 兼容性问题，避免搜索内容含空格、连字符等字符时正则查询报错
+* 【优化】`万能表单` number money percentage discount 统一数值输入处理逻辑
+* 【优化】其他细节问题
+## 1.26.0（2026-10-21）
+- 【升级】`vk-unicloud-admin-ui` 的 npm 包（执行`npm i vk-unicloud-admin-ui@1.26.0 --registry https://registry.npmjs.org/`）
+- 【升级】`vk依赖` [详情](https://ext.dcloud.net.cn/plugin?id=4157&update_log)
+- 【重要】默认富文本编辑器切换为 TinyMCE，直接使用 `vk-data-input-editor` 的页面请改用 `custom-editor-tinymce`
+- 【重要】云函数恢复 Nodejs18 运行环境，不兼容 HBuilderX 5.15，请升级 HBuilderX
+- 【修复】批量导入菜单时忽略重复标识失效、覆盖导入丢失内置权限的问题
+- 【修复】登录页面和支付统计已知问题
+- 【优化】统一组件默认尺寸
+- 【优化】其他细节问题
 ## 1.25.2（2026-09-10）
 - 【升级】`vk-unicloud-admin-ui` 的 npm 包（执行`npm i vk-unicloud-admin-ui@1.25.5 --registry https://registry.npmjs.org/`）
 - 【升级】`vk依赖` [详情](https://ext.dcloud.net.cn/plugin?id=4157&update_log)

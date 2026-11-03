@@ -87,7 +87,7 @@ storage.clearSessionStorageSync = function (key) {
     if (keys) {
       keys.map((keyName) => {
         if (keyName.indexOf(key) == 0) {
-          sessionStorage.removeItem(keyName);
+          storage.removeSessionStorageSync(keyName);
         }
       });
     }

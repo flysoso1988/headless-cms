@@ -1,12 +1,12 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Dialog 弹窗" subTitle="基础用法"></vk-data-page-header>
-    <view class="page-body">
+    <div class="page-body">
       <el-button @click="dialog.show1 = true">显示弹窗1</el-button>
-      <el-button @click="dialog.show2 = true">显示弹窗2</el-button>
-    </view>
-    <view class="page-dialog">
+      <el-button @click="dialog.show2 = true">显示弹窗2（居中弹窗）</el-button>
+    </div>
+    <div class="page-dialog">
       <!-- 页面弹窗内容开始 -->
       <vk-data-dialog v-model="dialog.show1" title="标题1" width="500px" top="14vh" center :close-on-click-modal="true">
         这里是自定义内容
@@ -16,7 +16,7 @@
         </template>
       </vk-data-dialog>
 
-      <vk-data-dialog v-model="dialog.show2" title="标题2" width="500px" top="14vh" :close-on-click-modal="true">
+      <vk-data-dialog v-model="dialog.show2" title="标题2" width="500px" auto-center :close-on-click-modal="true">
         这里是自定义内容
         <template v-slot:footer="{ close }">
           <el-button @click="close">取 消</el-button>
@@ -25,9 +25,9 @@
       </vk-data-dialog>
 
       <!-- 页面弹窗内容开始 -->
-    </view>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

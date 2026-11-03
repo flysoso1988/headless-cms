@@ -38,7 +38,6 @@
         { "path": "input/input-select" },
         { "path": "input/input-remote-select" },
         { "path": "input/input" },
-        { "path": "editor/editor" },
         { "path": "editor/editor-tinymce" }
       ]
     },

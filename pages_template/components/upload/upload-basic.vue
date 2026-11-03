@@ -1,25 +1,25 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Upload 上传" subTitle="基础用法"></vk-data-page-header>
-    <view class="page-body">
+    <div class="page-body">
       <vk-data-upload v-model="form1.images" :limit="6"></vk-data-upload>
-    </view>
+    </div>
 
     <el-button @click="a">清空值</el-button>
     <el-button @click="b">设置值</el-button>
 
-    <view class="tips mt15">
-      <view class="mt15 json-view" v-if="form1">
-        <view style="font-size: 14px">表单数据</view>
+    <div class="tips mt15">
+      <div class="mt15 json-view" v-if="form1">
+        <div style="font-size: 14px">表单数据</div>
         <pre>
 					{{ form1 }}
 				</pre
         >
-      </view>
-    </view>
+      </div>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

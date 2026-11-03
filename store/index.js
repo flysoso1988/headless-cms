@@ -58,7 +58,7 @@ const saveLifeData = function (key, value) {
   }
 };
 
-// #ifndef VUE3
+// #ifdef VUE2
 import Vue from 'vue';
 import Vuex from 'vuex';
 
@@ -80,7 +80,7 @@ const store = new Vuex.Store({
         let obj = state[nameArr[0]];
         for (let i = 1; i < len - 1; i++) {
           let keyName = nameArr[i];
-          if (typeof obj[keyName] !== 'object') Vue.set(obj, keyName, {});
+          if (obj[keyName] === null || typeof obj[keyName] !== 'object') Vue.set(obj, keyName, {});
           obj = obj[keyName];
         }
         Vue.set(obj, nameArr[len - 1], JSON.parse(JSON.stringify(payload.value)));
@@ -115,7 +115,7 @@ const store = createStore({
         let obj = state[nameArr[0]];
         for (let i = 1; i < len - 1; i++) {
           let keyName = nameArr[i];
-          if (typeof obj[keyName] !== 'object') obj[keyName] = {};
+          if (obj[keyName] === null || typeof obj[keyName] !== 'object') obj[keyName] = {};
           obj = obj[keyName];
         }
         obj[nameArr[len - 1]] = JSON.parse(JSON.stringify(payload.value));

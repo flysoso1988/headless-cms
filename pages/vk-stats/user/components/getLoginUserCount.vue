@@ -35,15 +35,15 @@
         <view class="box-card-contrast">
           <view>
             <text class="label">较前日</text>
-            <text class="value" :class="contrastFn(data.yesterday, data.beforeYesterday).symbol === '+' ? 'up' : 'down'">{{
-              contrastFn(data.yesterday, data.beforeYesterday).value
-            }}</text>
+            <text class="value" :class="contrastFn(data.yesterday, data.beforeYesterday).symbol === '+' ? 'up' : 'down'">
+              {{ contrastFn(data.yesterday, data.beforeYesterday).value }}
+            </text>
           </view>
           <view>
             <text class="label ml10">较7日平均</text>
-            <text class="value" :class="contrastFn(data.yesterday, data.day7Total / 7).symbol === '+' ? 'up' : 'down'">{{
-              contrastFn(data.yesterday, data.day7Total / 7).value
-            }}</text>
+            <text class="value" :class="contrastFn(data.yesterday, data.day7Total / 7).symbol === '+' ? 'up' : 'down'">
+              {{ contrastFn(data.yesterday, data.day7Total / 7).value }}
+            </text>
           </view>
         </view>
       </el-card>

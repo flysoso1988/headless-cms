@@ -15,10 +15,11 @@
       :show-cancel="page.showCancel"
       :cancel-text="page.cancelText"
       :submit-text="page.submitText"
+      :submit-disabled="page.loading || !tree.loaded"
       @success="onFormSuccess"
     >
       <template v-slot:permissionList>
-        <el-input placeholder="输入关键字进行搜索" v-model="tree.filterText"> </el-input>
+        <el-input placeholder="输入关键字进行搜索" v-model="tree.filterText"></el-input>
         <div style="margin-top: 5px">
           <el-checkbox v-model="tree.expandAll" @change="expandAllChange">展开/折叠</el-checkbox>
           <el-checkbox v-model="tree.checkAll" @change="checkAllChange" v-if="!tree.filterText">全选/全不选</el-checkbox>
@@ -83,6 +84,7 @@
           loading: false,
         },
         tree: {
+          loaded: false,
           filterText: '',
           expandAll: false,
           checkAll: false,
@@ -108,6 +110,7 @@
             rules: {},
             labelWidth: '80px',
             beforeAction: (formData) => {
+              if (this.page.loading || !this.tree.loaded) return false;
               let checkedKeys = this.$refs.tree.getCheckedKeys();
               let halfCheckedKeys = this.$refs.tree.getHalfCheckedKeys();
               let allCheckedKeys = checkedKeys.concat(halfCheckedKeys);
@@ -192,13 +195,14 @@
         this.data.info = item;
         this.form1.data.role_id = role_id;
         this.form1.data.permissionList = permission;
-        if (vk.pubfn.isNotNull(this.data.treeData)) {
+        if (this.tree.loaded) {
           this.initData();
           return;
         }
         this.getList();
       },
       getList() {
+        this.tree.loaded = false;
         // 执行请求
         vk.callFunction({
           url: 'admin/system/permission/sys/getAll',
@@ -209,6 +213,7 @@
             this.data.treeData = data.rows;
             this.data.list = data.list;
             this.initData();
+            this.tree.loaded = true;
           },
         });
       },

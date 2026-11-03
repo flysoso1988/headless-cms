@@ -1,5 +1,5 @@
 <template>
-  <view class="page-body">
+  <div class="page-body">
     <!-- 页面内容开始 -->
     <div style="padding: 40rpx; font-size: 70rpx; font-family: kaiti">悬浮提示功能演示</div>
 
@@ -7,28 +7,28 @@
       <el-col :span="24" style="padding: 40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">基本用法:</div>
 
-        <el-button plain @click="open1"> 可自动关闭 </el-button>
-        <el-button plain @click="open2"> 不会自动关闭 </el-button>
+        <el-button plain @click="open1">可自动关闭</el-button>
+        <el-button plain @click="open2">不会自动关闭</el-button>
       </el-col>
     </el-row>
 
     <el-row>
       <el-col :span="24" style="padding: 30rpx 40rpx; margin-top: -40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">具有倾向性:</div>
-        <el-button plain @click="openA"> 成功 </el-button>
-        <el-button plain @click="openB"> 警告 </el-button>
-        <el-button plain @click="openC"> 消息 </el-button>
-        <el-button plain @click="openD"> 错误 </el-button>
+        <el-button plain @click="openA">成功</el-button>
+        <el-button plain @click="openB">警告</el-button>
+        <el-button plain @click="openC">消息</el-button>
+        <el-button plain @click="openD">错误</el-button>
       </el-col>
     </el-row>
 
     <el-row>
       <el-col :span="24" style="padding: 30rpx 40rpx; margin-top: -40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">自定义弹出位置:</div>
-        <el-button plain @click="opena"> 右上角 </el-button>
-        <el-button plain @click="openb"> 右下角 </el-button>
-        <el-button plain @click="openc"> 左下角 </el-button>
-        <el-button plain @click="opend"> 左上角 </el-button>
+        <el-button plain @click="opena">右上角</el-button>
+        <el-button plain @click="openb">右下角</el-button>
+        <el-button plain @click="openc">左下角</el-button>
+        <el-button plain @click="opend">左上角</el-button>
       </el-col>
     </el-row>
 
@@ -36,26 +36,26 @@
     <el-row>
       <el-col :span="24" style="padding: 30rpx 40rpx; margin-top: -40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">带偏移的消息提示:</div>
-        <el-button plain @click="open"> 偏移的消息 </el-button>
+        <el-button plain @click="open">偏移的消息</el-button>
       </el-col>
     </el-row>
 
     <el-row>
       <el-col :span="24" style="padding: 30rpx 40rpx; margin-top: -40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">使用HTML字段:</div>
-        <el-button plain @click="openuu"> 使用 HTML 片段 </el-button>
+        <el-button plain @click="openuu">使用 HTML 片段</el-button>
       </el-col>
     </el-row>
 
     <el-row>
       <el-col :span="24" style="padding: 30rpx 40rpx; margin-top: -40rpx">
         <div style="padding: 40rpx 0rpx; font-size: 40rpx; font-family: simsun">不显示关闭按钮:</div>
-        <el-button plain @click="openhide"> 隐藏关闭按钮 </el-button>
+        <el-button plain @click="openhide">隐藏关闭按钮</el-button>
       </el-col>
     </el-row>
 
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

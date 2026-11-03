@@ -28,11 +28,11 @@ export default {
   },
   // 404 Not Found 错误页面路径
   error: {
-    url: '/pages_plugs/error/404',
+    url: '/pages/error/404',
   },
   // 403 无权限页面路径
   noPermission: {
-    url: '/pages_plugs/error/403',
+    url: '/pages/error/403',
   },
   // 前端默认时区（中国为8）
   targetTimezone: 8,
@@ -53,7 +53,7 @@ export default {
      * 在无需登录的页面上执行kh或sys函数，也会自动判断是否登录，未登录会自动跳登录页面，登录成功后会自动返回本来要跳转的页面。
      */
     mode: 2,
-    list: ['/pages/login/*', '/pages_plugs/error/*', '/pages_template/element/*', '/pages_template/components/form/*', '/pages_template/components/icons/*'],
+    list: ['/pages/login/*', '/pages/error/*', '/pages_template/element/*', '/pages_template/components/form/*', '/pages_template/components/icons/*'],
   },
   // 需要检查菜单权限的页面列表
   checkPermissionPages: {
@@ -63,7 +63,7 @@ export default {
      * 注意: list内是通配符表达式，非正则表达式，如果一个页面不在左侧菜单中，但需要能访问，则需要在此设置
      */
     mode: 2,
-    list: ['/pages/index/index', '/pages/login/*', '/pages_plugs/error/*'],
+    list: ['/pages/index/index', '/pages/login/*', '/pages/error/*'],
   },
   // 需要检查是否哪些请求需要加密通信
   checkEncryptRequest: {

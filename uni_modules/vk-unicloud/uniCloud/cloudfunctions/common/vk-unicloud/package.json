@@ -1,6 +1,6 @@
 {
     "name": "vk-unicloud",
-    "version": "2.25.2",
+    "version": "2.26.3",
     "description": "【云函数端SDK】VK云函数路由模式uniCloud开发框架，更新方法：右键项目根目录的 uni_modules/vk-unicloud 点击从插件市场更新",
     "main": "index.js",
     "homepage": "https://gitee.com/vk-uni/vk-uni-cloud-router.git",
@@ -14,7 +14,7 @@
     "author": "VK",
     "license": "Apache-2.0",
     "origin-plugin-dev-name": "vk-unicloud",
-    "origin-plugin-version": "2.25.2",
+    "origin-plugin-version": "2.26.3",
     "plugin-dev-name": "vk-unicloud-admin",
-    "plugin-version": "1.25.2"
+    "plugin-version": "1.26.2"
 }

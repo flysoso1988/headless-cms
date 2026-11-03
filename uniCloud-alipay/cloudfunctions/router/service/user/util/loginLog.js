@@ -17,12 +17,12 @@ module.exports = {
     // 业务逻辑开始-----------------------------------------------------------
     let { type, login_type, user_id, ip, ua, os, device_id, platform, context = {}, state = 1, dcloud_appid } = event;
     if (context) {
-      ip = context.CLIENTIP;
-      ua = context.CLIENTUA;
-      os = context.OS;
-      device_id = context.DEVICEID;
-      platform = context.PLATFORM;
-      dcloud_appid = context.APPID;
+      ip = context.CLIENTIP || ip;
+      ua = context.CLIENTUA || ua;
+      os = context.OS || os;
+      device_id = context.DEVICEID || device_id;
+      platform = context.PLATFORM || platform;
+      dcloud_appid = context.APPID || dcloud_appid;
     }
     try {
       if (vk.pubfn.getData(config, 'vk.service.log.login.status')) {
@@ -70,6 +70,8 @@ module.exports = {
       dbName: 'uni-id-log',
       whereJson: {
         user_id,
+        type: _.in(['login', 'register']),
+        state: 1,
         _add_time: _.gte(todayStart).lte(todayEnd),
         dcloud_appid,
       },

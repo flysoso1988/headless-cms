@@ -1,29 +1,23 @@
 <template>
-  <view class="page">
+  <div class="page">
     <!-- 页面内容开始 -->
     <vk-data-page-header title="Input 表单输入" subTitle="money 金额"></vk-data-page-header>
-    <view class="page-body">
-      <view class="tips">
-        金额 与 数字不一样的地方是 此处金额单位是分<br />
+    <div class="page-body">
+      <div class="tips">
+        金额 与 数字不一样的地方是 此处金额单位是分
+        <br />
         输入框显示的是1，但值其实是100
-      </view>
-      <view class="mt15">
+      </div>
+      <div class="mt15">
         金额输入框：
-        <vk-data-input-money v-model="form1.value1" placeholder="请输入金额" width="300px"></vk-data-input-money>
-      </view>
-      <view class="mt15">
-        表单绑定值：
-        <vk-data-input-number class="mt15" v-model="form1.value1" :precision="0" width="300px" placeholder="请输入金额"></vk-data-input-number>
-      </view>
-      <view class="mt15 json-view" v-if="form1">
-        <pre>
-					{{ form1 }}
-				</pre
-        >
-      </view>
-    </view>
+        <vk-data-input-numeric mode="money" v-model="form1.value1" placeholder="请输入金额" width="300px"></vk-data-input-numeric>
+      </div>
+      <div class="mt15 json-view" v-if="form1">
+        <pre>{{ form1 }}</pre>
+      </div>
+    </div>
     <!-- 页面内容结束 -->
-  </view>
+  </div>
 </template>
 
 <script>

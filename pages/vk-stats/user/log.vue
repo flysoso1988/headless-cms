@@ -18,7 +18,7 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">登录日志列表</div>
         <div class="vk-page-card-actions">
-          <el-button :size="$global.size" icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
+          <el-button icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
         </div>
       </div>
 
@@ -60,7 +60,7 @@
             {
               key: 'appList',
               title: '登录的应用',
-              type: 'html',
+              type: 'text',
               width: 220,
               formatter: function (val, row, column, index) {
                 if (typeof row.dcloud_appid === 'undefined') return '全部应用';

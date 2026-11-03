@@ -102,6 +102,7 @@
   "vk.select.refresh": "Refresh",
 
   "vk.tableSelect.maximum": "Select up to",
+  "vk.tableSelect.missingItem": "Record not found",
 
   "vk.dateTime.datePickerRangeTodayMorning": "Morning",
   "vk.dateTime.datePickerRangeTodayAfternoon": "Afternoon",

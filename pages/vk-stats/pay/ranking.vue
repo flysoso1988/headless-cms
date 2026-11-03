@@ -18,9 +18,9 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">用户价值排行</div>
         <div class="vk-page-card-actions">
-          <el-button :size="$global.size" icon="el-icon-data-line" @click="pageTo('./overview')">支付统计</el-button>
-          <el-button :size="$global.size" icon="el-icon-tickets" @click="pageTo('./list')">订单明细</el-button>
-          <el-button :size="$global.size" icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
+          <el-button icon="el-icon-data-line" @click="pageTo('./overview')">支付统计</el-button>
+          <el-button icon="el-icon-tickets" @click="pageTo('./list')">订单明细</el-button>
+          <el-button icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
         </div>
       </div>
 
@@ -37,7 +37,6 @@
           :pagination="true"
           get-count="auto"
           :top="0"
-          :data-preprocess="dataPreprocess"
           @current-change="currentChange"
           @selection-change="selectionChange"
         ></vk-data-table>
@@ -146,7 +145,7 @@
               key: 'pay_type',
               title: '支付方式',
               type: 'select',
-              mode: '%*',
+              mode: 'custom',
               data: payTypeSearchData,
             },
             { key: 'pay_date', title: '支付时间', type: 'datetimerange', mode: '[]', minWidth: 400, clearable: false },
@@ -226,18 +225,6 @@
       selectionChange(list) {
         this.table1.multipleSelection = list;
       },
-      // 给当前页数据补排行序号
-      dataPreprocess(list) {
-        if (!Array.isArray(list)) return list;
-        const table = this.$refs.table1 || {};
-        const pageIndex = Number(table.pageIndex || 1);
-        const pageSize = Number(table.pageSize || list.length || 10);
-        return list.map((item, index) => {
-          item.rank = (pageIndex - 1) * pageSize + index + 1;
-          item.user = getUserDisplayName(item);
-          return item;
-        });
-      },
       // 导出Excel
       exportExcel() {
         this.$refs.table1.exportExcel({
@@ -249,11 +236,6 @@
     // 计算属性
     computed: {},
   };
-
-  function getUserDisplayName(row) {
-    const userInfo = row.userInfo || {};
-    return userInfo.nickname || row.user_id || '-';
-  }
 
   function getDefaultPayDateRange() {
     const start = vk.pubfn.getDayOffsetStartAndEnd(-29, new Date());
