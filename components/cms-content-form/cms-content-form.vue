@@ -28,7 +28,7 @@
       // 内容 CRUD 云对象 action 前缀，如 'admin/cms/sys.content'
       contentAction: { type: String, default: 'admin/cms/sys.content' },
       // 远程下拉（关联内容）数据源 action
-      contentPubAction: { type: String, default: 'admin/cms/content/pub/getContent' },
+      contentPubAction: { type: String, default: 'admin/cms/sys.content.pubGetContent' },
       // 附加固定数据，会合并进新增表单默认数据（如 { site_id: 'xxx' }）
       extraData: { type: Object, default: () => ({}) },
       labelWidth: { type: String, default: '120px' },

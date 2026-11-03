@@ -40,7 +40,10 @@ module.exports = {
   // ==================== 项目业务表 ====================
   // 新增表标记点（请勿删除此行注释，自动化建Dao工具需要）
   test: "vk-test", // 测试表
-
+  model: "vk-cms-model",
+  modelField: "vk-cms-model-field",
+  content: "vk-cms-content",
+  settingI18n: "vk-setting-i18n",
   // ==================== vk框架内置表 ====================
   user: "uni-id-users", // 用户表
   role: "uni-id-roles", // 角色表

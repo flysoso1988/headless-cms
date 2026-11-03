@@ -162,7 +162,7 @@ export default {
   sideBar: {
     // 配置静态菜单列表
     staticMenu: staticMenu,
-    defaultOpeneds: ['components-admin'], // 默认展开的菜单项的 menu_id
+    defaultOpeneds: [], // 默认展开的菜单项的 menu_id
     navigateMode: 'redirectTo', // 默认 redirectTo，可选项为 navigateTo
   },
   // 顶部菜单
@@ -177,7 +177,7 @@ export default {
   // 主题配置
   theme: {
     // 当前使用哪个主题
-    use: 'white', // white blackWhite black custom
+    use: 'blackWhite', // white blackWhite black custom
     ...themeConfig,
     // 自定义主题
     custom: {

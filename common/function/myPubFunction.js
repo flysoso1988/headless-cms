@@ -150,7 +150,7 @@ myfn.buildTableConfig = function (options = {}) {
  * @returns {Object} { columns, rules }；model 为空时返回空配置
  */
 myfn.buildFormConfig = function (options = {}) {
-  let { model, contentPubAction = 'admin/cms/content/pub/getContent' } = options;
+  let { model, contentPubAction = 'admin/cms/sys.content.pubGetContent' } = options;
   if (!model || !model._id) return { columns: [], rules: {} };
   let fields = model.fields || [];
   let formCols = []; // 表单列
