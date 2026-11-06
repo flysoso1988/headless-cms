@@ -203,11 +203,11 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
-    let { model_key, status, document_id, locale } = data;
+    let { model_key, status=true, document_id, locale } = data;
 
     if (vk.pubfn.isNull(model_key)) return { code: -1, msg: '参数错误' };
 
-    // document_id 为空时自动生成，用于后续国际化版本关联
+    // document_id 为空时自动生成
     if (vk.pubfn.isNull(document_id)) {
       document_id = await vk.pubfn.randomAsync(
         24,
