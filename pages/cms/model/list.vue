@@ -46,7 +46,10 @@
               </view>
               <view class="field-info">
                 <span class="field-name">{{ field.title }}</span>
-                <span class="field-key">{{ field.key }}<span v-if="field.required" class="field-required">*</span></span>
+                <span class="field-key">
+                  {{ field.key }}
+                  <span v-if="field.required" class="field-required">*</span>
+                </span>
                 <el-tag size="mini" type="info">{{ getFieldTypeLabel(field.type) }}</el-tag>
               </view>
               <view class="field-actions">
@@ -55,7 +58,7 @@
               </view>
             </view>
           </draggable>
-          <view v-if="!currentModel.fields || currentModel.fields.length === 0" class="empty-fields">暂无字段，点击"添加字段"添加 </view>
+          <view v-if="!currentModel.fields || currentModel.fields.length === 0" class="empty-fields">暂无字段，点击"添加字段"添加</view>
         </view>
       </view>
       <view v-else class="empty-content">
@@ -174,7 +177,7 @@
             show: false,
             mode: 'add',
             item: {},
-            modelId: '',
+            modelKey: '',
           },
         },
         modelForm: {
@@ -333,13 +336,13 @@
       },
       addField() {
         if (!this.currentModel) return;
-        const { _id, fields = [] } = this.currentModel;
+        const { key, fields = [] } = this.currentModel;
         vk.pubfn.openForm(
           'fieldUpdate',
           {
             mode: 'add',
             item: {
-              model_id: _id,
+              model_key: key,
               sort: fields.length,
             },
           },

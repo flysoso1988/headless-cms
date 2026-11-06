@@ -53,8 +53,8 @@ const cloudObject = {
       foreignDB: [
         {
           dbName: dbName.modelField,
-          localKey: '_id',
-          foreignKey: 'model_id',
+          localKey: 'key',
+          foreignKey: 'model_key',
           as: 'fields',
           sortArr: [{ name: 'sort', type: 'asc' }],
           limit: 500,
@@ -65,23 +65,24 @@ const cloudObject = {
     return res;
   },
   /**
-   * 获取详情
+   * 获取详情（优先按 key 查询，兼容 id 即 _id 的旧参数）
    * @url admin/cms/sys.model.getInfo 前端调用的url参数地址
    */
   getInfo: async function (data) {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
-    const { id } = data;
+    const { id, key } = data;
+    if (vk.pubfn.isNullOne({ id, key })) return { code: -1, msg: '参数错误' };
+    // 主表where条件：优先按 key（模型标识唯一）查询
+    let whereJson = vk.pubfn.isNull(key) ? { _id: id } : { key };
     res.info = await vk.baseDao.selects({
       dbName: dbName.model,
       getCount: false,
       getMain: true,
       getOne: true,
       // 主表where条件
-      whereJson: {
-        _id: id,
-      },
+      whereJson,
       // 主表字段显示规则
       fieldJson: {},
       // 主表排序规则
@@ -90,9 +91,10 @@ const cloudObject = {
       foreignDB: [
         {
           dbName: dbName.modelField,
-          localKey: '_id',
-          foreignKey: 'model_id',
+          localKey: 'key',
+          foreignKey: 'model_key',
           as: 'fields',
+          sortArr: [{ name: 'sort', type: 'asc' }],
         },
       ],
     });
@@ -110,6 +112,13 @@ const cloudObject = {
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
     let { name, key, type, status = true, draft = false, internationalization = false, display_fields = [] } = data;
+
+    // 模型标识唯一性校验（数据库层面另有 key 唯一索引兜底）
+    let num = await vk.baseDao.count({
+      dbName: 'vk-cms-model',
+      whereJson: { key },
+    });
+    if (num > 0) return { code: -1, msg: `模型标识「${key}」已存在，请更换` };
 
     res.id = await vk.baseDao.add({
       dbName: 'vk-cms-model',
@@ -140,6 +149,13 @@ const cloudObject = {
       return { code: -1, msg: '_id不能为空' };
     }
 
+    // 模型标识唯一性校验：排除自身记录（数据库层面另有 key 唯一索引兜底）
+    let num = await vk.baseDao.count({
+      dbName: 'vk-cms-model',
+      whereJson: { key, _id: _.ne(_id) },
+    });
+    if (num > 0) return { code: -1, msg: `模型标识「${key}」已存在，请更换` };
+
     await vk.baseDao.updateById({
       dbName: 'vk-cms-model',
       id: _id,
@@ -166,6 +182,19 @@ const cloudObject = {
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
     const { _id } = data;
+
+    // 先查出要删除的模型，再级联删除其字段定义（字段表通过 model_key 关联，避免留下孤儿字段）
+    let modelRes = await vk.baseDao.select({
+      dbName: dbName.model,
+      whereJson: { _id },
+      getOne: true,
+    });
+    if (modelRes.info && vk.pubfn.isNotNull(modelRes.info.key)) {
+      await vk.baseDao.del({
+        dbName: dbName.modelField,
+        whereJson: { model_key: modelRes.info.key },
+      });
+    }
 
     let num = await vk.baseDao.deleteById({
       dbName: dbName.model,

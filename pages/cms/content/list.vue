@@ -161,14 +161,14 @@
       },
       loadSinglePageData() {
         this.singlePageFormType = 'add';
-        // 构建包含 model_id 的默认数据
-        const defaultData = { model_id: this.currentModel._id, status: this.currentModel.draft ? false : true };
+        // 构建包含 model_key 的默认数据
+        const defaultData = { model_key: this.currentModel.key, status: this.currentModel.draft ? false : true };
         (this.currentModel.fields || []).forEach((f) => {
           if (f.default_value !== undefined && f.default_value !== null && f.default_value !== '') {
             defaultData[f.key] = f.default_value;
           }
         });
-        let formData = { model_id: this.currentModel._id };
+        let formData = { model_key: this.currentModel.key };
         if (this.currentModel.internationalization) {
           defaultData.locale = this.locale;
           formData.locale = this.locale;
@@ -200,13 +200,13 @@
       },
       onAdd({ locale } = {}) {
         // 新增的内容归属于当前选中的语言，通过参数传给编辑页注入表单默认数据
-        let url = '/pages/cms/content/edit?mode=add&model_id=' + this.currentModel._id;
+        let url = '/pages/cms/content/edit?mode=add&model_key=' + this.currentModel.key;
         if (vk.pubfn.isNotNull(locale)) url += '&locale=' + locale;
         this.toContentEditPage(url);
       },
       onUpdate({ item }) {
         // 编辑通过 document_id 定位内容，locale 决定打开哪个语言版本
-        let url = '/pages/cms/content/edit?mode=update&model_id=' + this.currentModel._id + '&document_id=' + item.document_id + '&locale=' + this.locale;
+        let url = '/pages/cms/content/edit?mode=update&model_key=' + this.currentModel.key + '&document_id=' + item.document_id + '&locale=' + this.locale;
         this.toContentEditPage(url);
       },
       toContentEditPage(url) {

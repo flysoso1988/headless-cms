@@ -35,12 +35,12 @@ async function loadComponentFieldMap({ componentKeys = [] }) {
   if (models.length === 0) return map;
   let fieldRes = await vk.baseDao.select({
     dbName: dbName.modelField,
-    whereJson: { model_id: _.in(models.map((m) => m._id)) },
+    whereJson: { model_key: _.in(componentKeys) },
     pageSize: -1,
   });
   let fields = fieldRes.rows || [];
   models.forEach((model) => {
-    map[model.key] = fields.filter((f) => f.model_id === model._id).map((f) => f.key);
+    map[model.key] = fields.filter((f) => f.model_key === model.key).map((f) => f.key);
   });
   return map;
 }
@@ -184,8 +184,8 @@ const cloudObject = {
       foreignDB: [
         {
           dbName: dbName.model,
-          localKey: 'model_id',
-          foreignKey: '_id',
+          localKey: 'model_key',
+          foreignKey: 'key',
           as: 'model',
           limit: 1,
         },
@@ -203,9 +203,9 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
-    let { model_id, status, document_id, locale } = data;
+    let { model_key, status, document_id, locale } = data;
 
-    if (vk.pubfn.isNull(model_id)) return { code: -1, msg: '参数错误' };
+    if (vk.pubfn.isNull(model_key)) return { code: -1, msg: '参数错误' };
 
     // document_id 为空时自动生成，用于后续国际化版本关联
     if (vk.pubfn.isNull(document_id)) {
@@ -226,7 +226,7 @@ const cloudObject = {
     }
 
     // 只提取基础字段和模型定义的动态字段
-    let dataJson = { model_id, status, document_id, locale };
+    let dataJson = { model_key, status, document_id, locale };
     // if (!vk.pubfn.isNull(locale)) dataJson.locale = locale;
 
     // 查询模型字段定义
@@ -236,7 +236,7 @@ const cloudObject = {
       pageIndex: 1,
       pageSize: -1,
       // 主表where条件
-      whereJson: { model_id },
+      whereJson: { model_key },
     });
 
     // 按字段定义生成写入白名单，并对动态区块做递归一层校验
@@ -261,12 +261,12 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
-    let { _id, model_id, status, document_id, locale } = data;
+    let { _id, model_key, status, document_id, locale } = data;
 
-    if (vk.pubfn.isNullOne({ _id, model_id, document_id })) return { code: -1, msg: '参数错误' };
+    if (vk.pubfn.isNullOne({ _id, model_key, document_id })) return { code: -1, msg: '参数错误' };
 
     // 只提取基础字段和模型定义的动态字段
-    let dataJson = { model_id, status, document_id, locale };
+    let dataJson = { model_key, status, document_id, locale };
     // if (!vk.pubfn.isNull(locale)) dataJson.locale = locale;
 
     // 查询模型字段定义
@@ -276,7 +276,7 @@ const cloudObject = {
       pageIndex: 1,
       pageSize: -1,
       // 主表where条件
-      whereJson: { model_id },
+      whereJson: { model_key },
     });
 
     // 按字段定义生成写入白名单，并对动态区块做递归一层校验
@@ -343,13 +343,13 @@ const cloudObject = {
     let { uid } = this.getClientInfo();
     // 业务逻辑开始-----------------------------------------------------------
     let { data: paramData = {} } = data;
-    let { model_id } = paramData;
+    let { model_key } = paramData;
 
     // 该模型的动态区块字段（仅这些字段需要额外透出块数组，其余字段维持 value/label 契约不变）
     let fieldRes = await vk.baseDao.select({
       dbName: dbName.modelField,
       whereJson: {
-        model_id,
+        model_key,
         type: 'dynamiczone',
       },
     });
@@ -358,7 +358,7 @@ const cloudObject = {
     let selectRes = await vk.baseDao.selects({
       dbName: dbName.content,
       whereJson: {
-        model_id,
+        model_key,
       },
     });
 

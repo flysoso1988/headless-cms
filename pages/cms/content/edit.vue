@@ -38,7 +38,7 @@
         mode: 'add',
         // 内容文档公共标识，同一内容的多语言版本共用
         documentId: '',
-        modelId: '',
+        modelKey: '',
         // 语言候选清单（多语言模型下用于切换内容语言）
         localeOptions: [],
       };
@@ -71,9 +71,9 @@
     },
     methods: {
       async init(options = {}) {
-        let { mode, model_id, document_id, locale } = options;
+        let { mode, model_key, document_id, locale } = options;
         this.mode = mode === 'update' ? 'update' : 'add';
-        this.modelId = model_id || '';
+        this.modelKey = model_key || '';
         this.documentId = document_id || '';
         try {
           await this.loadModel();
@@ -92,12 +92,12 @@
           console.error('初始化失败', err);
         }
       },
-      // 加载模型配置：始终按 model_id 拉取最新定义
+      // 加载模型配置：始终按 model_key 拉取最新定义
       // Vuex 中的模型是会被持久化的完整快照，字段在模型管理里增删改后会过期，
       // 直接复用会导致新增字段不出现在表单中
       async loadModel() {
         let storeModel = vk.getVuex('$app.model') || {};
-        if (vk.pubfn.isNull(this.modelId)) {
+        if (vk.pubfn.isNull(this.modelKey)) {
           this.model = storeModel;
           return;
         }
@@ -105,7 +105,7 @@
         try {
           let res = await vk.callFunction({
             url: 'admin/cms/sys.model.getInfo',
-            data: { id: this.modelId },
+            data: { key: this.modelKey },
           });
           info = res.info;
         } catch (err) {
@@ -118,7 +118,7 @@
           return;
         }
         // 拉取失败时退化为列表页写入的当前模型
-        if (storeModel._id === this.modelId) this.model = storeModel;
+        if (storeModel.key === this.modelKey) this.model = storeModel;
       },
       async loadContent(locale) {
         let data = { document_id: this.documentId };
@@ -141,7 +141,7 @@
         this.mode = 'add';
         // vk-data-form 不会自动应用列上的 defaultValue，新增时必须显式拼入模型字段默认值
         let formData = vk.myfn.buildFormDefaultData({ model: this.model });
-        formData.model_id = this.modelId || this.model._id;
+        formData.model_key = this.modelKey || this.model.key;
         if (vk.pubfn.isNotNull(this.documentId)) formData.document_id = this.documentId;
         if (this.isInternationalization && vk.pubfn.isNotNull(locale)) formData.locale = locale;
         this.formData = formData;

@@ -151,7 +151,7 @@
                 placeholder: '请选择关联模型',
                 showRule: 'type=relation',
                 action: 'admin/cms/sys.model.getList',
-                props: { list: 'rows', value: '_id', label: 'name' },
+                props: { list: 'rows', value: 'key', label: 'name' },
                 showAll: true,
                 actionData: { type: 'collection' },
               },

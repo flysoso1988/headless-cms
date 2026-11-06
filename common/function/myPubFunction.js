@@ -123,7 +123,7 @@ myfn.buildTableConfig = function (options = {}) {
 
   // 查询列兜底：没有可用查询字段时默认按标题查
   if (searchCols.length === 0) searchCols.push({ key: 'title', title: '标题', type: 'text', width: 160, mode: '%%' });
-  searchCols.push({ key: 'model_id', title: '所属模型', hidden: true });
+  searchCols.push({ key: 'model_key', title: '所属模型', hidden: true });
 
   // 列表查询参数：过滤草稿；多语言模型按当前语言过滤
   let query = { draft: model.draft };
@@ -136,7 +136,7 @@ myfn.buildTableConfig = function (options = {}) {
     checkedCols: checkedCols, // 勾选的显示字段
     action: contentAction + '.getList', // 列表数据接口
     searchColumns: searchCols, // 查询表单列
-    formData: Object.assign({ model_id: model._id }, extraData), // 查询表单固定数据
+    formData: Object.assign({ model_key: model.key }, extraData), // 查询表单固定数据
     query: query, // 列表查询条件
   };
 };
@@ -201,7 +201,7 @@ myfn.buildFormConfig = function (options = {}) {
       } else {
         col.action = contentPubAction;
         col.showAll = true;
-        col.actionData = f.relation ? { model_id: f.relation, status: 'all' } : { model_key: f.settings.ref_model_key, status: 'all' };
+        col.actionData = { model_key: f.relation || (f.settings && f.settings.ref_model_key), status: 'all' };
         if (f.settings && f.settings.multiple) col.multiple = true;
       }
     }
@@ -236,7 +236,7 @@ myfn.buildStatusColumn = function (options = {}) {
       uni.vk.callFunction({
         url: contentAction + '.update',
         title: value ? '发布中...' : '下架中...',
-        data: { _id: row._id, model_id: row.model_id, status: value },
+        data: { _id: row._id, model_key: row.model_key, status: value },
         success: () => {
           change(value);
         },
@@ -255,7 +255,7 @@ myfn.buildStatusColumn = function (options = {}) {
  */
 myfn.buildFormDefaultData = function (options = {}) {
   let { model = {}, extraData = {} } = options;
-  let data = { model_id: model._id, status: !model.draft };
+  let data = { model_key: model.key, status: !model.draft };
   (model.fields || []).forEach((f) => {
     // 动态区块没有可序列化为文本的默认值，跳过
     if (f.type === 'dynamiczone') return;

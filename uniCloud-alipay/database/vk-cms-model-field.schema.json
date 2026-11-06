@@ -1,6 +1,6 @@
 {
   "bsonType": "object",
-  "required": ["model_id", "key", "title", "type"],
+  "required": ["model_key", "key", "title", "type"],
   "permission": {
     "read": true,
     "create": "'admin' in auth.role || 'UPDATE_CMS_MODEL' in auth.permission",
@@ -11,10 +11,10 @@
     "_id": {
       "description": "存储文档 ID，系统自动生成"
     },
-    "model_id": {
+    "model_key": {
       "bsonType": "string",
-      "title": "所属模型ID",
-      "foreignKey": "vk-cms-model._id"
+      "title": "所属模型Key",
+      "foreignKey": "vk-cms-model.key"
     },
     "key": {
       "bsonType": "string",
@@ -83,7 +83,7 @@
     "relation": {
       "bsonType": "string",
       "title": "关联模型",
-      "description": "关联模型时选择的模型_id"
+      "description": "关联模型时选择的模型key"
     },
     "multiple": {
       "bsonType": "bool",

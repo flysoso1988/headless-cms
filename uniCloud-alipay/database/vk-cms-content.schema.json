@@ -1,6 +1,6 @@
 {
   "bsonType": "object",
-  "required": ["model_id"],
+  "required": ["model_key"],
   "permission": {
     "read": true,
     "create": "'admin' in auth.role || 'CREATE_CMS_ENTRY' in auth.permission",
@@ -11,10 +11,10 @@
     "_id": {
       "description": "存储文档 ID，系统自动生成"
     },
-    "model_id": {
+    "model_key": {
       "bsonType": "string",
-      "title": "所属模型ID",
-      "foreignKey": "vk-cms-model._id"
+      "title": "所属模型Key",
+      "foreignKey": "vk-cms-model.key"
     },
     "document_id": {
       "bsonType": "string",

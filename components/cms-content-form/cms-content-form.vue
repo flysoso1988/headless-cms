@@ -42,7 +42,7 @@
         },
         immediate: true,
       },
-      'model._id'() {
+      'model.key'() {
         this.syncDefaultData();
       },
       formType() {
@@ -82,7 +82,7 @@
         if (!model || !model._id) return;
         let current = this.value || {};
         let next = Object.assign({}, this.buildDefaultData(), current);
-        let changed = Object.keys(next).length !== Object.keys(current).length || next.model_id !== current.model_id;
+        let changed = Object.keys(next).length !== Object.keys(current).length || next.model_key !== current.model_key;
         if (changed) this.$emit('input', next);
       },
       /**
