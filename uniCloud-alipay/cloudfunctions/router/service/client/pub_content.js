@@ -169,7 +169,6 @@ const cloudObject = {
    */
   getList: async function (data) {
     let { model_key, locale, sort, where, page = 1, size = 10, fields, populate, status = 'published' } = data;
-    console.log('data:', data);
     // 参数校验
     if (vk.pubfn.isNull(model_key)) return { code: -1, msg: '参数错误' };
 
@@ -197,7 +196,6 @@ const cloudObject = {
     }
 
     const whereJson = _.and(andArr);
-    console.log('whereJson:', whereJson);
     // 解析字段选择
     const fieldJson = this._parseFields(fields);
 
@@ -221,8 +219,8 @@ const cloudObject = {
     if (fieldJson) {
       queryOptions.fieldJson = fieldJson;
     } else {
-      // 默认排除 content 大字段
-      queryOptions.fieldJson = { content: false };
+      // 默认排除 content 大字段，以及内部审计字段（不对外暴露用户ID）
+      queryOptions.fieldJson = { content: false, created_by_id: false, updated_by_id: false, user_id: false };
     }
 
     return await vk.baseDao.selects(queryOptions);
@@ -285,7 +283,8 @@ const cloudObject = {
     if (fieldJson) {
       queryOptions.fieldJson = fieldJson;
     } else {
-      queryOptions.fieldJson = {};
+      // 默认排除内部审计字段（不对外暴露用户ID，content 正文保留）
+      queryOptions.fieldJson = { created_by_id: false, updated_by_id: false, user_id: false };
     }
 
     if (foreignDB.length > 0) {

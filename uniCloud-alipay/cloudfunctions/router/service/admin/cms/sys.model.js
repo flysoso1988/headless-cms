@@ -143,25 +143,17 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
-    let { _id, name, key, type, status = true, draft = false, internationalization = false, display_fields = [] } = data;
+    let { _id, name, type, status = true, draft = false, internationalization = false, display_fields = [] } = data;
 
     if (vk.pubfn.isNullOne(_id)) {
       return { code: -1, msg: '_id不能为空' };
     }
-
-    // 模型标识唯一性校验：排除自身记录（数据库层面另有 key 唯一索引兜底）
-    let num = await vk.baseDao.count({
-      dbName: 'vk-cms-model',
-      whereJson: { key, _id: _.ne(_id) },
-    });
-    if (num > 0) return { code: -1, msg: `模型标识「${key}」已存在，请更换` };
 
     await vk.baseDao.updateById({
       dbName: 'vk-cms-model',
       id: _id,
       dataJson: {
         name,
-        key,
         type,
         status,
         draft,
@@ -184,15 +176,17 @@ const cloudObject = {
     const { _id } = data;
 
     // 先查出要删除的模型，再级联删除其字段定义（字段表通过 model_key 关联，避免留下孤儿字段）
-    let modelRes = await vk.baseDao.select({
+    // getOne 需配合 getMain:true 才直接返回单条文档
+    let model = await vk.baseDao.select({
       dbName: dbName.model,
       whereJson: { _id },
       getOne: true,
+      getMain: true,
     });
-    if (modelRes.info && vk.pubfn.isNotNull(modelRes.info.key)) {
+    if (model && vk.pubfn.isNotNull(model.key)) {
       await vk.baseDao.del({
         dbName: dbName.modelField,
-        whereJson: { model_key: modelRes.info.key },
+        whereJson: { model_key: model.key },
       });
     }
 

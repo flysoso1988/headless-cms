@@ -2,7 +2,7 @@
   "bsonType": "object",
   "required": ["model_key"],
   "permission": {
-    "read": true,
+    "read": "'admin' in auth.role || 'READ_CMS_ENTRY' in auth.permission",
     "create": "'admin' in auth.role || 'CREATE_CMS_ENTRY' in auth.permission",
     "update": "'admin' in auth.role || 'UPDATE_CMS_ENTRY' in auth.permission",
     "delete": "'admin' in auth.role || 'DELETE_CMS_ENTRY' in auth.permission"
@@ -31,7 +31,17 @@
     },
     "user_id": {
       "bsonType": "string",
+      "title": "创建用户ID（历史字段，新数据使用 created_by_id）",
+      "foreignKey": "uni-id-users._id"
+    },
+    "created_by_id": {
+      "bsonType": "string",
       "title": "创建用户ID",
+      "foreignKey": "uni-id-users._id"
+    },
+    "updated_by_id": {
+      "bsonType": "string",
+      "title": "最后更新用户ID",
       "foreignKey": "uni-id-users._id"
     },
     "_add_time": {
