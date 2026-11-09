@@ -41,6 +41,12 @@
       "pages": [
         {
           "path": "i18n/list"
+        },
+        {
+          "path": "api_tokens/list",
+          "style": {
+            "navigationBarTitleText": "API 令牌"
+          }
         }
       ]
     },

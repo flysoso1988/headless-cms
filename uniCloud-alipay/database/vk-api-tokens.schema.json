@@ -1,0 +1,67 @@
+{
+  "bsonType": "object",
+  "required": ["name", "token"],
+  "permission": {
+    "read": "'admin' in auth.role || 'READ_API_TOKEN' in auth.permission",
+    "create": "'admin' in auth.role || 'CREATE_API_TOKEN' in auth.permission",
+    "update": "'admin' in auth.role || 'UPDATE_API_TOKEN' in auth.permission",
+    "delete": "'admin' in auth.role || 'DELETE_API_TOKEN' in auth.permission"
+  },
+  "properties": {
+    "_id": {
+      "description": "存储文档 ID，系统自动生成"
+    },
+    "name": {
+      "bsonType": "string",
+      "title": "名称",
+      "trim": "both",
+      "maxLength": 100
+    },
+    "description": {
+      "bsonType": "string",
+      "title": "描述",
+      "trim": "both",
+      "maxLength": 500
+    },
+    "token": {
+      "bsonType": "string",
+      "title": "令牌",
+      "description": "服务端生成的访问令牌，不对前端列表返回"
+    },
+    "token_duration": {
+      "bsonType": "int",
+      "title": "有效期（天）",
+      "defaultValue": 0,
+      "description": "0 表示永久有效，其余为有效天数"
+    },
+    "token_type": {
+      "bsonType": "string",
+      "title": "令牌类型",
+      "defaultValue": "read-only",
+      "enum": [
+        { "value": "read-only", "text": "只读" },
+        { "value": "full-access", "text": "完全访问" },
+        { "value": "custom", "text": "自定义" }
+      ]
+    },
+    "model_permissions": {
+      "bsonType": "array",
+      "title": "模型权限",
+      "description": "令牌类型为自定义时可访问的模型标识集合",
+      "items": {
+        "bsonType": "string"
+      }
+    },
+    "expire_time": {
+      "bsonType": "timestamp",
+      "title": "过期时间",
+      "description": "有效期到期时间，永久有效时为空"
+    },
+    "_add_time": {
+      "bsonType": "timestamp",
+      "title": "创建时间",
+      "defaultValue": { "$env": "now" }
+    }
+  },
+  "version": "0.0.1"
+}

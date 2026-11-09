@@ -44,6 +44,7 @@ module.exports = {
   modelField: "vk-cms-model-field",
   content: "vk-cms-content",
   settingI18n: "vk-setting-i18n",
+  apiTokens: "vk-api-tokens",
   // ==================== vk框架内置表 ====================
   user: "uni-id-users", // 用户表
   role: "uni-id-roles", // 角色表
