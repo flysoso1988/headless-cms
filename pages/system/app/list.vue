@@ -91,7 +91,7 @@
               title: '版本管理',
               type: 'primary',
               onClick: (item) => {
-                vk.navigateTo(`/pages_plugs/system/app-upgrade-center/list?appid=${item.appid}`);
+                vk.navigateTo(`/pages/system/app-upgrade-center/list?appid=${item.appid}`);
               },
               disabled: 'enable_upgrade_center!=true',
             },

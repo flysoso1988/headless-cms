@@ -1,13 +1,22 @@
 <template>
-  <view class="content-edit-page">
+  <view class="content-edit-page" :class="{ 'is-readonly': formReadOnly }">
     <!-- 左侧：内容表单 -->
     <view class="content-edit-main">
-      <view class="vk-page-card">
-        <vk-data-page-header :title="pageTitle" :sub-title="model.name" show-back @back="goBack">
+      <view class="editor-card" :class="{ 'has-tabs': hasDraftBox }">
+        <vk-data-page-header :title="pageTitle" :sub-title="model.name" :bottom="0" class="editor-page-header">
+          <view class="editor-title-row">
+            <el-button class="header-back-btn" size="mini" icon="el-icon-back" @click="goBack">{{ $t('vk.common.back') }}</el-button>
+            <span class="editor-title-text">{{ pageTitle }}</span>
+          </view>
+          <template #sub-title>
+            <span v-if="model.name" class="model-chip">{{ model.name }}</span>
+          </template>
           <template #right>
-            <el-select v-if="isInternationalization" :value="currentLocale" size="small" class="locale-select" @change="onLocaleChange">
-              <el-option v-for="opt in localeOptions" :key="opt.value" :label="opt.label" :value="opt.value"></el-option>
-            </el-select>
+            <view class="header-actions">
+              <el-select v-if="isInternationalization" :value="currentLocale" size="small" class="locale-select" @change="onLocaleChange">
+                <el-option v-for="opt in localeOptions" :key="opt.value" :label="opt.label" :value="opt.value"></el-option>
+              </el-select>
+            </view>
           </template>
         </vk-data-page-header>
         <!-- 开启草稿箱的模型：草稿 / 发布 双记录标签页，已发布记录不存在时发布页禁用 -->
@@ -17,32 +26,44 @@
             <el-tab-pane label="发布" name="publish" :disabled="!hasPublished"></el-tab-pane>
           </el-tabs>
         </view>
-        <vk-data-form
-          ref="contentForm"
-          v-model="formData"
-          :action="formAction"
-          :form-type="mode"
-          :columns="formColumns"
-          :rules="formRules"
-          :disabled="formReadOnly"
-          :footer-show="false"
-          @success="onFormSuccess"
-          @loading="onFormLoading"
-        ></vk-data-form>
-        <view style="height: 20px"></view>
+        <view class="editor-body">
+          <!-- 只读态提示：仅表达当前查看状态，不复用旧的标签页提示文案 -->
+          <view v-if="formReadOnly" class="readonly-notice">
+            <i class="el-icon-lock"></i>
+            <span>当前为已发布版本，内容只读</span>
+          </view>
+          <vk-data-form
+            ref="contentForm"
+            class="editor-form"
+            v-model="formData"
+            :action="formAction"
+            :form-type="mode"
+            :columns="formColumns"
+            :rules="formRules"
+            :disabled="formReadOnly"
+            :footer-show="false"
+            label-width="120px"
+            @success="onFormSuccess"
+            @loading="onFormLoading"
+          ></vk-data-form>
+        </view>
       </view>
     </view>
     <!-- 右侧：固定操作区（不随表单滚动） -->
     <view class="content-edit-side">
       <view class="side-card">
-        <view class="side-title">操作</view>
+        <view class="side-header">
+          <span class="side-title">操作</span>
+        </view>
         <view v-if="hasDraftBox" class="side-status">
           <span class="side-status-label">当前查看</span>
           <el-tag :type="activeTab === 'publish' ? 'success' : 'info'" size="small">{{ activeTab === 'publish' ? '已发布' : '草稿' }}</el-tag>
         </view>
-        <el-button v-if="isUpdate" class="side-btn" icon="el-icon-view" @click="onPreview">预览</el-button>
-        <el-button v-if="hasDraftBox" class="side-btn" :loading="formLoading" :disabled="formReadOnly" @click="submit('draft')">保存</el-button>
-        <el-button type="primary" class="side-btn" :loading="formLoading" :disabled="formReadOnly" @click="submit('publish')">发布</el-button>
+        <view class="side-actions">
+          <el-button v-if="isUpdate" class="side-preview-btn" type="text" icon="el-icon-view" @click="onPreview">预览</el-button>
+          <el-button v-if="hasDraftBox" class="side-btn" size="medium" :loading="formLoading" :disabled="formReadOnly" @click="submit('draft')">保存</el-button>
+          <el-button type="primary" class="side-btn side-btn-publish" size="medium" :loading="formLoading" :disabled="formReadOnly" @click="submit('publish')">发布</el-button>
+        </view>
         <view v-if="hasDraftBox" class="side-tip">{{ formReadOnly ? '已发布版本只读，请切换到「草稿」继续编辑' : '「保存」写入草稿，「发布」会把草稿同步为已发布记录' }}</view>
       </view>
     </view>
@@ -383,64 +404,402 @@
 
 <style lang="scss" scoped>
   .content-edit-page {
+    /* 页面级间距与语义色变量：同页取值统一收敛，避免散落的魔法数字 */
+    --ce-space-1: 4px;
+    --ce-space-2: 8px;
+    --ce-space-3: 12px;
+    --ce-space-4: 16px;
+    --ce-space-5: 20px;
+    --ce-text-primary: #303133;
+    --ce-text-secondary: #606266;
+    --ce-text-muted: #909399;
+    --ce-primary: #409eff;
+    --ce-border: #ebeef5;
+    --ce-border-soft: #f2f4f7;
+    --ce-surface: #ffffff;
+    --ce-surface-muted: #f8f9fb;
+    --ce-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    --ce-radius: var(--border-radius, 6px);
+
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: var(--ce-space-4);
   }
 
   .content-edit-main {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
   }
 
   .content-edit-side {
-    flex: 0 0 220px;
-    width: 220px;
+    flex: 0 0 260px;
     position: sticky;
-    top: 10px;
+    top: var(--ce-space-4);
+  }
+
+  .editor-card {
+    overflow: hidden;
+    border: 1px solid var(--ce-border);
+    border-radius: var(--ce-radius);
+    background: var(--ce-surface);
+    box-shadow: var(--ce-shadow);
+  }
+
+  /* 提高选择器权重，稳定覆盖组件自带的头部高度与内边距 */
+  .content-edit-page .editor-page-header {
+    height: auto;
+    padding: var(--ce-space-4) var(--ce-space-5) var(--ce-space-3);
+    border-bottom: none;
+  }
+
+  .content-edit-page .editor-page-header ::v-deep .header-title {
+    display: flex;
+    align-items: center;
+    gap: var(--ce-space-3);
+    color: var(--ce-text-primary);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .content-edit-page .editor-page-header ::v-deep .header-sub-title {
+    margin-top: 0;
+    margin-left: var(--ce-space-3);
+  }
+
+  /* 模型名做成弱化 chip，与页面标题形成主次层级 */
+  .model-chip {
+    display: inline-block;
+    max-width: 180px;
+    padding: 2px 8px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--ce-surface-muted);
+    color: var(--ce-text-secondary);
+    font-size: 12px;
+    line-height: 18px;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .editor-title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--ce-space-3);
+  }
+
+  .editor-title-text {
+    color: var(--ce-text-primary);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .content-edit-page .header-back-btn {
+    height: 26px;
+    padding: 0 9px;
+    border-color: var(--ce-border);
+    border-radius: 4px;
+    background: var(--ce-surface);
+    color: var(--ce-text-secondary);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 24px;
+  }
+
+  .content-edit-page .header-back-btn:hover,
+  .content-edit-page .header-back-btn:focus {
+    border-color: var(--ce-primary);
+    color: var(--ce-primary);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--ce-space-2);
+  }
+
+  .locale-select {
+    width: 160px;
+  }
+
+  /* 无标签页时由头部自身承担分隔线，避免与标签条底部线条重复 */
+  .editor-card:not(.has-tabs) .editor-page-header {
+    border-bottom: 1px solid var(--ce-border-soft);
+  }
+
+  .status-tabs {
+    padding: 0 var(--ce-space-5);
+    border-bottom: 1px solid var(--ce-border-soft);
+  }
+
+  .status-tabs ::v-deep .el-tabs__header {
+    margin: 0;
+  }
+
+  .status-tabs ::v-deep .el-tabs__nav-wrap::after {
+    display: none;
+  }
+
+  .status-tabs ::v-deep .el-tabs__item {
+    height: 46px;
+    margin-right: var(--ce-space-5);
+    padding: 0 2px;
+    color: var(--ce-text-secondary);
+    font-size: 14px;
+    line-height: 46px;
+  }
+
+  .status-tabs ::v-deep .el-tabs__item.is-active {
+    color: var(--ce-text-primary);
+    font-weight: 600;
+  }
+
+  .status-tabs ::v-deep .el-tabs__item.is-disabled {
+    color: #c0c4cc;
+    font-weight: 400;
+  }
+
+  .status-tabs ::v-deep .el-tabs__active-bar {
+    height: 2px;
+    border-radius: 2px;
+    background-color: var(--ce-primary);
+  }
+
+  .editor-body {
+    background: var(--ce-surface);
+  }
+
+  /* 只读态：表单区整体降一档底色，配合只读提示与弱化 label 表达查看状态 */
+  .is-readonly .editor-body {
+    background: var(--ce-surface-muted);
+  }
+
+  .readonly-notice {
+    display: flex;
+    align-items: center;
+    gap: var(--ce-space-2);
+    margin: var(--ce-space-4) var(--ce-space-5) 0;
+    padding: 10px 14px;
+    border: 1px solid #faecd8;
+    border-radius: 4px;
+    background: #fdf6ec;
+    color: #b88230;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .readonly-notice i {
+    font-size: 14px;
+  }
+
+  /* 覆盖万能表单自带的 30px 内边距，与头部、标签条保持同一横向留白 */
+  .editor-body .editor-form ::v-deep > .el-form {
+    padding: var(--ce-space-4) var(--ce-space-5) var(--ce-space-1);
+  }
+
+  .is-readonly .editor-form ::v-deep .el-form-item__label {
+    color: var(--ce-text-muted);
   }
 
   .side-card {
-    background: #fff;
-    border-radius: 4px;
-    padding: 16px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    padding: var(--ce-space-4);
+    border: 1px solid var(--ce-border);
+    border-radius: var(--ce-radius);
+    background: var(--ce-surface);
+    box-shadow: var(--ce-shadow);
+  }
+
+  .side-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--ce-space-3);
+    border-bottom: 1px solid var(--ce-border-soft);
   }
 
   .side-title {
+    color: var(--ce-text-primary);
     font-size: 14px;
     font-weight: 600;
-    color: #303133;
-    margin-bottom: 12px;
+    letter-spacing: 0.2px;
   }
 
   .side-status {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin: var(--ce-space-3) 0 0;
+    padding: 10px 12px;
+    border-radius: 4px;
+    background: var(--ce-surface-muted);
+    color: var(--ce-text-secondary);
     font-size: 13px;
-    color: #606266;
+  }
+
+  .side-status-label {
+    color: var(--ce-text-muted);
+  }
+
+  .side-actions {
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--ce-space-4);
+    gap: var(--ce-space-2);
+  }
+
+  .side-actions ::v-deep .el-button + .el-button {
+    margin-left: 0;
   }
 
   .side-btn {
     width: 100%;
-    margin-left: 0 !important;
-    margin-bottom: 10px;
+    margin: 0;
+  }
+
+  .side-btn-publish {
+    letter-spacing: 2px;
+  }
+
+  /* 预览为弱化入口：文字按钮，不参与主次按钮的视觉竞争 */
+  .side-preview-btn {
+    align-self: flex-start;
+    padding: 0 var(--ce-space-1);
+    color: var(--ce-text-secondary);
+    font-size: 13px;
+  }
+
+  .side-preview-btn:hover {
+    color: var(--ce-primary);
   }
 
   .side-tip {
+    margin-top: var(--ce-space-3);
+    padding-top: var(--ce-space-3);
+    border-top: 1px solid var(--ce-border-soft);
+    color: var(--ce-text-muted);
     font-size: 12px;
-    color: #909399;
     line-height: 1.6;
-    margin-top: 4px;
   }
 
-  .status-tabs ::v-deep .el-tabs__header {
-    margin-bottom: 8px;
+  /* 窄屏：操作区改为底部吸底条，避免右侧固定列压缩表单宽度 */
+  @media screen and (max-width: 1180px) {
+    .content-edit-page {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ce-space-3);
+    }
+
+    .content-edit-side {
+      flex: 0 0 auto;
+      width: 100%;
+      position: sticky;
+      top: auto;
+      bottom: var(--ce-space-3);
+      z-index: 1;
+    }
+
+    .side-card {
+      display: flex;
+      align-items: center;
+      gap: var(--ce-space-3);
+      padding: 10px var(--ce-space-4);
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .side-header {
+      display: none;
+    }
+
+    .side-status {
+      flex: 0 0 auto;
+      margin: 0;
+      padding: 4px 10px;
+      background: transparent;
+    }
+
+    .side-status-label {
+      display: none;
+    }
+
+    .side-actions {
+      flex: 1 1 auto;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 0;
+    }
+
+    .side-btn {
+      width: auto;
+      min-width: 88px;
+    }
+
+    .side-preview-btn {
+      align-self: center;
+    }
+
+    .side-tip {
+      display: none;
+    }
   }
 
-  .locale-select {
-    width: 160px;
+  /* 更窄的窗口：压缩头部与表单留白，按钮等分撑满操作条 */
+  @media screen and (max-width: 768px) {
+    .content-edit-page .editor-page-header {
+      padding: var(--ce-space-3) var(--ce-space-4);
+    }
+
+    .content-edit-page .editor-page-header ::v-deep .header-title {
+      gap: var(--ce-space-2);
+      font-size: 18px;
+    }
+
+    .model-chip {
+      max-width: 96px;
+    }
+
+    .editor-title-text {
+      font-size: 18px;
+    }
+
+    .locale-select {
+      width: 132px;
+    }
+
+    .status-tabs {
+      padding: 0 var(--ce-space-4);
+    }
+
+    .status-tabs ::v-deep .el-tabs__item {
+      margin-right: var(--ce-space-4);
+    }
+
+    .readonly-notice {
+      margin: var(--ce-space-3) var(--ce-space-4) 0;
+    }
+
+    .editor-body .editor-form ::v-deep > .el-form {
+      padding: var(--ce-space-3) var(--ce-space-4) var(--ce-space-1);
+    }
+  }
+
+  @media screen and (max-width: 640px) {
+    .side-status {
+      display: none;
+    }
+
+    .side-actions {
+      justify-content: space-between;
+    }
+
+    .side-btn {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .side-preview-btn {
+      flex: 0 0 auto;
+    }
   }
 </style>

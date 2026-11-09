@@ -27,8 +27,8 @@
       action: { type: String, default: '' },
       // 内容 CRUD 云对象 action 前缀，如 'admin/cms/sys.content'
       contentAction: { type: String, default: 'admin/cms/sys.content' },
-      // 远程下拉（关联内容）数据源 action
-      contentPubAction: { type: String, default: 'admin/cms/sys.content.pubGetContent' },
+      // 关联字段（relation / remote-select）远程下拉数据源 action
+      contentRelationAction: { type: String, default: 'admin/cms/sys.content.getRelationOptions' },
       // 附加固定数据，会合并进新增表单默认数据（如 { site_id: 'xxx' }）
       extraData: { type: Object, default: () => ({}) },
       labelWidth: { type: String, default: '120px' },
@@ -62,7 +62,7 @@
         return this.action || this.contentAction + '.' + this.formType;
       },
       formConfig() {
-        let config = vk.myfn.buildFormConfig({ model: this.model, contentPubAction: this.contentPubAction });
+        let config = vk.myfn.buildFormConfig({ model: this.model, contentRelationAction: this.contentRelationAction });
         config.columns.push({ key: 'status', title: '发布', type: 'switch', defaultValue: !(this.model && this.model.draft) });
         return config;
       },

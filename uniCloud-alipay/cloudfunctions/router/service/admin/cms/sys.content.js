@@ -69,6 +69,162 @@ function normalizeStatus(value, fallback) {
   return { code: 0, value };
 }
 
+/* ============ 内容列表去重（草稿/发布双记录模型，单段聚合） ============ */
+
+// 列表行必须携带的字段（行操作依赖），即使 display_fields 未勾选也要返回
+const CONTENT_LIST_REQUIRED_KEYS = ['_id', 'document_id', 'model_key', 'status', 'locale', '_add_time'];
+
+// 聚合字段白名单必须排除的内部字段
+const CONTENT_LIST_EXCLUDED_KEYS = ['created_by_id', 'updated_by_id', 'user_id', 'is_delete', '_update_time', '_update_time_str'];
+
+// 分组字段 / 取值数组字段前缀，避免与模型字段、分组键冲突
+const CONTENT_GROUP_KEY_PREFIX = '_gk_';
+const CONTENT_VALUE_KEY_PREFIX = '_vf_';
+
+// 合法字段名：字母或下划线开头，仅含字母数字下划线（天然排除 $ 与 .）
+const CONTENT_FIELD_KEY_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+// 字段名是否可安全地拼进聚合表达式
+function isSafeContentFieldKey(key) {
+  if (typeof key !== 'string' || key.length === 0) return false;
+  if (key.charAt(0) === '$') return false;
+  if (key.indexOf('.') !== -1) return false;
+  if (!CONTENT_FIELD_KEY_PATTERN.test(key)) return false;
+  if (CONTENT_LIST_EXCLUDED_KEYS.indexOf(key) !== -1) return false;
+  return true;
+}
+
+// 构建列表展示字段白名单：模型字段 ∪ 必需字段；display_fields 非空时取交集
+function buildContentListFieldKeys(model = {}, modelFields = []) {
+  let displayFields = Array.isArray(model.display_fields) ? model.display_fields : [];
+  let limitByDisplay = displayFields.length > 0;
+  let keys = [];
+  let pushKey = (key) => {
+    if (!isSafeContentFieldKey(key)) return;
+    if (keys.indexOf(key) === -1) keys.push(key);
+  };
+  modelFields.forEach((field) => {
+    if (!field || typeof field.key !== 'string') return;
+    if (limitByDisplay && displayFields.indexOf(field.key) === -1) return;
+    pushKey(field.key);
+  });
+  CONTENT_LIST_REQUIRED_KEYS.forEach(pushKey);
+  return keys;
+}
+
+// 前端排序列 → 分组后累加器字段的映射；映射表外的字段回退默认排序
+function buildContentListSortArr(sortRule) {
+  let list = Array.isArray(sortRule) ? sortRule : [];
+  let sortArr = [];
+  list.forEach((item) => {
+    if (!item) return;
+    let type = item.type === 'asc' ? 'asc' : 'desc';
+    if (item.name === '_add_time') {
+      sortArr.push({ name: CONTENT_GROUP_KEY_PREFIX + 'add_time', type });
+    } else if (item.name === '_id') {
+      sortArr.push({ name: CONTENT_GROUP_KEY_PREFIX + 'id', type });
+    }
+  });
+  if (sortArr.length === 0) sortArr.push({ name: CONTENT_GROUP_KEY_PREFIX + 'id', type: 'desc' });
+  return sortArr;
+}
+
+// 单段聚合的分组结构：分组键 + 状态/时间/ID 累加器 + 展示字段的 $push 数组
+// $push 遇到字段缺失会跳过元素导致各数组下标错位，必须用 $ifNull 补 null 保证对齐
+function buildContentGroupJson(fieldKeys = []) {
+  let groupJson = {
+    _id: { document_id: '$document_id', locale: { $ifNull: ['$locale', ''] } },
+  };
+  groupJson[CONTENT_GROUP_KEY_PREFIX + 'status'] = { $max: '$status' };
+  groupJson[CONTENT_GROUP_KEY_PREFIX + 'add_time'] = { $max: '$_add_time' };
+  groupJson[CONTENT_GROUP_KEY_PREFIX + 'id'] = { $max: '$_id' };
+  fieldKeys.forEach((key) => {
+    groupJson[CONTENT_VALUE_KEY_PREFIX + key] = { $push: { $ifNull: ['$' + key, null] } };
+  });
+  return groupJson;
+}
+
+// 统一时间比较口径（兼容数字时间戳、Date、数字字符串）
+function getContentSortValue(value) {
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string' && value.trim() !== '' && !isNaN(Number(value))) return Number(value);
+  return 0;
+}
+
+// a 是否比 b 更新（_add_time 降序，_id 兜底）
+function isLaterContentRow(timeA, idA, timeB, idB) {
+  if (timeB === undefined || timeB === null) return true;
+  let sortA = getContentSortValue(timeA);
+  let sortB = getContentSortValue(timeB);
+  if (sortA > sortB) return true;
+  if (sortA === sortB) return String(idA || '') > String(idB || '');
+  return false;
+}
+
+// 分组结果拍平成原始行结构：已发布优先，其次草稿，均取最新一条
+function flattenContentListGroupRows(rows = [], fieldKeys = []) {
+  let result = [];
+  rows.forEach((group) => {
+    if (!group) return;
+    let statusArr = group[CONTENT_VALUE_KEY_PREFIX + 'status'] || [];
+    let timeArr = group[CONTENT_VALUE_KEY_PREFIX + '_add_time'] || [];
+    let idArr = group[CONTENT_VALUE_KEY_PREFIX + '_id'] || [];
+    let publishedIndex = -1;
+    let draftIndex = -1;
+    for (let i = 0; i < statusArr.length; i++) {
+      if (statusArr[i] === true) {
+        if (publishedIndex === -1 || isLaterContentRow(timeArr[i], idArr[i], timeArr[publishedIndex], idArr[publishedIndex])) publishedIndex = i;
+      } else if (statusArr[i] === false) {
+        if (draftIndex === -1 || isLaterContentRow(timeArr[i], idArr[i], timeArr[draftIndex], idArr[draftIndex])) draftIndex = i;
+      }
+    }
+    let pickIndex = publishedIndex !== -1 ? publishedIndex : draftIndex;
+    if (pickIndex === -1) pickIndex = 0;
+    let row = {};
+    fieldKeys.forEach((key) => {
+      let valueArr = group[CONTENT_VALUE_KEY_PREFIX + key];
+      row[key] = Array.isArray(valueArr) ? valueArr[pickIndex] : undefined;
+    });
+    // 分组键兜底，保证 document_id / locale 与分组结果一致
+    row.document_id = group._id ? group._id.document_id : row.document_id;
+    if (group._id && group._id.locale) {
+      row.locale = group._id.locale;
+    } else if (row.locale !== undefined) {
+      delete row.locale;
+    }
+    result.push(row);
+  });
+  return result;
+}
+
+// 按 key 读取内容模型（含 draft / type / display_fields）
+async function loadContentListModel(modelKey) {
+  if (vk.pubfn.isNull(modelKey)) return null;
+  return await vk.baseDao.select({
+    dbName: dbName.model,
+    whereJson: { key: modelKey },
+    getOne: true,
+    getMain: true,
+  });
+}
+
+// 原有列表查询逻辑（非草稿箱模型 / 非集合模型 / 无法定位模型时保持原行为）
+async function getContentListLegacy(data, locale, status) {
+  let andArr = [];
+  if (vk.pubfn.isNotNull(locale)) {
+    andArr.push({ locale });
+  }
+  if (status !== undefined && status !== null) {
+    andArr.push({ status });
+  }
+  return await vk.baseDao.getTableData({
+    dbName: dbName.content,
+    data,
+    whereJson: andArr.length > 0 ? _.and(andArr) : {},
+  });
+}
+
 // 必填字段判空（false / 0 视为有效值）
 function isFieldValueEmpty(field = {}, value) {
   if (vk.pubfn.isNull(value)) return true;
@@ -124,8 +280,8 @@ function getFieldValueError({ field = {}, value }) {
   if (type === 'file-select') {
     return typeof value === 'string' || Array.isArray(value) ? null : `字段「${title}」必须为字符串或数组`;
   }
-  if (type === 'date' || type === 'datetime') {
-    return typeof value === 'string' || typeof value === 'number' ? null : `字段「${title}」必须为日期字符串或时间戳`;
+  if (type === 'date' || type === 'datetime' || type === 'time') {
+    return typeof value === 'string' || typeof value === 'number' ? null : `字段「${title}」必须为日期/时间字符串或时间戳`;
   }
   if (type === 'text' || type === 'textarea' || type === 'editor' || type === 'color' || type === 'relation' || type === 'remote-select') {
     return typeof value === 'string' ? null : `字段「${title}」必须为字符串`;
@@ -312,24 +468,67 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo(); // 获取客户端信息
     // 业务逻辑开始-----------------------------------------------------------
-    const { locale, status } = data.query || {};
+    const query = data.query || {};
+    const { locale, status } = query;
+
+    // 后台列表默认返回全部状态（含未发布/草稿）；双记录模型下同一 document_id 可能出现草稿、已发布两行，
+    // 需要只看某一状态时传 query.status（true 已发布 / false 草稿）
+    if (status !== undefined && status !== null && typeof status !== 'boolean') {
+      return { code: -1, msg: 'status 必须为布尔值' };
+    }
+
+    // 前端已明确标记为非草稿箱模型（buildTableConfig 会带 query.draft），直接走原查询路径，避免多查一次模型
+    if (query.draft === false) {
+      return await getContentListLegacy(data, locale, status);
+    }
+
+    // 只有「集合类型 + 开启草稿箱」的模型才需要把草稿/已发布两条记录合并为一行
+    const modelKey = (data.formData || {}).model_key;
+    const modelInfo = await loadContentListModel(modelKey);
+    if (!modelInfo || modelInfo.draft !== true || modelInfo.type !== 'collection') {
+      return await getContentListLegacy(data, locale, status);
+    }
+
+    // 字段白名单：模型字段 ∩ display_fields，再补齐行操作必需字段
+    const modelFields = await loadModelFields({ model_key: modelKey });
+    const fieldKeys = buildContentListFieldKeys(modelInfo, modelFields);
+    const sortArr = buildContentListSortArr(data.sortRule);
 
     let andArr = [];
     if (vk.pubfn.isNotNull(locale)) {
       andArr.push({ locale });
     }
-    // 后台列表默认返回全部状态（含未发布/草稿）；双记录模型下同一 document_id 可能出现草稿、已发布两行，
-    // 需要只看某一状态时传 query.status（true 已发布 / false 草稿）
-    if (status !== undefined && status !== null) {
-      if (typeof status !== 'boolean') return { code: -1, msg: 'status 必须为布尔值' };
-      andArr.push({ status });
+    // 分组前必须锁定模型，避免调用方未传 columns 时把其他模型的内容一起聚合进来
+    andArr.push({ model_key: modelKey });
+
+    // data 内的 sortRule / lastSortRule / getCount 会覆盖顶层同名参数，聚合路径必须剔除
+    let tableData = Object.assign({}, data);
+    delete tableData.sortRule;
+    delete tableData.lastSortRule;
+    delete tableData.getCount;
+
+    let options = {
+      dbName: dbName.content,
+      data: tableData,
+      whereJson: andArr.length > 0 ? _.and(andArr) : {},
+      groupJson: buildContentGroupJson(fieldKeys),
+      sortArr,
+      // 有 groupJson 时 getTableData 默认关闭计数，分页依赖 total，必须显式开启
+      getCount: true,
+    };
+
+    // status 不能进分组前 match（否则草稿组会整体消失），只能在分组后过滤；
+    // 同时必须给非空的 lastSortArr，否则 skip/limit 会提前到过滤之前执行
+    if (status === true || status === false) {
+      let lastWhereJson = {};
+      lastWhereJson[CONTENT_GROUP_KEY_PREFIX + 'status'] = status;
+      options.lastWhereJson = lastWhereJson;
+      options.lastSortArr = sortArr;
     }
 
-    res = await vk.baseDao.getTableData({
-      dbName: dbName.content,
-      data,
-      whereJson: andArr.length > 0 ? _.and(andArr) : {},
-    });
+    res = await vk.baseDao.getTableData(options);
+    // 分组结果拍平回原始行结构，表格列渲染、编辑跳转、删除（依赖 _id）均无需改动
+    res.rows = flattenContentListGroupRows(res.rows, fieldKeys);
     // 业务逻辑结束-----------------------------------------------------------
     return res;
   },
@@ -643,7 +842,8 @@ const cloudObject = {
     return res;
   },
   /**
-   * 供远程下拉等场景使用的公开只读接口：按模型返回内容列表
+   * 供远程下拉等场景使用的只读接口：按模型返回「已发布」内容列表
+   * 可见性由接口固定为 status: true，调用方无法通过参数改变，避免未发布内容对外泄露
    * 动态区块字段原样透出块数组，消费端据 __component 逐块渲染，后台不做任何加工与清洗
    * @url admin/cms/sys.content.pubGetContent 前端调用的url参数地址
    */
@@ -651,14 +851,19 @@ const cloudObject = {
     let res = { code: 0, msg: '' };
     let { uid } = this.getClientInfo();
     // 业务逻辑开始-----------------------------------------------------------
-    let paramData = data.data || {};
-    let { model_key } = paramData;
+    // 请求体由 vk-data-input-remote-select 直接以 actionData 扁平传入，不能再取 data.data
+    let { model_key } = data;
+
+    // 只接受 true 或不传；其它值（含历史调用方传的 'all'）直接拒绝，避免误以为可以改变可见性
+    if (data.status !== undefined && data.status !== null && data.status !== true) {
+      return { code: -1, msg: 'pubGetContent 仅返回已发布内容，不支持自定义 status' };
+    }
 
     if (vk.pubfn.isNull(model_key)) return { code: -1, msg: '参数错误' };
 
     // 分页参数：默认取前 100 条，允许调用方指定，最大 500
-    let pageIndex = Number(paramData.pageIndex) > 0 ? Number(paramData.pageIndex) : 1;
-    let pageSize = Number(paramData.pageSize) > 0 ? Math.min(Number(paramData.pageSize), 500) : 100;
+    let pageIndex = Number(data.pageIndex) > 0 ? Number(data.pageIndex) : 1;
+    let pageSize = Number(data.pageSize) > 0 ? Math.min(Number(data.pageSize), 500) : 100;
 
     // 该模型的动态区块字段（仅这些字段需要额外透出块数组，其余字段维持 value/label 契约不变）
     let fieldRes = await vk.baseDao.select({
@@ -682,6 +887,7 @@ const cloudObject = {
       pageSize,
       whereJson: {
         model_key,
+        // 固定过滤：无论调用方传什么，都只返回已发布内容
         status: true,
       },
       fieldJson,
@@ -699,6 +905,93 @@ const cloudObject = {
       list.push(option);
     }
     res.list = list;
+    // 业务逻辑结束-----------------------------------------------------------
+    return res;
+  },
+  /**
+   * 后台关联字段专用选项接口：按模型返回草稿 + 已发布内容，供关联选择使用
+   * 与 pubGetContent（固定只返回已发布）不同，本接口仅在后台登录态下使用，可见草稿
+   * 双记录模型下同一 document_id 会同时存在草稿行与发布行，按 document_id 去重后只返回一个选项；
+   * 选项的 label / value 字段由调用方按字段配置传入，未配置时使用默认规则（见下）
+   * @url admin/cms/sys.content.getRelationOptions 前端调用的url参数地址
+   */
+  getRelationOptions: async function (data) {
+    let res = { code: 0, msg: '' };
+    let { uid } = this.getClientInfo();
+    // 业务逻辑开始-----------------------------------------------------------
+    let { model_key } = data;
+
+    if (vk.pubfn.isNull(model_key)) return { code: -1, msg: '参数错误' };
+
+    // 分页参数：默认取前 500 条原始行，允许调用方指定，最大 500
+    let pageIndex = Number(data.pageIndex) > 0 ? Number(data.pageIndex) : 1;
+    let pageSize = Number(data.pageSize) > 0 ? Math.min(Number(data.pageSize), 500) : 500;
+
+    // 该模型全部字段定义：既用于透出动态区块，也作为 label / value 字段名的白名单来源
+    let fieldRes = await vk.baseDao.select({
+      dbName: dbName.modelField,
+      pageSize: -1,
+      whereJson: { model_key },
+    });
+    let modelFields = fieldRes.rows || [];
+    let dynamicZoneKeys = modelFields.filter((f) => f.type === 'dynamiczone').map((f) => f.key);
+
+    // 选项字段白名单：内容系统字段 + 当前模型已定义字段，禁止把任意字段名拼进查询
+    let optionKeyWhitelist = ['_id', 'document_id', 'title', 'status', 'locale', '_add_time'];
+    modelFields.forEach((f) => {
+      if (optionKeyWhitelist.indexOf(f.key) === -1) optionKeyWhitelist.push(f.key);
+    });
+
+    // 默认规则：label 优先 title（模型无 title 字段时回退 _id）；value 回退 _id
+    let hasTitleField = modelFields.some((f) => f.key === 'title');
+    let labelKey = vk.pubfn.isNotNull(data.label) ? data.label : hasTitleField ? 'title' : '_id';
+    let valueKey = vk.pubfn.isNotNull(data.value) ? data.value : '_id';
+
+    if (typeof labelKey !== 'string' || optionKeyWhitelist.indexOf(labelKey) === -1) {
+      return { code: -1, msg: `关联显示字段「${labelKey}」不在允许范围内` };
+    }
+    if (typeof valueKey !== 'string' || optionKeyWhitelist.indexOf(valueKey) === -1) {
+      return { code: -1, msg: `关联取值字段「${valueKey}」不在允许范围内` };
+    }
+
+    // 字段白名单：去重所需的 document_id / status，以及配置的 label / value 字段
+    let fieldJson = { _id: true, document_id: true, status: true };
+    fieldJson[labelKey] = true;
+    fieldJson[valueKey] = true;
+    dynamicZoneKeys.forEach((key) => {
+      fieldJson[key] = true;
+    });
+
+    let selectRes = await vk.baseDao.selects({
+      dbName: dbName.content,
+      pageIndex,
+      pageSize,
+      // 后台选项不做 status 过滤：草稿也要能被关联选中
+      whereJson: { model_key },
+      fieldJson,
+      sortArr: [{ name: '_add_time', type: 'desc' }],
+    });
+
+    // 按 document_id 合并草稿/发布两行；已发布行优先作为展示行
+    let optionMap = {};
+    let optionOrder = [];
+    (selectRes.rows || []).forEach((item) => {
+      let dedupeKey = item.document_id || item._id;
+      let existing = optionMap[dedupeKey];
+      // 已存在选项时，仅当当前行为已发布行才覆盖（发布行是逻辑文档的对外权威版本）
+      if (existing && item.status !== true) return;
+      // 配置字段为空或不存在时回退 _id，保证选项始终可展示、可选中
+      let label = vk.pubfn.isNull(item[labelKey]) ? item._id : item[labelKey];
+      let value = vk.pubfn.isNull(item[valueKey]) ? item._id : item[valueKey];
+      let option = { value: value, label: label };
+      dynamicZoneKeys.forEach((key) => {
+        if (item[key] !== undefined) option[key] = item[key];
+      });
+      optionMap[dedupeKey] = option;
+      if (!existing) optionOrder.push(dedupeKey);
+    });
+
+    res.list = optionOrder.map((dedupeKey) => optionMap[dedupeKey]);
     // 业务逻辑结束-----------------------------------------------------------
     return res;
   },

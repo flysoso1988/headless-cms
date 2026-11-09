@@ -42,19 +42,19 @@
           {
             "menu_id": "vk-error-403",
             "name": "403",
-            "url": "/pages_plugs/error/403",
+            "url": "/pages/error/403",
             "hidden_tab": true
           },
           {
             "menu_id": "vk-error-404",
             "name": "404",
-            "url": "/pages_plugs/error/404",
+            "url": "/pages/error/404",
             "hidden_tab": true
           },
           {
             "menu_id": "vk-error-500",
             "name": "500",
-            "url": "/pages_plugs/error/500",
+            "url": "/pages/error/500",
             "hidden_tab": true
           }
         ]

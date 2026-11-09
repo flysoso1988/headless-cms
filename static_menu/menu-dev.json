@@ -385,19 +385,19 @@
             "menu_id": "__demo__error-403",
             "name": "403",
             "icon": "",
-            "url": "/pages_plugs/error/403"
+            "url": "/pages/error/403"
           },
           {
             "menu_id": "__demo__error-404",
             "name": "404",
             "icon": "",
-            "url": "/pages_plugs/error/404"
+            "url": "/pages/error/404"
           },
           {
             "menu_id": "__demo__error-500",
             "name": "500",
             "icon": "",
-            "url": "/pages_plugs/error/500"
+            "url": "/pages/error/500"
           }
         ]
       },

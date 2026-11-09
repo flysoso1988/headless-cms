@@ -110,7 +110,7 @@
               if (!data.info || data.info.appid !== systemInfo.appId) {
                 vk.confirm(`您当前登录的应用【${systemInfo.appId}】未在已有应用列表中，是否需要去添加？`, '提示', '前往应用管理', '取消', (res) => {
                   if (res.confirm) {
-                    vk.navigateTo('/pages_plugs/system/app/list');
+                    vk.navigateTo('/pages/system/app/list');
                   }
                 });
               }

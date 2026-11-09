@@ -33,6 +33,7 @@
       "bsonType": "string",
       "title": "字段类型",
       "defaultValue": "text",
+      "description": "可选类型与字段编辑页的类型下拉、内容表单的渲染映射（common/function/myPubFunction.js 的 cmsFieldTypeMap）保持一致：能选就能存、能存就能渲染",
       "enum": [
         { "value": "text", "text": "单行文本" },
         { "value": "textarea", "text": "多行文本" },
@@ -44,13 +45,12 @@
         { "value": "file-select", "text": "文件选择" },
         { "value": "date", "text": "日期" },
         { "value": "datetime", "text": "日期时间" },
+        { "value": "time", "text": "时间" },
         { "value": "color", "text": "颜色" },
         { "value": "editor", "text": "富文本" },
         { "value": "relation", "text": "关联模型" },
-        { "value": "remote-select", "text": "远程选择" },
         { "value": "json", "text": "JSON" },
-        { "value": "dynamiczone", "text": "动态区块" },
-        { "value": "component", "text": "组件" }
+        { "value": "dynamiczone", "text": "动态区块" }
       ]
     },
     "data": {
@@ -133,7 +133,7 @@
     "settings": {
       "bsonType": "object",
       "title": "字段配置",
-      "description": "按字段类型存放的类型专属配置，如动态区块字段的允许组件集合 settings.components",
+      "description": "按字段类型存放的类型专属配置，如动态区块字段的允许组件集合 settings.components、关联字段的选项字段 settings.label / settings.value",
       "properties": {
         "components": {
           "bsonType": "array",
@@ -142,6 +142,16 @@
           "items": {
             "bsonType": "string"
           }
+        },
+        "label": {
+          "bsonType": "string",
+          "title": "关联显示字段",
+          "description": "关联选项展示所用的目标模型字段标识，如 title；未配置时优先 title，目标模型无 title 时回退 _id"
+        },
+        "value": {
+          "bsonType": "string",
+          "title": "关联取值字段",
+          "description": "关联选项选中值所用的目标模型字段标识，如 _id；未配置时回退 _id"
         }
       }
     },

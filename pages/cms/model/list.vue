@@ -136,6 +136,10 @@
       label: '日期时间',
     },
     {
+      value: 'time',
+      label: '时间',
+    },
+    {
       value: 'color',
       label: '颜色',
     },
@@ -144,8 +148,8 @@
       label: '富文本',
     },
     {
-      value: 'remote-select',
-      label: '远程选择',
+      value: 'relation',
+      label: '关联模型',
     },
     {
       value: 'json',
@@ -154,10 +158,6 @@
     {
       value: 'dynamiczone',
       label: '动态区块',
-    },
-    {
-      value: 'component',
-      label: '组件',
     },
   ];
   export default {

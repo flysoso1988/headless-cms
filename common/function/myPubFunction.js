@@ -13,6 +13,7 @@ myfn.test1 = function (obj = {}) {
 };
 
 // CMS 内容模型字段类型 → 万能表格/万能表单组件类型的映射
+// 与 vk-cms-model-field.schema.json 的 type 枚举、字段编辑页的类型下拉保持一致
 let cmsFieldTypeMap = {
   text: 'text',
   textarea: 'textarea',
@@ -23,14 +24,14 @@ let cmsFieldTypeMap = {
   select: 'select',
   'file-select': 'file-select',
   date: 'date',
-  datetime: 'datetime',
+  // 万能表单没有 datetime 组件，日期时间用 date + dateType=datetime 渲染
+  datetime: 'date',
+  time: 'time',
   color: 'color',
   editor: 'editor',
-  'remote-select': 'remote-select',
   relation: 'remote-select',
   json: 'json',
   dynamiczone: 'dynamiczone',
-  component: 'component',
 };
 
 /**
@@ -84,14 +85,15 @@ myfn.buildTableConfig = function (options = {}) {
     } else if (formType === 'number') {
       col.type = 'number';
       col.width = 100;
+    } else if (f.type === 'datetime') {
+      // 日期时间必须先于 date 判断：datetime 同样映射为 date 组件
+      col.type = 'time';
+      col.valueFormat = 'yyyy-MM-dd hh:mm:ss';
+      col.width = 160;
     } else if (formType === 'date') {
       col.type = 'date';
       col.valueFormat = 'yyyy-MM-dd';
       col.width = 110;
-    } else if (formType === 'datetime') {
-      col.type = 'time';
-      col.valueFormat = 'yyyy-MM-dd hh:mm:ss';
-      col.width = 160;
     } else if (formType === 'dynamiczone') {
       // 动态区块：表格侧渲染为「N 个区块」摘要列
       col.type = 'custom';
@@ -143,14 +145,14 @@ myfn.buildTableConfig = function (options = {}) {
 
 /**
  * 生成内容管理的万能表单配置（表单列、校验规则）
- * vk.myfn.buildFormConfig({ model, contentPubAction });
+ * vk.myfn.buildFormConfig({ model, contentRelationAction });
  * @param {Object} options
  * @param {Object} options.model 内容模型（含 fields 字段配置）
- * @param {String} options.contentPubAction 关联内容远程下拉的数据源接口
+ * @param {String} options.contentRelationAction 关联字段远程下拉的数据源接口（后台选项接口，含草稿）
  * @returns {Object} { columns, rules }；model 为空时返回空配置
  */
 myfn.buildFormConfig = function (options = {}) {
-  let { model, contentPubAction = 'admin/cms/sys.content.pubGetContent' } = options;
+  let { model, contentRelationAction = 'admin/cms/sys.content.getRelationOptions' } = options;
   if (!model || !model._id) return { columns: [], rules: {} };
   let fields = model.fields || [];
   let formCols = []; // 表单列
@@ -182,6 +184,8 @@ myfn.buildFormConfig = function (options = {}) {
       col.placeholder = (f.settings && f.settings.placeholder) || '开始输入...';
     }
     if (formType === 'textarea' && f.settings && f.settings.rows) col.rows = f.settings.rows;
+    // 日期时间字段：万能表单没有 datetime 组件，使用 date + dateType=datetime 渲染
+    if (f.type === 'datetime') col.dateType = 'datetime';
     if (f.default_value !== undefined && f.default_value !== null && f.default_value !== '') col.defaultValue = f.default_value;
     // 下拉/单选/多选：选项数据与多选设置
     if (formType === 'select' || formType === 'radio' || formType === 'checkbox') {
@@ -199,10 +203,14 @@ myfn.buildFormConfig = function (options = {}) {
       if (!(f.relation || (f.settings && f.settings.ref_model_key))) {
         col.type = 'text';
       } else {
-        col.action = contentPubAction;
+        col.action = contentRelationAction;
         col.showAll = true;
-        col.actionData = { model_key: f.relation || (f.settings && f.settings.ref_model_key), status: 'all' };
-        if (f.settings && f.settings.multiple) col.multiple = true;
+        // 后台选项接口返回草稿 + 已发布内容，选项字段由字段配置 settings.label / settings.value 决定
+        let relationSettings = f.settings || {};
+        col.actionData = { model_key: f.relation || relationSettings.ref_model_key };
+        if (vk.pubfn.isNotNull(relationSettings.label)) col.actionData.label = relationSettings.label;
+        if (vk.pubfn.isNotNull(relationSettings.value)) col.actionData.value = relationSettings.value;
+        if (relationSettings.multiple) col.multiple = true;
       }
     }
     // 显示条件已在上方统一设置

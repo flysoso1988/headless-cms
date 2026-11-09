@@ -101,13 +101,13 @@
                   { value: 'select', label: '下拉选择' },
                   { value: 'file-select', label: '媒体选择' },
                   { value: 'date', label: '日期选择' },
+                  { value: 'datetime', label: '日期时间' },
                   { value: 'time', label: '时间选择' },
                   { value: 'color', label: '颜色' },
                   { value: 'editor', label: '富文本' },
                   { value: 'relation', label: '关联模型' },
                   { value: 'json', label: 'JSON' },
                   { value: 'dynamiczone', label: '动态区块' },
-                  // { value: 'component', label: '组件' },
                 ],
               },
               // 选择类配置
@@ -154,6 +154,24 @@
                 props: { list: 'rows', value: 'key', label: 'name' },
                 showAll: true,
                 actionData: { type: 'collection' },
+              },
+              // 关联字段选项配置：写入字段 settings 通道（settings.label / settings.value）
+              // showRule 必须读取表单当前值（formData.type），且用函数式写法，切换字段类型时随渲染实时显隐
+              {
+                key: 'relation_label',
+                title: '显示字段',
+                type: 'text',
+                placeholder: '关联选项展示的字段标识，如 title；留空默认 title（无则 _id）',
+                span: 12,
+                showRule: (formData) => formData.type === 'relation',
+              },
+              {
+                key: 'relation_value',
+                title: '取值字段',
+                type: 'text',
+                placeholder: '选中值用的字段标识，如 _id；留空默认 _id',
+                span: 12,
+                showRule: (formData) => formData.type === 'relation',
               },
               { key: 'default_value', title: '默认值', type: 'text', placeholder: '该字段的默认值，可留空', span: 12, showRule: (formData) => formData.type !== 'dynamiczone' },
               // 动态区块配置：允许的组件集合（来源为组件类型模型）
@@ -221,14 +239,17 @@
           this.page.title = '添加字段';
           this.page.submitText = '添加';
         }
-        console.log('form:', this.form1.data);
-        console.log(item);
-        this.form1.data = vk.pubfn.objectAssign(this.form1.data, item);
+        // 注意：必须用「新对象」整体替换 form1.data，再交由 Vue 重新 observe。
+        // 若直接在已有响应式对象上 Object.assign 追加 item 的键（如 type），Vue2 不会为新增键建立 getter/setter，
+        // 之后下拉框选中的值虽然写进了对象，但不会触发视图更新，表现为「字段类型改不动」。
+        this.form1.data = vk.pubfn.objectAssign(vk.pubfn.copyObject(this.form1.data), vk.pubfn.copyObject(item));
         // 允许的组件集合存放在字段 settings 通道（settings.components），表单上用扁平 components 编辑
         let components = item.settings && Array.isArray(item.settings.components) ? item.settings.components : [];
         this.$set(this.form1.data, 'components', components);
-
-        console.log('form1:', this.form1.data);
+        // 关联字段的选项字段配置存放在 settings 通道（settings.label / settings.value），表单上用扁平字段编辑
+        let settings = item.settings || {};
+        this.$set(this.form1.data, 'relation_label', settings.label || '');
+        this.$set(this.form1.data, 'relation_value', settings.value || '');
       },
       // 监听 - 页面关闭
       onClose() {
@@ -251,7 +272,26 @@
             components: Array.isArray(formData.components) ? formData.components : [],
           });
         }
+        // 关联字段的选项字段配置写入字段 settings 通道（label 显示字段 / value 取值字段）
+        // 注意：非 relation 类型必须清掉这两项，避免切换字段类型后把无用配置残留进数据库
+        if (formData.type === 'relation') {
+          let settings = Object.assign({}, formData.settings);
+          let relationLabel = typeof formData.relation_label === 'string' ? formData.relation_label.trim() : '';
+          let relationValue = typeof formData.relation_value === 'string' ? formData.relation_value.trim() : '';
+          if (relationLabel) settings.label = relationLabel;
+          else delete settings.label;
+          if (relationValue) settings.value = relationValue;
+          else delete settings.value;
+          formData.settings = settings;
+        } else if (formData.settings) {
+          let settings = Object.assign({}, formData.settings);
+          delete settings.label;
+          delete settings.value;
+          formData.settings = settings;
+        }
         delete formData.components;
+        delete formData.relation_label;
+        delete formData.relation_value;
         return formData;
       },
       // 表单重置
