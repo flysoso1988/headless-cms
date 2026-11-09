@@ -6,14 +6,14 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">菜单列表</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加菜单</el-button>
+          <el-button type="primary" icon="el-icon-plus" :size="$global.size" @click="addBtn">添加菜单</el-button>
           <el-tooltip :disabled="!!table1.selectItem" content="请先点击需要操作的菜单" placement="top">
-            <el-button type="success" icon="el-icon-key" :disabled="!table1.selectItem" @click="bindPermissionBtn">设置内置权限</el-button>
+            <el-button type="success" icon="el-icon-key" :size="$global.size" :disabled="!table1.selectItem" @click="bindPermissionBtn">设置内置权限</el-button>
           </el-tooltip>
-          <el-button icon="el-icon-upload2" @click="addMenuByJsonBtn">通过JSON批量导入</el-button>
-          <el-button icon="el-icon-data-line" @click="initVkStatBtn">初始化vk统计</el-button>
+          <el-button icon="el-icon-upload2" :size="$global.size" @click="addMenuByJsonBtn">通过JSON批量导入</el-button>
+          <el-button icon="el-icon-data-line" :size="$global.size" @click="initVkStatBtn">初始化vk统计</el-button>
           <el-badge v-if="pluginMenus && pluginMenus.length > 0" :value="pluginMenus.length" class="item">
-            <el-button type="warning" icon="el-icon-plus" style="margin-right: 0" @click="addPluginMenuMenu">待添加的插件菜单</el-button>
+            <el-button type="warning" icon="el-icon-plus" :size="$global.size" style="margin-right: 0" @click="addPluginMenuMenu">待添加的插件菜单</el-button>
           </el-badge>
         </div>
       </div>

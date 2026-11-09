@@ -16,11 +16,11 @@
         <div class="vk-page-card-title">用户列表</div>
         <!-- 右侧操作栏 -->
         <div class="vk-page-card-actions">
-          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加用户</el-button>
+          <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加用户</el-button>
           <el-tooltip :disabled="!!table1.selectItem" content="请先点击需要操作的用户" placement="top">
-            <el-button type="warning" icon="el-icon-user" :disabled="!table1.selectItem" @click="bindRoleBtn()">绑定角色</el-button>
+            <el-button type="warning" :size="$global.size" icon="el-icon-user" :disabled="!table1.selectItem" @click="bindRoleBtn()">绑定角色</el-button>
           </el-tooltip>
-          <el-button icon="el-icon-download" @click="exportExcel">导出Excel</el-button>
+          <el-button icon="el-icon-download" :size="$global.size" @click="exportExcel">导出Excel</el-button>
         </div>
       </div>
 

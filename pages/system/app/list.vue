@@ -11,7 +11,7 @@
       <div class="vk-page-card-toolbar">
         <div class="vk-page-card-title">应用列表</div>
         <div class="vk-page-card-actions">
-          <el-button type="primary" icon="el-icon-plus" @click="addBtn">添加应用</el-button>
+          <el-button type="primary" icon="el-icon-plus" :size="$global.size" @click="addBtn">添加应用</el-button>
         </div>
       </div>
 

@@ -1,17 +1,5 @@
 <template>
   <view>
-    <!-- 搜索区域卡片 -->
-    <!-- <view class="vk-page-card vk-page-search-card">
-      <vk-data-table-query
-        v-model="queryForm1.formData"
-        :columns="queryForm1.columns"
-        :span="3"
-        :collapse-rows="1"
-        :collapse-default-expand="true"
-        @search="search"
-        @collapse-change="collapseChange"
-      ></vk-data-table-query>
-    </view> -->
     <!-- 表格内容卡片 -->
     <view class="vk-page-card">
       <!-- 操作按钮与表格标题区域 -->
@@ -21,15 +9,6 @@
         <!-- 右侧操作栏 -->
         <view class="vk-page-card-actions">
           <el-button type="primary" :size="$global.size" icon="el-icon-plus" @click="addBtn">添加</el-button>
-          <!-- <el-dropdown v-if="table1.multipleSelection" :split-button="false" trigger="click" @command="batchBtn">
-            <el-button type="danger" :size="$global.size" style="margin-left: 20rpx" :disabled="table1.multipleSelection.length === 0">
-              批量操作<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item :command="1">批量操作1</el-dropdown-item>
-              <el-dropdown-item :command="2">批量操作2</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown> -->
         </view>
       </view>
 
